@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import StationPage from '../components/StationPage.astro';
+import { getStations, HOME_ID } from '../lib/stations';
+
+// One real, static HTML page per station: /work/elancer/, /poetry/poem-i/, ...
+// The home station (me/about) lives at "/" instead.
+export async function getStaticPaths() {
+  const stations = await getStations();
+  return stations
+    .filter((s) => s.id !== HOME_ID)
+    .map((station) => ({ params: { slug: station.id }, props: { station, stations } }));
+}
+
+const { station, stations } = Astro.props;
+const { data } = station;
+---
+
+<Base
+  title={`${data.title} · Ahmed Hamdan`}
+  description={data.lede ?? `${data.kicker ?? data.band} · Ahmed Hamdan, cybersecurity graduate and full-stack developer.`}
+>
+  <StationPage station={station} stations={stations} />
+</Base>

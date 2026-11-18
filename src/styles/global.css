@@ -1,0 +1,124 @@
+/* Tokens from the approved reference mock (docs/design/reference/g-radio-wall.html).
+   Seven-segment world: matte black ground, red LED segments, unlit ghost cells, one amber accent. */
+
+@font-face {
+  font-family: 'DSEG7';
+  src: url('/fonts/DSEG7Classic-Bold.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'DSEG14';
+  src: url('/fonts/DSEG14Classic-Bold.woff2') format('woff2');
+  font-display: block;
+}
+
+:root {
+  --ground: #121110;
+  --case: #211d1a;
+  --lit: #ff3b1f; /* lit LED segment, primary accent */
+  --ghost: #2b1915; /* unlit segment: decorative only, always aria-hidden */
+  --amber: #ffb000; /* lock, AFC, focus ring */
+  --text: #e6dad3;
+  --label: #c2b3ab;
+  --quiet: #9a8c85;
+  --dimlabel: #9a7a70;
+  --rubber: #24211f;
+  --rule: #2a2725;
+
+  --font-ui: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-seg7: 'DSEG7', ui-monospace, monospace;
+  --font-seg14: 'DSEG14', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--ground);
+  color: var(--label);
+  font-family: var(--font-ui);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  min-height: 100dvh;
+}
+::selection {
+  background: var(--lit);
+  color: #000;
+}
+a {
+  color: inherit;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Seven/fourteen-segment readout: ghost cells under lit cells.
+   Ghost "~" lights every segment; "!" is a blank cell of the same width. */
+.seg {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  white-space: pre;
+}
+.seg .g {
+  color: var(--ghost);
+}
+.seg .l {
+  position: absolute;
+  inset: 0;
+  color: var(--lit);
+}
+
+/* Shared label styles */
+.k {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  color: var(--lit);
+}
+.draft {
+  display: inline-block;
+  margin-left: 12px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  vertical-align: middle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

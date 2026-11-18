@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="No signal · Ahmed Hamdan" description="Nothing is broadcasting on this frequency.">
+  <main class="nosig">
+    <p class="seg readout" aria-hidden="true"><span class="g">~~~~~~~~~</span><span class="l">NO!SIGNAL</span></p>
+    <h1>Nothing is broadcasting here.</h1>
+    <p><a href="/">Back to the dial</a></p>
+  </main>
+</Base>
+
+<style>
+  .nosig {
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+  .readout {
+    font-family: var(--font-seg14);
+    font-size: clamp(28px, 7vw, 56px);
+    margin-inline: auto;
+  }
+  h1 {
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--text);
+  }
+  a {
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--amber);
+  }
+</style>

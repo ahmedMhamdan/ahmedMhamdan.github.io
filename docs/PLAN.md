@@ -1,0 +1,395 @@
+# 009 - Ahmed Hamdan Portfolio: "Transmission" Radio Site
+
+## How To Read This Plan
+
+This is the build plan for Ahmed Hamdan's portfolio at `ahmedmhamdan.github.io`. It is written for two readers: Ahmed, to understand the whole project and approve its choices, and a fresh coding session (terminal Codex or Claude Code), to implement it without any chat history.
+
+- **Status:** active. The direction, stack, hosting and scope were approved on 2026-11-18. Phase 0 (scaffold) is done. Ahmed has not yet reviewed this plan text line by line; if anything here contradicts what he says, his word wins and this file gets updated.
+- **Copies:** this file (`docs/PLAN.md`) is the working copy inside the repository. Ahmed's private planning vault keeps the same plan as plan 009.
+- **Still undecided:** the content Ahmed must supply (poems, photos, write-ups, links, music rights), the code licence, and the phone layout details. See Open Questions.
+- **Companion docs:** `docs/design/direction.md` (exact design and behaviour numbers), `docs/design/reference/g-radio-wall.html` (the approved interactive mock), `docs/CONTENT.md` (content inventory), `docs/DECISIONS.md`.
+
+## Executive Summary
+
+Ahmed wants a portfolio people remember after one visit. Most developer portfolios look alike; this one is a radio. On the left stands a full physical radio drawn in CSS: a seven-segment LED display, a five-row FM dial (88 to 108 MHz), a tuning knob, preset keys, a speaker and an antenna. On the right, a full-bleed LED wall reacts to the signal with a different animation for each band, above a content panel holding the text, photos and poems.
+
+You navigate by tuning. Each band is a section (ME, WORK, SECURITY, POETRY, CONTACT), and each printed station on the dial is a real page with its own URL. Between stations you hear static and see noise; on a station the signal locks, the text decodes out of the static, and the music in the "What I listen to" player plays through the radio, filtered while you tune and clear when locked.
+
+The implementation is a static Astro site with TypeScript. Every station is plain, readable HTML first (search engines, screen readers and no-JS visitors get everything); the radio, wall and audio are small framework-free scripts that enhance it. It deploys free to GitHub Pages, manually.
+
+## Problem And Context
+
+### Problem
+
+Ahmed is about to graduate in cybersecurity and works as a full-stack developer (Laravel + React). He needs one link to put on a CV, LinkedIn and applications (jobs, freelance clients, scholarships) that shows skill rather than listing it, carries his voice (including poetry), and makes contacting him easy.
+
+### Current State And Evidence
+
+- Repository `ahmedMhamdan/ahmedMhamdan.github.io` (public) holds the Phase 0 scaffold: Astro 7.4, a content collection with all 14 stations as Markdown (13 still marked placeholder), a readable baseline page per station, self-hosted fonts, CI, and a manual deploy workflow.
+- The approved design is an interactive single-file mock: `docs/design/reference/g-radio-wall.html`, with screenshots in `docs/design/screenshots/`. Ahmed's verdict on it: "kinda" good, start building. It was verified in a browser: tuning, lock, content decode, LED wall per band, music playback through the filter chain.
+- Real evidence for content: Elancer (bilingual Laravel + React marketplace, in progress); security coursework and labs; a team research paper on AI-assisted SQLi/XSS detection. No testimonials, clients, metrics or awards exist and none may be invented.
+
+### Why Now
+
+Graduation is close and applications are starting. A portfolio is needed before then, and the design direction is settled.
+
+## Goals And Success Measures
+
+### Goals
+
+1. A visitor understands within one screen who Ahmed is, what he builds, and how to reach him.
+2. The radio mechanic is memorable and works: tuning by knob, dial, keys, wheel and keyboard; lock, decode, static, wall and sound all react to one signal.
+3. Everything is readable and reachable without JavaScript, by keyboard, and with a screen reader.
+4. Light and fast on mid-range phones and weak connections.
+5. Ready for an Arabic (RTL) version later without a rewrite.
+
+### Non-Goals
+
+- No CMS, backend, database, accounts, comments, analytics or newsletter.
+- No blog or updates feed, no CTF hunt, no gaming channel content (all excluded by Ahmed for now).
+- No React or other UI framework runtime.
+- No redesign of the approved direction.
+
+### Measurable Success
+
+- Lighthouse (mobile) on the deployed site: Performance ≥ 90, Accessibility 100, Best Practices ≥ 95, SEO ≥ 95.
+- Initial JavaScript ≤ 40 KB gzip; total transfer for the home page ≤ 300 KB before any photo or audio.
+- Every station reachable by link and keyboard; zero axe violations on every page.
+- Zero placeholders live at launch (enforced by the deploy workflow).
+
+## Users And Stakeholders
+
+- **Recruiters and clients** (remote full-stack or security roles): scan fast; need the pitch, the work and contact in seconds.
+- **Scholarship and admissions committees:** read for the person and story; need the Story station and seriousness.
+- **Friends and poetry readers:** browse slowly; need the poems to be beautiful and readable.
+- **Ahmed:** owner, sole content author and decision maker.
+
+## User Journeys And Key Flows
+
+1. **Recruiter from a CV link** lands on `/` (ME · ABOUT, already tuned): name, one-line pitch, facts, two buttons: GET IN TOUCH (tunes to EMAIL) and SEE THE WORK (tunes to ELANCER). Time to contact: one click.
+2. **Explorer** grabs the knob and turns: the needle sweeps the five rows, static and a heterodyne whistle rise between stations, the LCD scrambles, the wall shows noise; resting near a station, AFC pulls it in, the TUNED lamp lights, a click plays, the panel content decodes, the wall switches to that band's animation, and the URL changes to the station page.
+3. **Keyboard user** presses 1 to 5 to jump to a band, ← → for the previous or next station; the knob is a focusable slider (arrows ±0.1 MHz, Page Up/Down next/previous station).
+4. **Shared link** to `/poetry/poem-i/` opens with the dial already on 100.7 and the poem showing; back and forward retune the dial.
+5. **Listener** presses play: the jazz track plays through the radio; DIAL FX makes tuning audible; the speaker cone pulses with the bass; the wall shows a small spectrum.
+6. **No-JS or screen-reader visitor** gets the same pages as plain HTML with real links for every station.
+
+## Scope
+
+### In Scope
+
+- Five bands, 14 stations: ME (About 88.7, Photos 90.1, Story 91.4), WORK (Elancer 92.9, Laravel 94.3, React 95.4), SECURITY (Lab notes 96.8, Research 98.6), POETRY (Poem I 100.7, Poem II 102.1, Poem III 103.3), CONTACT (Email 104.9, GitHub 106.3, LinkedIn 107.5). Frequencies may change; the build enforces spacing and band ranges.
+- The radio object, LED wall, content panel, music player and dial sound effects as in the reference mock.
+- Responsive layouts (desktop, tablet, phone), reduced motion, keyboard, screen-reader support.
+- SEO basics: titles, descriptions, canonical URLs, Open Graph image, sitemap, robots.txt.
+- Manual deployment to GitHub Pages.
+
+### Out Of Scope
+
+- Anything listed under Non-Goals.
+- Publishing the music before rights are confirmed.
+- Publishing coursework answers before deadlines, or lab material from systems Ahmed does not own.
+
+### Deferred
+
+- Arabic version (architecture ready from the start; translation and RTL layout later).
+- Custom domain.
+- More tracks in the player.
+- Case study pages beyond the station panel (Elancer "CASE STUDY · SOON").
+
+## Requirements
+
+### Functional Requirements
+
+- **FR-01 Station pages.** Every station is a static HTML page at `/<band>/<slug>/` (ME · ABOUT at `/`), generated from `src/content/stations/**`. Done in Phase 0.
+- **FR-02 Content model.** Station frontmatter is validated at build time: band, LED key (≤ 9 cells, A–Z 0–9 space), frequency inside its band, spacing ≥ 0.8 MHz from neighbours, alt text required with images, `placeholder` flag. Done in Phase 0; extended in Phase 1 for station-specific blocks (facts, actions, gallery).
+- **FR-03 Radio object.** The left column renders the radio from the mock: antenna, handle, piano preset keys, case with screws, LCD (FM, seven-segment frequency, 14-segment station key, TUNED and AFC lamps, 10-bar signal meter), dial window (five band rows, station marks, needle), name plate, speaker grille, tuning knob, seek buttons, volume knob.
+- **FR-04 Tuning.** Continuous frequency 88–108 MHz with eased motion, AFC snap and lock exactly as specified in `docs/design/direction.md` (Tuning model). Inputs: knob drag (one turn = 2 MHz), wheel on the dial or knob, preset keys and band keys, station marks, seek buttons, keyboard.
+- **FR-05 URL sync.** Locking a station pushes its URL; popstate retunes the dial; loading any station URL starts tuned to it.
+- **FR-06 Content panel.** On lock: content slides in, `[data-decode]` text decodes out of random characters over 600 ms, images pixel-resolve, static overlay fades with signal strength. Between stations (strength < 0.15): the idle panel "BETWEEN STATIONS · Turn the dial".
+- **FR-07 LED wall.** Full-bleed dot-matrix canvas behind the program area with per-band animations (ME name scroll, WORK bars and scan cursor, SECURITY firewall and packets, POETRY waves, CONTACT Morse "HELLO" and ping arcs), image billboard for stations with an image, noise between stations, pointer ripples, lock ripple, music spectrum.
+- **FR-08 Music player.** "What I listen to" player bottom-right: play/pause, 14-segment marquee title, time readout, DIAL FX toggle, volume knob on the radio. Hidden entirely when no track is configured.
+- **FR-09 Radio sound.** Web Audio graph with filtered music, static, heterodyne whistle and lock click, all reacting to signal strength and tuning speed (direction.md, Audio).
+- **FR-10 Physical feedback.** Speaker cone pulses with the music; antenna springs when tuning and lights its tip on lock; preset key for the active band stays pressed.
+- **FR-11 Contact.** Email, GitHub and LinkedIn stations with real links (`rel="me"`), copyable email.
+- **FR-12 Poems.** Each poem station is a designed piece: typographic layout per poem, line breaks preserved, no text in images.
+- **FR-13 SEO and sharing.** Per-page title and description, canonical, Open Graph image, sitemap.xml, robots.txt, "NO SIGNAL" 404.
+- **FR-14 Deploy.** Manual GitHub Actions deploy to Pages that refuses placeholder content unless explicitly overridden. Done in Phase 0.
+
+### Quality Requirements
+
+- **QR-01 Readable first.** All text is real HTML; canvases are `aria-hidden`; the site is fully usable without JavaScript (plain links on the dial).
+- **QR-02 Accessibility.** WCAG 2.2 AA: contrast ≥ 4.5:1 for text (ghost segments are decorative and hidden); visible focus (amber outline); knob and volume are `role="slider"` with value text; live region announces the tuned station; zero axe violations.
+- **QR-03 Reduced motion.** `prefers-reduced-motion`: instant tuning, no decode scramble, no slide-in, no pixel-resolve, still wall frame, no antenna spring.
+- **QR-04 Performance.** Measurable Success budgets; canvas loops stop when the tab is hidden or the page is off screen; the wall caps at about 30 fps and draws only changed state; no layout thrash in the frame loop.
+- **QR-05 Privacy.** No analytics, trackers, cookies, third-party requests or embeds. Fonts self-hosted. No personal email, phone, student ID or local paths in the repo until Ahmed chooses what to publish.
+- **QR-06 Security.** Static site only. Content Security Policy via `<meta http-equiv>`: `default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'` (adjust only if Astro output requires hashes). No `innerHTML` with untrusted input (all content is build-time). External links use `rel="noopener"`. Dependencies kept current; `npm audit` reviewed each phase.
+- **QR-07 Audio etiquette.** No autoplay. Audio context created only on a user gesture. Volume remembered for the session only.
+- **QR-08 Arabic readiness.** Strings live in content files or one UI strings module, not in canvas or images; new CSS uses logical properties; layout tested with `dir="rtl"` at least once before launch.
+- **QR-09 Maintainability.** Framework-free TypeScript modules with one responsibility each; pure tuning math separated from DOM and tested; `npm run check` clean.
+- **QR-10 Honesty.** No invented claims; placeholders visibly marked; content reviewed by Ahmed before launch.
+
+## Proposed System
+
+### Architecture Overview
+
+```
+Markdown stations ──► Astro content collection (validated) ──► static pages /<band>/<slug>/
+                                                              │
+                                     every page = radio layout + all station panels
+                                                              │
+               client scripts (TypeScript, bundled by Astro/Vite, one entry)
+   tuner state ─► dial canvas · LCD · lamps · meter · knob · antenna
+              ─► panel (swap, decode, static, resolve) ─► history.pushState
+              ─► wall (per-band animation, billboard, noise, ripples, spectrum)
+              ─► audio (filters, static, whistle, click) ◄─ player (<audio>)
+```
+
+One state object (frequency `f`, `target`, nearest station, distance, strength, locked station) is computed per animation frame by the tuner and read by every other module. Modules never talk to each other directly.
+
+### Components And Responsibilities
+
+| Unit | Kind | Responsibility |
+| --- | --- | --- |
+| `src/content.config.ts` | build | Station schema and guards |
+| `src/lib/dial.ts` | shared TS | Constants (LO, HI, PER, TUNING), band math, spacing guard |
+| `src/lib/tuning.ts` (Phase 2) | shared TS, pure | `nearest`, `strength`, `isLocked`, `afcTarget`, `nextStation`, `prevStation`; unit tested |
+| `src/components/Radio.astro` (Phase 1) | markup + CSS | Radio object; station marks as real `<a>` links |
+| `src/components/Program.astro` (Phase 1) | markup + CSS | Wall canvas, stage head, panel, footer hint |
+| `src/components/Panel*.astro` (Phase 1) | markup | Station panel layouts: about, gallery, case, list, poem, contact |
+| `src/components/Player.astro` (Phase 4) | markup + CSS | Music player |
+| `src/scripts/main.ts` | client entry | Starts modules after fonts load; owns the rAF loop and visibility pause |
+| `src/scripts/tuner.ts` | client | Inputs (knob, wheel, keys, links), easing, AFC, lock events |
+| `src/scripts/dial-canvas.ts` | client | Dial ticks, marks, needle |
+| `src/scripts/readouts.ts` | client | LCD digits and key, lamps, meter, preset keys, antenna, cone |
+| `src/scripts/panel.ts` | client | Swap from `<template>`, decode, static overlay, pixel resolve, idle, live region, URL sync |
+| `src/scripts/wall.ts` | client | LED wall buffers, animations, billboard, noise, ripples, spectrum |
+| `src/scripts/audio.ts` | client | Web Audio graph and per-frame tick |
+| `src/scripts/player.ts` | client | Player UI, marquee, time, DIAL FX, volume |
+
+### Data Model And State
+
+- **Station (build time):** `id` ("work/elancer"), `band`, `key` (LED label), `freq`, `title`, `kicker`, `lede`, `image` + `imageAlt`, `href`, `placeholder`, Markdown body. Phase 1 adds optional `facts` (label/value list), `actions` (label + target station id or URL), `gallery` (images with alt and caption), and `layout` (about | gallery | case | list | poem | contact) so panels match the mock.
+- **Embedded client data:** each page includes a small JSON array of stations (`id`, `band`, `key`, `freq`, `path`, `image?`) in a `<script type="application/json">` and one `<template id="st-<id>">` per station with its rendered panel HTML. No runtime fetch.
+- **Runtime state (one object):** `f`, `target`, `dragging`, `lastMove`, `near`, `dist`, `strength`, `locked`, `afc`, `reduceMotion`, `audio { ready, playing, fx, volume }`.
+- **Tracks:** `src/data/tracks.ts` exports `[]` until a licensed excerpt exists; then `{ title, src: '/audio/<file>.mp3', credit }`.
+
+### Interfaces And Integrations
+
+- No external services. GitHub Actions builds; GitHub Pages hosts.
+- Browser APIs: Canvas 2D, Web Audio (`AudioContext`, `MediaElementAudioSourceNode`, `BiquadFilterNode`, `AnalyserNode`, `OscillatorNode`), Pointer Events with pointer capture, History API, `matchMedia`, `document.fonts`, Page Visibility, `IntersectionObserver`.
+
+### Permissions And Trust Boundaries
+
+- All content is authored by Ahmed at build time; no user input reaches the page. The only trust boundary is the public repository: anything committed is public forever, so private material (music, photos not chosen, contact details, coursework) stays out of git until Ahmed approves it.
+- Deploy permissions are limited to the deploy workflow (`pages: write`, `id-token: write`); CI is read-only.
+
+### Important Design Decisions
+
+See `docs/DECISIONS.md`. In short: Astro + TypeScript, no UI framework; one page per station with progressive enhancement; panels embedded as templates rather than fetched; a single rAF loop with a shared state object; Canvas 2D (not WebGL) for the wall; GitHub Pages with manual deploys; music held back until rights are clear.
+
+## Implementation Roadmap
+
+Each phase ends with: `npm run check` clean, `npm run build` clean, a browser check of affected stations at 1440×900, 1024×768 and 390×844, and a short progress note at the end of this file. Stop after each phase and show Ahmed before starting the next.
+
+### Phase 0: Scaffold (done 2026-11-18)
+
+- **Outcome:** repository, Astro 7 + TypeScript, content collection with 14 stations and build guards, readable baseline pages, DSEG fonts self-hosted with the OFL licence, CI on every push, manual deploy workflow with a placeholder gate, AGENTS.md, PRODUCT.md, docs.
+- **Verification done:** `npm run build` (15 pages), `npx astro check` (0 errors), spacing and band guards proven to fail the build with a bad station.
+
+### Phase 1: Radio shell and panels (static, no client JS)
+
+- **Outcome:** every page looks like the reference mock at rest, tuned to its own station, with no JavaScript: the radio on the left and the program area on the right, with the panel styled per station.
+- **Dependencies:** Phase 0.
+- **Tasks:**
+  1. Extend the station schema with `layout`, `facts`, `actions`, `gallery` (FR-02). Move the mock's panel copy into the Markdown files.
+  2. Build `Radio.astro`: port the mock's `.radio` markup and CSS (antenna, handle, keys, case, LCD, dial window, plate, lower). Station marks and band keys become `<a href>` links. Render the LCD and meter for the current station on the server (ghost cells `aria-hidden`; a visually hidden "Tuned to 92.9 MHz, Elancer" text for screen readers).
+  3. Port the speaker grille SVG generation to build time (Astro frontmatter loop).
+  4. Build `Program.astro` and panel components for each layout; replace `StationPage.astro` with a `RadioLayout.astro`.
+  5. Scale the radio to fit the viewport height with CSS (`min()` and `dvh`) instead of the mock's JS `fit()`, if achievable; otherwise a tiny inline script.
+  6. Draw a static dial scale (ticks, marks, needle at the station) with CSS or inline SVG so the no-JS page looks complete.
+- **Files:** `src/content.config.ts`, `src/content/stations/**`, `src/components/Radio.astro`, `Program.astro`, `Panel*.astro`, `src/layouts/RadioLayout.astro`, `src/styles/global.css`, `src/pages/*`.
+- **Requirements:** FR-01, FR-02, FR-03 (static), FR-06 (static), FR-11, FR-12 (structure), QR-01, QR-02, QR-05, QR-08.
+- **Checks:** with JS disabled every station is reachable from the dial links; axe clean; contrast AA on all real text; the page matches `docs/design/screenshots/` at 1280×800.
+- **Acceptance:** Ahmed agrees the static radio matches the mock.
+- **Rollback:** revert the phase commits; the Phase 0 baseline still works.
+
+### Phase 2: Tuner engine
+
+- **Outcome:** the radio works: knob, wheel, keys, links and keyboard tune the dial; AFC and lock behave as in the mock; panels swap with decode and static; URLs follow the dial.
+- **Dependencies:** Phase 1.
+- **Tasks:**
+  1. `src/lib/tuning.ts` pure functions plus `src/lib/tuning.test.ts` (node:test; Node 24 runs TypeScript directly, or add Vitest if imports get awkward). Cover nearest, strength, lock, AFC conditions, next/prev wrap-around, band of a frequency.
+  2. `src/scripts/main.ts`: one rAF loop, `document.fonts.ready` start, pause on `visibilitychange`, `reduceMotion` from `matchMedia` (live-updating).
+  3. `tuner.ts`: rotary drag with pointer capture (one turn = 2 MHz), wheel (`deltaY × 0.0025`, non-passive only on the dial and knob), keys 1–5, ← →, knob slider keys, link clicks intercepted (`preventDefault`, then tune to the station; modifier-clicks keep normal link behaviour).
+  4. `dial-canvas.ts` and `readouts.ts`: the canvas dial, LCD digits and scrambled key, lamps, meter, preset keys, knob rotation, antenna spring and tip.
+  5. `panel.ts`: swap panel HTML from `<template>`, slide-in, decode, pixel resolve, static overlay canvas, idle panel, `aria-live="polite"` announcement of the locked station only (not every frame), `history.pushState` on lock and `popstate` retune, `document.title` update.
+  6. Data-tune actions (GET IN TOUCH → EMAIL, SEE THE WORK → ELANCER) as links that the tuner intercepts.
+- **Files:** `src/lib/tuning.ts`, `src/lib/tuning.test.ts`, `src/scripts/*.ts`, `src/layouts/RadioLayout.astro`, `package.json` (test script).
+- **Requirements:** FR-04, FR-05, FR-06, FR-10 (antenna, keys), QR-02, QR-03, QR-04, QR-09.
+- **Checks:** unit tests pass; manual: sweep 88→108 with the knob, AFC pulls in from within 0.35 MHz after resting about 0.4 s, lock below 0.06 MHz, back and forward buttons retune, reduced motion makes tuning instant.
+- **Acceptance:** tuning feels like the mock or better; Ahmed approves.
+- **Rollback:** the script is one entry; removing its `<script>` tag returns the working static site.
+
+### Phase 3: LED wall
+
+- **Outcome:** the right side comes alive: per-band animations, billboards, noise, ripples.
+- **Dependencies:** Phase 2 (state object).
+- **Tasks:** port the mock's wall: ghost dot layer cached in an offscreen canvas, red and amber buffers with decay, the five band animations, billboard halftone for stations with images (computed once per image and size), noise between stations, pointer ripples (throttled), lock ripple, resize and DPR handling, about 30 fps cap. Optimise the draw: batch dots by colour and alpha bucket rather than one `fillStyle` per dot; skip frames when nothing is lit and nothing changed. Reduced motion: draw one still frame per station.
+- **Files:** `src/scripts/wall.ts`, `src/components/Program.astro`.
+- **Requirements:** FR-07, QR-03, QR-04.
+- **Checks:** Chrome performance panel: wall frame under 4 ms on a mid-range laptop at 1440×900; no long tasks while idle; phone check (frame rate steady, or reduce dot density on small or low-power screens).
+- **Acceptance:** each band reads as its own animation; Ahmed approves.
+- **Rollback:** the wall module can be disabled independently (the canvas stays empty).
+
+### Phase 4: Sound and player
+
+- **Outcome:** music through the radio and dial sound effects.
+- **Dependencies:** Phase 2; a licensed excerpt for production (development can use a local, git-ignored file in `public/audio/`).
+- **Tasks:** `audio.ts` graph and per-frame tick exactly as direction.md; `Player.astro` and `player.ts` (play/pause, marquee, time, DIAL FX, volume knob wiring, `aria-pressed`, accessible labels with the track title and credit); speaker cone driven by the analyser; spectrum strip on the wall; `src/data/tracks.ts` empty by default, so the player is not rendered.
+- **Files:** `src/scripts/audio.ts`, `src/scripts/player.ts`, `src/components/Player.astro`, `src/data/tracks.ts`.
+- **Requirements:** FR-08, FR-09, FR-10 (cone), QR-07.
+- **Checks:** no audio before a click; Safari/iOS unlock works; tab hidden pauses the loops but not the music; volume and DIAL FX behave; no clicks or pops when filters move.
+- **Acceptance:** Ahmed approves the sound.
+- **Rollback:** an empty `tracks.ts` removes the player; the FX still need a user gesture.
+
+### Phase 5: Responsive, accessibility, polish
+
+- **Outcome:** great on phones and tablets, fully accessible, Arabic-ready.
+- **Dependencies:** Phases 1–4.
+- **Tasks:**
+  1. Phone layout (open question: show Ahmed a mock first). Proposed: a compact head unit on top (LCD, preset keys, seek), the dial window full width with drag-to-tune along the rows, the wall as a 160–200 px strip behind the stage head, the panel full width, and the player as a slim bar at the bottom. Touch targets ≥ 44 px.
+  2. Tablet layout: radio scaled, program narrower.
+  3. Accessibility pass: keyboard-only run, screen reader (NVDA + Chrome, VoiceOver if available), focus order, skip link to the panel, live region wording, reduced motion, 200% zoom.
+  4. RTL readiness: render a page with `dir="rtl"`; fix physical CSS properties.
+  5. Impeccable critique and audit against the reference mock and `docs/design/direction.md`; fix findings.
+  6. CSP meta tag (QR-06).
+- **Requirements:** QR-01 to QR-08.
+- **Checks:** Lighthouse budgets, axe clean on all 15 pages, manual screen-reader script.
+- **Acceptance:** Ahmed tries it on his own phone and approves.
+
+### Phase 6: Content and launch
+
+- **Outcome:** real content, live site.
+- **Dependencies:** content from Ahmed (`docs/CONTENT.md`), music rights decision, code licence decision.
+- **Tasks:** replace every placeholder; optimise photos with `astro:assets` (AVIF/WebP, sizes); design each poem layout with Ahmed; Open Graph image (1200×630, the radio tuned to ABOUT); sitemap and robots.txt; README credits (music credit if used); Pages settings: Source = GitHub Actions; run the deploy workflow; verify the live site; tag `v1.0.0`.
+- **Requirements:** FR-11, FR-12, FR-13, FR-14, QR-10.
+- **Checks:** deploy gate passes without override; live Lighthouse; all links work; share preview renders (Open Graph).
+- **Acceptance:** Ahmed approves the live site. Plan closes.
+
+## Testing And Verification Strategy
+
+### Automated Tests
+
+- `npm run check` (Astro + TypeScript) and `npm run build` on every push (CI).
+- Content guards in the build: schema, band range, spacing, alt text.
+- Unit tests for `src/lib/tuning.ts` (Phase 2) run in CI.
+- Deploy gate: no `placeholder: true` unless overridden.
+- Optional (Phase 5): a Playwright smoke test that loads each page, checks the title and that the panel text exists, and runs axe. Add only if it stays cheap to maintain.
+
+### Manual Verification
+
+Per phase, as listed. Browsers: Chrome, Firefox, Safari (or WebKit through Playwright), Chrome on Android, Safari on iOS if available. Viewports 1440×900, 1280×800, 1024×768, 390×844.
+
+### Security Verification
+
+- No secrets or private data in git (review `git diff --staged` before every commit; the `.gitignore` blocks audio).
+- CSP present and the console clean of CSP violations.
+- `npm audit` reviewed each phase (known: picomatch advisory in build tooling, no fix available; static output unaffected).
+- External links `rel="noopener"`; no third-party requests (check the network panel).
+
+### Final Acceptance Matrix
+
+| Requirement | Evidence |
+| --- | --- |
+| FR-01, FR-02 | Build output lists 15 pages; guard failures demonstrated |
+| FR-03, FR-10 | Visual match to screenshots; key, antenna and cone behaviour observed |
+| FR-04, FR-05 | Manual tuning script; unit tests; back/forward check |
+| FR-06 | Lock, decode, static and idle observed on every station |
+| FR-07 | Each band's wall animation and billboards observed |
+| FR-08, FR-09, QR-07 | Audio checks in Phase 4 |
+| FR-11, FR-12 | Ahmed's content review |
+| FR-13 | Lighthouse SEO; share preview |
+| FR-14 | Successful manual deploy; gate blocks placeholders |
+| QR-01 to QR-03 | No-JS run, axe, screen reader, reduced-motion run |
+| QR-04 | Lighthouse and performance-panel numbers |
+| QR-05, QR-06 | Network panel shows only same-origin requests; CSP present |
+| QR-08 | RTL test page screenshot |
+| QR-09 | `npm run check` clean; module boundaries as specified |
+| QR-10 | Ahmed's sign-off; zero placeholders |
+
+## Data Migration, Rollout, And Rollback
+
+- No data migration.
+- **Rollout:** deploy manually from the Actions tab after Phase 6 (earlier preview deploys are allowed with `allow_placeholders` if Ahmed wants to share progress). Before the first deploy, set Settings → Pages → Source to "GitHub Actions" so GitHub does not publish the raw repository with Jekyll.
+- **Rollback:** re-run the deploy workflow on the previous tag or commit (workflow_dispatch lets you pick the ref), or unpublish the site from Settings → Pages.
+
+## Risks And Mitigations
+
+| Risk | Mitigation |
+| --- | --- |
+| Canvas wall too heavy on phones | 30 fps cap, batching, visibility pause, lower density or a static wall on small or low-power screens |
+| Effects hurt readability | Readable-first rule; panel background opaque enough; reduced-motion path |
+| Music rights unclear | No audio ships until rights are confirmed; the player is hidden with an empty track list |
+| Placeholders go live | Deploy gate; launch checklist |
+| Private data committed to a public repo | AGENTS.md rules; `.gitignore`; staged-diff review |
+| Novelty confuses recruiters | Home is already tuned to ABOUT with a clear pitch and contact button; plain links on the dial |
+| Scope creep (blog, CTF, extra sections) | Non-Goals; new ideas go to a new plan |
+| Build-tool advisory (picomatch) | Static output; monitor Astro releases |
+
+## Assumptions
+
+- GitHub Pages free hosting is enough (static, low traffic).
+- Ahmed will supply real content before launch; the site can be built fully with placeholders until then.
+- The mock's numbers (easing, AFC, lock, wall rates) are the target feel; small tuning is allowed if it feels better and Ahmed agrees.
+
+## Open Questions
+
+1. Poems: which ones, and the title of each (Poem I–III are placeholders)?
+2. Photos: which photos of Ahmed (portrait for ABOUT, gallery for PHOTOS), with captions?
+3. Security: which lab write-ups to publish; what can be shared about the research paper and when?
+4. Work: confirm the Laravel and React lists; Elancer screenshots, source link (public or private?), case study timing.
+5. Contact: which public email address, and the LinkedIn URL?
+6. Music: is the track licensed for publishing? If yes, which excerpt (length, start) and the credit line? If not, choose another track or ship without music.
+7. Code licence: all rights reserved (default), MIT for the code with content excluded, or something else?
+8. Phone layout: approve the proposed layout (Phase 5) or choose another.
+9. Timeline for the Arabic version and a custom domain.
+
+## Decisions
+
+Recorded in `docs/DECISIONS.md` (newest first). Key ones: the Transmission radio concept; the seven-segment LED radio on the left with the Family Radio dial; the LED wall on the right; the station list; no nickname and "cybersecurity graduate" wording; Gaza only in ME; English first, Arabic-ready; Astro + TypeScript without React; GitHub Pages user site, public repository, manual deploys; the music held back until its rights are clear.
+
+## Dependencies And Prerequisites
+
+- Node ≥ 22.23.4 (24 recommended), npm.
+- GitHub account `ahmedMhamdan` with Pages enabled (Source: GitHub Actions) before the first deploy.
+- Fonts already in the repo: DSEG (OFL-1.1) and Barlow Semi Condensed (OFL-1.1, Fontsource).
+- Content from Ahmed for Phase 6.
+
+## Terminal Codex Handoff
+
+```text
+Read docs/PLAN.md completely before editing anything.
+Work in the ahmedMhamdan.github.io repository root and follow its AGENTS.md (also read PRODUCT.md, docs/design/direction.md and open docs/design/reference/g-radio-wall.html in a browser).
+Treat the plan as the approved product and implementation contract. Inspect the current code before relying on file-impact guidance, preserve unrelated dirty work, and do not expand scope.
+Implement the plan phase by phase starting with the first phase not marked done, run the specified verification, and keep the plan's requirement IDs in your progress report. Stop after each phase and show Ahmed before continuing.
+If current code contradicts the plan or a material decision is missing, stop and ask Ahmed instead of guessing.
+```
+
+## Progress And Closure
+
+### Progress Log
+
+- **2026-11-18:** Plan approved (direction, stack, hosting, scope). Phase 0 done: Astro 7.4 scaffold, 14 stations, baseline pages, guards, fonts, CI, manual deploy, docs. Public repository created.
+
+### Closure Checklist
+
+- [ ] Phases 1–6 accepted by Ahmed
+- [ ] Zero placeholders; deploy gate passes without override
+- [ ] Live site verified (Lighthouse budgets, axe, links, share preview)
+- [ ] Music published only with confirmed rights, or omitted
+- [ ] Code licence decided
+- [ ] `v1.0.0` tagged
+
+### Closure Outcome
+
+Not closed.

@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+# Manual only. Run it from the Actions tab when a release is ready.
+on:
+  workflow_dispatch:
+    inputs:
+      allow_placeholders:
+        description: Deploy even if some stations are still marked placeholder
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Refuse placeholder content
+        if: ${{ !inputs.allow_placeholders }}
+        run: |
+          if grep -rl '^placeholder: true' src/content/stations; then
+            echo "::error::The stations listed above are still placeholders. Replace them or re-run with allow_placeholders."
+            exit 1
+          fi
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

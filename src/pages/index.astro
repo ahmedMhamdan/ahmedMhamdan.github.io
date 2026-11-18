@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import StationPage from '../components/StationPage.astro';
+import { getStations, HOME_ID } from '../lib/stations';
+
+const stations = await getStations();
+const station = stations.find((s) => s.id === HOME_ID)!;
+---
+
+<Base
+  title="Ahmed Hamdan · Cybersecurity graduate and full-stack developer"
+  description={station.data.lede ?? 'Cybersecurity graduate and full-stack developer.'}
+>
+  <StationPage station={station} stations={stations} />
+</Base>

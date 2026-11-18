@@ -1,0 +1,102 @@
+# AGENTS.md: ahmedmhamdan.github.io
+
+Canonical instructions for any coding agent (Codex, Claude Code, others) working in this repository. `CLAUDE.md` only imports this file.
+
+## What this is
+
+The personal portfolio of **Ahmed Hamdan**, a cybersecurity graduate and full-stack developer (Laravel + React) who also writes poetry. The site is a radio: a full physical radio on the left (seven-segment LED display, a five-row FM dial from 88 to 108 MHz, a tuning knob, a speaker), and a full-bleed LED wall plus content panel on the right. Tuning the dial is the navigation. Each station is a real static page.
+
+Live URL (after the first manual deploy): https://ahmedmhamdan.github.io
+
+## Read before working
+
+1. `PRODUCT.md`: who it is for, brand commitments, constraints (Impeccable product brief).
+2. `docs/README.md`: map of the docs.
+3. `docs/PLAN.md`: the build plan, phases, requirements (FR/QR IDs) and acceptance checks. Work phase by phase.
+4. `docs/design/direction.md`: the design contract: tokens, anatomy, motion, sound, the wall animations, and the exact tuning numbers.
+5. `docs/design/reference/g-radio-wall.html`: the approved interactive mock. **It is the visual and behavioural spec.** Port it faithfully; do not redesign it.
+6. `docs/CONTENT.md`: what content exists, what is a placeholder, what Ahmed still has to supply.
+7. `docs/DECISIONS.md`: decisions already made. Do not reopen them without Ahmed.
+
+## Commands
+
+| Task | Command |
+| --- | --- |
+| Install | `npm ci` |
+| Dev server (background) | `npx astro dev --background`, then `npx astro dev status`, `npx astro dev logs`, `npx astro dev stop` |
+| Type and template check | `npm run check` |
+| Production build | `npm run build` (outputs `dist/`) |
+| Preview the build | `npm run preview` |
+
+Node >= 22.23.4 (CI uses Node 24). The dev and preview servers bind to `127.0.0.1` (see `astro.config.mjs`). Stop any server you start before you finish.
+
+## Project map
+
+```
+src/
+  content.config.ts        station collection schema (band, key, freq, title, ...) with build-time guards
+  content/stations/<band>/<slug>.md   one file per station; id = URL (/work/elancer/), me/about is "/"
+  lib/dial.ts              dial constants (88–108 MHz, 4 MHz per band, tuning numbers) and spacing guard
+  lib/stations.ts          getStations() in dial order, stationPath(), HOME_ID
+  layouts/Base.astro       html shell, fonts, meta
+  components/StationPage.astro   readable no-JS baseline: station list + content panel
+  pages/index.astro        home (ME · ABOUT)
+  pages/[...slug].astro    every other station
+  pages/404.astro          "NO SIGNAL"
+  styles/global.css        design tokens, @font-face for DSEG, segment readout classes
+public/fonts/              DSEG7/DSEG14 Classic Bold woff2 + SIL OFL licence (keep the licence file)
+docs/                      plan, design contract, reference mock, content inventory, decisions
+.github/workflows/         ci.yml (every push), deploy.yml (manual only)
+```
+
+Planned client modules (phase 2 onward, see `docs/PLAN.md`): `src/scripts/tuner.ts`, `dial.ts` canvas, `wall.ts`, `panel.ts`, `audio.ts`, `player.ts`, loaded from one `<script>` in the radio layout. Keep them framework-free TypeScript.
+
+## Hard rules
+
+### Identity and copy
+- Public name is **Ahmed Hamdan**. No nickname, handle or call sign anywhere in the site, metadata, alt text, or commit-visible copy.
+- Describe him as a **cybersecurity graduate**, never a student.
+- Gaza appears only in the ME band (About/Story), never as a headline or tagline.
+- Never invent testimonials, clients, metrics, awards, employers, dates or project claims. Unknown content stays a visible placeholder with `placeholder: true`.
+- English at launch. Keep text out of images and canvases so an Arabic (RTL) version can follow: use logical CSS properties (`margin-inline`, `inset-inline-start`) in new CSS.
+
+### Privacy and safety (public repository)
+- Never commit audio files, unreleased photos, private notes, credentials or `.env` files. `public/audio/` and `*.mp3` are git-ignored on purpose. Music ships only after Ahmed confirms the rights and the excerpt (see `docs/CONTENT.md`).
+- Never commit Ahmed's personal email address, phone number, student ID, or local machine paths. Contact details are added only when Ahmed confirms them.
+- Lab write-ups only from labs on Ahmed's own machines; no coursework answers before their deadlines; nothing that targets third-party systems.
+- No analytics, trackers, third-party embeds, or external font/CDN requests. Self-host everything.
+
+### Design
+- Impeccable is the design authority for this project. The approved direction is fixed (see `docs/DECISIONS.md`). Port the reference mock; improve craft, not concept.
+- Real text is HTML. Canvas (wall, dial scale, static) is decoration and must be `aria-hidden="true"`.
+- Unlit ghost segments (`--ghost`) are decorative only and always `aria-hidden`. All real text meets WCAG AA (4.5:1 normal, 3:1 large).
+- Minimum text size 12px. No glow shadows on text. One accent (`--lit`), amber (`--amber`) only for lock/AFC/focus.
+- Respect `prefers-reduced-motion`: instant tuning, no decode scramble, still wall, no image pixel-resolve.
+
+### Behaviour and performance
+- Audio starts only after a user gesture. No autoplay, ever.
+- Every station is reachable by plain links and by keyboard (1–5 bands, arrow keys, knob as `role="slider"`).
+- Tuning to a station updates the URL with `history.pushState` to its real page; back/forward retunes the dial.
+- Canvas loops pause when the tab is hidden and when nothing changes; target 60 fps on a mid-range laptop and a stable frame rate on mid-range phones.
+- Budget: initial JS under 40 KB gzip, no runtime dependencies beyond Astro's output.
+
+## Working rules
+
+- Build phase by phase from `docs/PLAN.md`. Each phase ends with `npm run check` and `npm run build` passing and a browser check of the affected stations.
+- Commit and push only when Ahmed asks. Use clear conventional messages (`feat(radio): ...`, `docs: ...`).
+- Deploy is manual: Actions tab → "Deploy to GitHub Pages" → Run workflow. It refuses to deploy while any station has `placeholder: true` unless `allow_placeholders` is ticked.
+- Record new decisions in `docs/DECISIONS.md` (newest first) and update `docs/CONTENT.md` when content arrives.
+- Known audit note: `npm audit` reports a picomatch ReDoS advisory with no patched version, reachable only through build tooling globs; the deployed site is static. Do not run `npm audit fix --force` (it downgrades Astro). Re-check when Astro updates.
+
+## Astro documentation
+
+Full documentation: https://docs.astro.build
+
+- [Routing](https://docs.astro.build/en/guides/routing/)
+- [Astro components](https://docs.astro.build/en/basics/astro-components/)
+- [Content collections](https://docs.astro.build/en/guides/content-collections/)
+- [Client-side scripts](https://docs.astro.build/en/guides/client-side-scripts/)
+- [Images](https://docs.astro.build/en/guides/images/)
+- [Styling](https://docs.astro.build/en/guides/styling/)
+- [Internationalization](https://docs.astro.build/en/guides/internationalization/)
+- [Deploy to GitHub Pages](https://docs.astro.build/en/guides/deploy/github/)
