@@ -379,7 +379,7 @@ If current code contradicts the plan or a material decision is missing, stop and
 
 ### Progress Log
 
-- **2026-11-18:** Plan approved (direction, stack, hosting, scope). Phase 0 done: Astro 7.4 scaffold, 14 stations, baseline pages, guards, fonts, CI, manual deploy, docs. Public repository created.
+- **2026-11-18:** Plan approved (direction, stack, hosting, scope). Phase 0 done: Astro 7.4 scaffold, 14 stations, baseline pages, guards, fonts, CI, manual deploy, docs. Public repository created. CI passed on the first push. GitHub had auto-enabled legacy Jekyll publishing for the *.github.io repository; the Pages source is now "GitHub Actions", so the site stays 404 until the first manual deploy.
 
 ### Closure Checklist
 
