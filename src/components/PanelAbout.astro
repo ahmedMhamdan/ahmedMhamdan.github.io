@@ -1,0 +1,38 @@
+---
+// about: portrait (4:5) beside heading, lede, facts and actions.
+import { render } from 'astro:content';
+import type { Station } from '../lib/stations';
+import Actions from './Actions.astro';
+import PanelHead from './PanelHead.astro';
+import Pic from './Pic.astro';
+
+interface Props {
+  station: Station;
+}
+
+const { station } = Astro.props;
+const { data } = station;
+const { Content } = await render(station);
+---
+
+<div class="about">
+  <Pic image={data.image} alt={data.imageAlt} shape="tall" width={240} />
+  <div>
+    <PanelHead station={station} />
+    {data.lede && <p class="lede" data-decode>{data.lede}</p>}
+    {station.body?.trim() && <div class="txt"><Content /></div>}
+    {
+      data.facts.length > 0 && (
+        <dl class="facts">
+          {data.facts.map((f) => (
+            <>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </>
+          ))}
+        </dl>
+      )
+    }
+    <Actions actions={data.actions} />
+  </div>
+</div>

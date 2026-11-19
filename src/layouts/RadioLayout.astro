@@ -1,0 +1,42 @@
+---
+// Every station page: the radio on the left, the program area on the right (reference mock).
+// Complete without JavaScript; the client scripts (Phase 2 onward) enhance this markup.
+import Program from '../components/Program.astro';
+import Radio from '../components/Radio.astro';
+import type { Station } from '../lib/stations';
+import { ui } from '../lib/ui';
+import Base from './Base.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  station: Station;
+  stations: Station[];
+}
+
+const { title, description, station, stations } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <a class="skip" href="#content">{ui.skipToContent}</a>
+  <div class="page">
+    <Radio station={station} stations={stations} />
+    <Program station={station} stations={stations} />
+  </div>
+</Base>
+
+<style>
+  .page {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 520px minmax(0, 1fr);
+  }
+  /* Interim narrow layout until the phone design (plan Phase 5): radio, then program, page scrolls. */
+  @media (max-width: 959px) {
+    .page {
+      position: static;
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

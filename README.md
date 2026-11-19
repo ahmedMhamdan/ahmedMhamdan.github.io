@@ -4,7 +4,7 @@ Portfolio of **Ahmed Hamdan**: cybersecurity graduate and full-stack developer (
 
 The site is a radio. Turn the dial on the left to tune between five bands (Me, Work, Security, Poetry, Contact); the LED wall on the right answers the signal, and the music plays through the radio.
 
-> Status: starter. The readable baseline (one static page per station) builds today; the radio, LED wall and audio are being ported from the approved design in `docs/design/reference/`.
+> Status: work in progress. The radio and station panels are live as static pages (no JavaScript yet), with placeholder content still marked as such. Tuning, the LED wall and audio come next, ported from the approved design in `docs/design/reference/`.
 
 ## Stack
 

@@ -1,0 +1,19 @@
+---
+// Kicker and heading shared by every panel layout. The heading is the page's only h1.
+import { bandLabel, type Station } from '../lib/stations';
+
+interface Props {
+  station: Station;
+  /** Heading text when it differs from the station title (contact panels). */
+  heading?: string;
+}
+
+const { station, heading } = Astro.props;
+const { data } = station;
+const kicker = data.kicker ?? `${bandLabel(data.band)} · ${data.key}`;
+---
+
+<p class="k">{kicker}</p>
+<h1 id="station-title" class:list={[data.layout === 'poem' ? 'poem-title' : 'big']}>
+  {heading ?? data.title}{data.tag && <span class="draft">{data.tag}</span>}
+</h1>

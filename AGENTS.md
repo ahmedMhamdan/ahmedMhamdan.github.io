@@ -37,13 +37,18 @@ src/
   content.config.ts        station collection schema (band, key, freq, title, ...) with build-time guards
   content/stations/<band>/<slug>.md   one file per station; id = URL (/work/elancer/), me/about is "/"
   lib/dial.ts              dial constants (88–108 MHz, 4 MHz per band, tuning numbers) and spacing guard
-  lib/stations.ts          getStations() in dial order, stationPath(), HOME_ID
+  lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName
+  lib/ui.ts                interface strings in one place (Arabic-ready)
   layouts/Base.astro       html shell, fonts, meta
-  components/StationPage.astro   readable no-JS baseline: station list + content panel
+  layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
+  components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time)
+  components/Program.astro wall canvas, stage head, panel, footer hint
+  components/Panel*.astro  panel layouts: about, gallery, case, list, poem, contact (+ PanelHead, Pic, Actions)
   pages/index.astro        home (ME · ABOUT)
   pages/[...slug].astro    every other station
   pages/404.astro          "NO SIGNAL"
   styles/global.css        design tokens, @font-face for DSEG, segment readout classes
+  styles/panel.css         panel layout styles (global, scoped under .view; container queries)
 public/fonts/              DSEG7/DSEG14 Classic Bold woff2 + SIL OFL licence (keep the licence file)
 docs/                      plan, design contract, reference mock, content inventory, decisions
 .github/workflows/         ci.yml (every push), deploy.yml (manual only)
@@ -86,7 +91,7 @@ Planned client modules (phase 2 onward, see `docs/PLAN.md`): `src/scripts/tuner.
 - Commit and push only when Ahmed asks. Use clear conventional messages (`feat(radio): ...`, `docs: ...`).
 - Deploy is manual: Actions tab → "Deploy to GitHub Pages" → Run workflow. It refuses to deploy while any station has `placeholder: true` unless `allow_placeholders` is ticked.
 - Record new decisions in `docs/DECISIONS.md` (newest first) and update `docs/CONTENT.md` when content arrives.
-- Known audit note: `npm audit` reports a picomatch ReDoS advisory with no patched version, reachable only through build tooling globs; the deployed site is static. Do not run `npm audit fix --force` (it downgrades Astro). Re-check when Astro updates.
+- Audit note: Phase 0 saw a picomatch ReDoS advisory in build tooling (static output unaffected); on 2026-11-19 `npm audit` reports 0 vulnerabilities. If it returns, do not run `npm audit fix --force` (it downgrades Astro); re-check when Astro updates.
 
 ## Astro documentation
 

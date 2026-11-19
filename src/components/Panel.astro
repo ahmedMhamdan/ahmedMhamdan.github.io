@@ -1,0 +1,25 @@
+---
+// Picks the panel layout named in the station's frontmatter.
+import type { Station } from '../lib/stations';
+import PanelAbout from './PanelAbout.astro';
+import PanelCase from './PanelCase.astro';
+import PanelContact from './PanelContact.astro';
+import PanelGallery from './PanelGallery.astro';
+import PanelList from './PanelList.astro';
+import PanelPoem from './PanelPoem.astro';
+
+interface Props {
+  station: Station;
+  stations: Station[];
+}
+
+const { station, stations } = Astro.props;
+const layout = station.data.layout;
+---
+
+{layout === 'about' && <PanelAbout station={station} />}
+{layout === 'gallery' && <PanelGallery station={station} />}
+{layout === 'case' && <PanelCase station={station} />}
+{layout === 'list' && <PanelList station={station} />}
+{layout === 'poem' && <PanelPoem station={station} />}
+{layout === 'contact' && <PanelContact station={station} stations={stations} />}

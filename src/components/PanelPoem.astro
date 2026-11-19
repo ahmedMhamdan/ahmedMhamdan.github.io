@@ -1,0 +1,19 @@
+---
+// poem: the poem's title and its verse. Lines keep their breaks (white-space: pre-line);
+// a blank line in the Markdown starts a new stanza. No text in images.
+import { render } from 'astro:content';
+import type { Station } from '../lib/stations';
+import PanelHead from './PanelHead.astro';
+
+interface Props {
+  station: Station;
+}
+
+const { station } = Astro.props;
+const { Content } = await render(station);
+---
+
+<div class="poem">
+  <PanelHead station={station} />
+  <div class="verse"><Content /></div>
+</div>

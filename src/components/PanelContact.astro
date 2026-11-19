@@ -1,0 +1,40 @@
+---
+// contact: one large row per CONTACT station; the tuned one is lit.
+// Rows without a confirmed destination are plain text, never a dead link.
+import { render } from 'astro:content';
+import type { Station } from '../lib/stations';
+import { ui } from '../lib/ui';
+import PanelHead from './PanelHead.astro';
+
+interface Props {
+  station: Station;
+  stations: Station[];
+}
+
+const { station, stations } = Astro.props;
+const { Content } = await render(station);
+const rows = stations.filter((s) => s.data.band === 'contact');
+const label = (href: string) => (href.startsWith('mailto:') ? ui.contactAddress : ui.contactProfile);
+---
+
+<PanelHead station={station} heading={ui.contactHeading} />
+<ul class="contact">
+  {
+    rows.map((s) => (
+      <li>
+        {s.data.href ? (
+          <a class:list={['crow', { on: s.id === station.id }]} href={s.data.href} rel="me noopener">
+            {s.data.title}
+            <span>{label(s.data.href)}</span>
+          </a>
+        ) : (
+          <span class:list={['crow', { on: s.id === station.id }]}>
+            {s.data.title}
+            <span>{ui.contactToConfirm}</span>
+          </span>
+        )}
+      </li>
+    ))
+  }
+</ul>
+{station.body?.trim() && <div class="txt"><Content /></div>}

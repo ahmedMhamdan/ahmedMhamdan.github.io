@@ -3,6 +3,7 @@ band: me
 key: STORY
 freq: 91.4
 title: Where I come from, where I'm going
+layout: list
 kicker: ME · STORY
 placeholder: true # Ahmed writes this in his own words
 ---

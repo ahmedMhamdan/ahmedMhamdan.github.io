@@ -1,0 +1,28 @@
+---
+// An image frame: a real optimised image, or a marked empty frame while the image is pending.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { ui } from '../lib/ui';
+
+interface Props {
+  image?: ImageMetadata;
+  alt?: string;
+  shape: 'tall' | 'wide';
+  /** Rendered width in CSS pixels at the reference layout; used for responsive sizes. */
+  width: number;
+}
+
+const { image, alt, shape, width } = Astro.props;
+---
+
+{
+  image ? (
+    <div class:list={['pic', shape]}>
+      <Image src={image} alt={alt ?? ''} widths={[width, width * 2]} sizes={`${width}px`} />
+    </div>
+  ) : (
+    <div class:list={['pic', shape, 'empty']}>
+      <span>{ui.placeholder}</span>
+    </div>
+  )
+}
