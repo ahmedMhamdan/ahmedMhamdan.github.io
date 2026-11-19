@@ -1,0 +1,277 @@
+/* Content panel layouts, ported from the reference mock (docs/design/reference/g-radio-wall.html).
+   Global (not component-scoped) because Markdown bodies render inside these blocks;
+   every rule is prefixed with .view so nothing leaks. The panel is a size container, so the
+   layouts collapse to one column whenever the panel is narrow, whatever the viewport. */
+
+.view .big {
+  font-weight: 600;
+  font-size: 2.6rem;
+  line-height: 1.02;
+  color: var(--text);
+  margin: 6px 0 12px;
+  text-wrap: balance;
+}
+.view .lede {
+  font-size: 1.3rem;
+  line-height: 1.45;
+  color: var(--text);
+  max-width: 52ch;
+}
+.view .txt {
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: #d8ccc5;
+  max-width: 62ch;
+}
+.view .lede + .txt {
+  margin-top: 12px;
+}
+.view .txt > * + * {
+  margin-top: 0.8em;
+}
+.view .txt a {
+  color: var(--text);
+  text-underline-offset: 3px;
+}
+
+/* about: facts list */
+.view .facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 20px;
+  margin-top: 16px;
+  font-size: 1.05rem;
+}
+.view .facts dt {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  padding-top: 4px;
+}
+.view .facts dd {
+  color: var(--text);
+}
+
+/* buttons */
+.view .acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.view .act {
+  display: inline-grid;
+  place-items: center;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 6px;
+  background: var(--rubber);
+  box-shadow:
+    0 3px 0 #0a0908,
+    0 5px 10px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+}
+.view .act:hover {
+  color: #fff;
+}
+.view .act.lit {
+  background: var(--lit);
+  color: #140806;
+  box-shadow:
+    0 3px 0 #7a1a0c,
+    0 5px 10px rgba(0, 0, 0, 0.5);
+}
+.view .act:active:not([disabled]) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #0a0908;
+}
+.view .act[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* image frames */
+.view .about {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 34px;
+  align-items: start;
+}
+.view .pic {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #1d1a18;
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.view .pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.view .pic.tall {
+  aspect-ratio: 4 / 5;
+}
+.view .pic.wide {
+  aspect-ratio: 16 / 8;
+}
+.view .pic.empty {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--quiet);
+}
+
+/* gallery */
+.view .grid4 {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.view .grid4 figcaption {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--quiet);
+}
+
+/* case */
+.view .case2 {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+.view .meta {
+  display: flex;
+  gap: 16px 30px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.view .meta div {
+  display: grid;
+  gap: 3px;
+}
+.view .meta dt {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+.view .meta dd {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+/* list */
+.view .list {
+  list-style: none;
+  margin-top: 12px;
+  max-width: 720px;
+}
+.view .list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.15rem;
+  color: var(--text);
+}
+.view .list li span {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  padding-top: 4px;
+  white-space: nowrap;
+}
+
+/* poem */
+.view .poem-title {
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--text);
+  margin: 6px 0 16px;
+}
+.view .verse p {
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.55rem;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-line;
+  max-width: 40ch;
+}
+.view .verse p + p {
+  margin-top: 1em;
+}
+
+/* contact */
+.view .contact {
+  list-style: none;
+}
+.view .crow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  font-size: 1.55rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.view .crow span {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: var(--quiet);
+  white-space: nowrap;
+}
+.view .crow.on {
+  color: var(--lit);
+}
+.view a.crow:hover {
+  color: #fff;
+}
+.view .contact + .txt {
+  margin-top: 16px;
+  color: var(--quiet);
+}
+
+@container (max-width: 600px) {
+  .view .about,
+  .view .case2 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .view .about .pic {
+    max-width: 160px;
+  }
+  .view .grid4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .view .big {
+    font-size: 2.1rem;
+  }
+  .view .crow {
+    font-size: 1.3rem;
+  }
+}

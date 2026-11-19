@@ -1,0 +1,31 @@
+---
+// gallery: heading and a four-column grid of 4:5 photos with captions.
+import { render } from 'astro:content';
+import type { Station } from '../lib/stations';
+import PanelHead from './PanelHead.astro';
+import Pic from './Pic.astro';
+
+interface Props {
+  station: Station;
+}
+
+const { station } = Astro.props;
+const { data } = station;
+const { Content } = await render(station);
+---
+
+<PanelHead station={station} />
+{data.lede && <p class="lede" data-decode>{data.lede}</p>}
+{station.body?.trim() && <div class="txt"><Content /></div>}
+<ul class="grid4">
+  {
+    data.gallery.map((g) => (
+      <li>
+        <figure>
+          <Pic image={g.image} alt={g.alt} shape="tall" width={160} />
+          <figcaption>{g.caption}</figcaption>
+        </figure>
+      </li>
+    ))
+  }
+</ul>

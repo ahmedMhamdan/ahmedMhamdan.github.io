@@ -24,6 +24,7 @@
   --dimlabel: #9a7a70;
   --rubber: #24211f;
   --rule: #2a2725;
+  --key-digit: #ada09a; /* preset key digits: the mock's --dimlabel is 3.4:1 on the key face; this is 5.2:1 */
 
   --font-ui: 'Barlow Semi Condensed', system-ui, sans-serif;
   --font-seg7: 'DSEG7', ui-monospace, monospace;
@@ -78,6 +79,25 @@ button {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+.skip {
+  position: absolute;
+  z-index: 10;
+  inset-inline-start: 16px;
+  top: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--rubber);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip:focus {
+  transform: none;
+}
 
 /* Seven/fourteen-segment readout: ghost cells under lit cells.
    Ghost "~" lights every segment; "!" is a blank cell of the same width. */
@@ -105,10 +125,11 @@ button {
 }
 .draft {
   display: inline-block;
-  margin-left: 12px;
+  margin-inline-start: 12px;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--amber);
   vertical-align: middle;
 }

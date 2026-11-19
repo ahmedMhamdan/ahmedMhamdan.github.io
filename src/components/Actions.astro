@@ -1,0 +1,33 @@
+---
+// Panel buttons. `to` links to another station's page (the tuner intercepts it from Phase 2),
+// `href` links out, and an action with neither is shown disabled until its target exists.
+import { stationPath, type Station } from '../lib/stations';
+
+interface Props {
+  actions: Station['data']['actions'];
+}
+
+const { actions } = Astro.props;
+---
+
+{
+  actions.length > 0 && (
+    <div class="acts">
+      {actions.map((a) =>
+        a.to ? (
+          <a class:list={['act', { lit: a.primary }]} href={stationPath(a.to)}>
+            {a.label}
+          </a>
+        ) : a.href ? (
+          <a class:list={['act', { lit: a.primary }]} href={a.href} rel="noopener">
+            {a.label}
+          </a>
+        ) : (
+          <button class:list={['act', { lit: a.primary }]} type="button" disabled>
+            {a.label}
+          </button>
+        ),
+      )}
+    </div>
+  )
+}

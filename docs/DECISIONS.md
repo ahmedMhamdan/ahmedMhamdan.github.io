@@ -2,6 +2,19 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-19: Phase 1 port details (for Ahmed's review)
+
+- **Context:** Porting the reference mock's radio and panels to static Astro pages (plan Phase 1) needed a few small calls the mock does not make.
+- **Decisions:**
+  - Placeholder images are marked empty frames ("PLACEHOLDER"), not the mock's stock photos, which must not reach the live site (`docs/CONTENT.md`).
+  - Preset key digits use 12px (AGENTS minimum; the mock had 11px) and a lighter unpressed colour (`--key-digit`, 5.2:1); the pressed key face is slightly darker so the lit digit passes 4.5:1. The mock's values failed AA on the key face.
+  - Preset keys repeat the band keys in the dial window, so they are pointer-only links (`aria-hidden`, out of the tab order); the band keys carry the names.
+  - Without JavaScript the knob and volume are decorative; they become sliders when the tuner script runs. The footer hint reads "Pick a station on the dial" until then, because the 1–5 and arrow-key shortcuts need the script.
+  - The radio scales to the viewport with CSS only (`tan(atan2())` turns two lengths into a ratio), replacing the mock's `fit()` script.
+  - The radio keeps its left-to-right shape in a right-to-left page (`direction: ltr` on the object); the page and panel layouts mirror.
+  - Below 960px wide an interim stacked layout (radio, then panel, page scrolls) stands in until the phone design in Phase 5.
+- **Consequences:** Phase 1 ships no client JavaScript. The station schema gained `layout`, `facts`, `actions`, `gallery`, `tag` and `imagePending`.
+
 ## 2026-11-18: Starter scope and repository
 
 - **Context:** Ahmed approved the design and asked for a repository with starter code and docs, to continue in a fresh session.

@@ -1,0 +1,40 @@
+---
+// case: optional 16:8 image beside heading, lede, meta row (facts) and actions.
+// Without an image (or a pending one) the text column stands alone.
+import { render } from 'astro:content';
+import type { Station } from '../lib/stations';
+import Actions from './Actions.astro';
+import PanelHead from './PanelHead.astro';
+import Pic from './Pic.astro';
+
+interface Props {
+  station: Station;
+}
+
+const { station } = Astro.props;
+const { data } = station;
+const { Content } = await render(station);
+const media = Boolean(data.image || data.imagePending);
+---
+
+<div class:list={[{ case2: media }]}>
+  {media && <Pic image={data.image} alt={data.imageAlt} shape="wide" width={320} />}
+  <div>
+    <PanelHead station={station} />
+    {data.lede && <p class="lede" data-decode>{data.lede}</p>}
+    {station.body?.trim() && <div class="txt"><Content /></div>}
+    {
+      data.facts.length > 0 && (
+        <dl class="meta">
+          {data.facts.map((f) => (
+            <div>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+    <Actions actions={data.actions} />
+  </div>
+</div>

@@ -23,6 +23,8 @@ Rules: no invented claims, clients, metrics or testimonials; no nickname; "cyber
 
 The number of stations per band can change (for example two poems or five). Frequencies must stay inside their band and at least 0.8 MHz apart; the build checks both.
 
+Station frontmatter (validated in `src/content.config.ts`): `layout` picks the panel (about, gallery, case, list, poem, contact); `facts` are label/value pairs (the facts list, the meta row, or list rows); `actions` are buttons (`to` a station id, `href` a URL, neither = shown disabled); `gallery` holds photos with `alt` and `caption`; `tag` is the small amber label after the heading (for example "Draft list"); `imagePending: true` shows a marked empty frame until the image arrives (placeholder stations only).
+
 ## Music
 
 - Track: "you got a lot to finish. let's lock in." (jazz piano), about 66 minutes, source and licence unknown.
