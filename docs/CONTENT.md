@@ -35,6 +35,7 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 
 - Placeholders in the reference mock (`docs/design/reference/img/`) are stock photos from picsum.photos (Unsplash licence). They are design placeholders only and must not appear on the live site.
 - Real photos go in `src/assets/` (optimised by `astro:assets`), never in `public/`. Every image needs alt text.
+- The LED wall shows a station's image as a dot-matrix billboard while it is tuned: the image of a `case` station (ELANCER) and the first photo of a `gallery` station (PHOTOS). Choose images that still read at about 175 × 36 dots (bold shapes, clear contrast). Until they arrive, those stations show their band's animation.
 
 ## Licence
 

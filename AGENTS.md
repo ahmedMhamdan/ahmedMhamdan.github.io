@@ -38,7 +38,7 @@ src/
   content.config.ts        station collection schema (band, key, freq, title, ...) with build-time guards
   content/stations/<band>/<slug>.md   one file per station; id = URL (/work/elancer/), me/about is "/"
   lib/dial.ts              dial constants (88–108 MHz, 4 MHz per band, tuning numbers) and spacing guard
-  lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName, stationInfo()
+  lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName, stationInfo() (with the billboard image)
   lib/tuning.ts            pure tuning math (nearest, strength, lock, AFC, seek, readouts, antenna); tests in tuning.test.ts
   lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts (run time)
   lib/ui.ts                interface strings in one place (Arabic-ready)
@@ -48,10 +48,11 @@ src/
   scripts/dial.ts          moves the SVG scale: needle, lit row, marks, preset keys, seek links
   scripts/readouts.ts      LCD, lamps, meter, knob slider, antenna, stage head
   scripts/panel.ts         panel swap from <template>, decode, pixel resolve, static, idle, URL/title/announcement
+  scripts/wall.ts          LED wall: band animations, billboards, noise, ripples; one canvas pixel per dot, scaled and masked by CSS
   layouts/Base.astro       html shell, fonts, meta
   layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
   components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time)
-  components/Program.astro wall canvas, stage head, panel, footer hint
+  components/Program.astro LED wall (dot grid, canvas, mask), stage head, panel, footer hint
   components/Panel*.astro  panel layouts: about, gallery, case, list, poem, contact (+ PanelHead, Pic, Actions)
   pages/index.astro        home (ME · ABOUT)
   pages/[...slug].astro    every other station
@@ -63,7 +64,7 @@ docs/                      plan, design contract, reference mock, content invent
 .github/workflows/         ci.yml (every push), deploy.yml (manual only)
 ```
 
-Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scripts/main.ts`); each returns a render function that reports whether it still needs frames. Still to come (see `docs/PLAN.md`): `wall.ts` (Phase 3), `audio.ts` and `player.ts` (Phase 4). Keep them framework-free TypeScript.
+Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scripts/main.ts`); each returns a render function that reports whether it still needs frames. Still to come (see `docs/PLAN.md`): `audio.ts` and `player.ts` (Phase 4). Keep them framework-free TypeScript.
 
 ## Hard rules
 

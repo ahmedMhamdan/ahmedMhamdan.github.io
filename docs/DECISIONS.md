@@ -2,6 +2,23 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-20: Phase 3 LED wall details (for Ahmed's review)
+
+- **Context:** Porting the mock's LED wall (plan Phase 3) needed a drawing method that stays cheap on phones, and some calls the mock and the plan leave open.
+- **Decisions:**
+  - The unlit dot grid stays the CSS background of the program area (as in Phase 1). The wall canvas has one pixel per LED; CSS scales it up 8× without smoothing (`image-rendering: pixelated`) and a CSS mask with the same 8px grid cuts each cell to its 5×5 dot. A frame is one `putImageData` of a few thousand pixels, skipped when nothing changed, and the canvas does not depend on the pixel ratio. This replaces the plan's offscreen ghost layer and the batched `fillRect` per lit dot: a first version did that, and between stations it cost about 1–3 ms per frame; the image version costs about 0.3–0.5 ms.
+  - Brightness is the pixel's alpha (256 levels), so there are no brightness buckets.
+  - Billboards: a case study's image or a gallery's first photo, as in the mock (ELANCER, PHOTOS); the ABOUT portrait keeps the name scroll. The build makes a 320px WebP and puts its URL in the station data. It loads as the dial approaches; the halftone is computed once per image and wall size, in the image's own task, not in an animation frame. Until an image exists (none does yet) the band animation stands in.
+  - The animations, decay, noise, ripples and lock ripple use the mock's numbers. Decay scales with real frame time; draws are at most about 30 per second.
+  - The stage is measured from the stage head (the 300px row gives 36 rows, as in the mock). The ME name scroll is drawn from `ui.siteName` at stage height − 8 rows, at least 10.
+  - The lock ripple starts on the radio's side of the wall: left, or right in a right-to-left page.
+  - A press on the panel or on a control does not send the big ripple ("empty space" in the direction); the mock excluded only buttons and links.
+  - Reduced motion: one still frame per station (ME shows the name from its first letter, the other bands their frame at 3 s, as the mock), noise between stations from a fixed seed so the frame does not flicker, redrawn only when the station or the dial position changes, and no ripples.
+  - While it is on screen with motion allowed, the wall keeps the frame loop running (the wall is alive by design). It stops when off screen (IntersectionObserver) or when the tab is hidden. The Phase 2 "loop sleeps at rest" now holds for the radio alone.
+  - In the interim narrow layout (below 960px) the lit wall is only the 120px strip behind the stage head. Behind the panel it was hidden anyway, and a wall changing under the panel made the browser redo the panel's backdrop blur every frame: on a phone-sized screen with the CPU slowed 4× that cut the wall from about 28 to 6–13 fps.
+  - The music spectrum on the wall waits for the audio in Phase 4.
+- **Consequences:** The client script is 8.4 KB gzip (was 5.7). Pages without JavaScript look as before.
+
 ## 2026-11-20: Phase 2 tuner details (for Ahmed's review)
 
 - **Context:** Making the radio tune (plan Phase 2) needed some calls the mock and the plan leave open, and two places where the mock's look failed the accessibility rules.
