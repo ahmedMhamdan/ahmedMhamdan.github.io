@@ -7,6 +7,7 @@ import { createPanel } from './panel';
 import { createReadouts } from './readouts';
 import { createState, need } from './state';
 import { createTuner } from './tuner';
+import { createWall } from './wall';
 
 interface RadioData {
   current: string;
@@ -35,6 +36,7 @@ function start() {
     createDial(radio, s),
     createReadouts(radio, program, s),
     createPanel(program, s),
+    createWall(program, s, wake),
   ];
 
   function frame(now: number) {
