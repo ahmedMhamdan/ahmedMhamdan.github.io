@@ -138,7 +138,7 @@ Markdown stations ──► Astro content collection (validated) ──► stati
                                      every page = radio layout + all station panels
                                                               │
                client scripts (TypeScript, bundled by Astro/Vite, one entry)
-   tuner state ─► dial canvas · LCD · lamps · meter · knob · antenna
+   tuner state ─► dial scale · LCD · lamps · meter · knob · antenna
               ─► panel (swap, decode, static, resolve) ─► history.pushState
               ─► wall (per-band animation, billboard, noise, ripples, spectrum)
               ─► audio (filters, static, whistle, click) ◄─ player (<audio>)
@@ -152,15 +152,17 @@ One state object (frequency `f`, `target`, nearest station, distance, strength, 
 | --- | --- | --- |
 | `src/content.config.ts` | build | Station schema and guards |
 | `src/lib/dial.ts` | shared TS | Constants (LO, HI, PER, TUNING), band math, spacing guard |
-| `src/lib/tuning.ts` (Phase 2) | shared TS, pure | `nearest`, `strength`, `isLocked`, `afcTarget`, `nextStation`, `prevStation`; unit tested |
+| `src/lib/tuning.ts` (Phase 2) | shared TS, pure | `nearest`, `strengthAt`, `isLocked`, `ease`, `afcPending`, `afcPull`, `nextStation`, `prevStation`, readout and antenna math; unit tested in `tuning.test.ts` |
+| `src/lib/scale.ts` (Phase 2) | shared TS | Dial scale geometry (ticks, marks, needle), used by `Radio.astro` at build time and by the dial script |
 | `src/components/Radio.astro` (Phase 1) | markup + CSS | Radio object; station marks as real `<a>` links |
 | `src/components/Program.astro` (Phase 1) | markup + CSS | Wall canvas, stage head, panel, footer hint |
 | `src/components/Panel*.astro` (Phase 1) | markup | Station panel layouts: about, gallery, case, list, poem, contact |
 | `src/components/Player.astro` (Phase 4) | markup + CSS | Music player |
-| `src/scripts/main.ts` | client entry | Starts modules after fonts load; owns the rAF loop and visibility pause |
-| `src/scripts/tuner.ts` | client | Inputs (knob, wheel, keys, links), easing, AFC, lock events |
-| `src/scripts/dial-canvas.ts` | client | Dial ticks, marks, needle |
-| `src/scripts/readouts.ts` | client | LCD digits and key, lamps, meter, preset keys, antenna, cone |
+| `src/scripts/main.ts` | client entry | Starts the modules and runs the first frame at once; owns the rAF loop (sleeps when idle) and visibility pause |
+| `src/scripts/state.ts` | client | The one state object; `need()` for required DOM hooks |
+| `src/scripts/tuner.ts` | client | Inputs (knob, wheel, keys, links, back/forward), easing, AFC, lock |
+| `src/scripts/dial.ts` | client | Moves the SVG scale: needle, lit row and ticks, station marks, preset keys, seek links |
+| `src/scripts/readouts.ts` | client | LCD digits and key, lamps, meter, knob rotation and slider value, antenna, stage head (cone in Phase 4) |
 | `src/scripts/panel.ts` | client | Swap from `<template>`, decode, static overlay, pixel resolve, idle, live region, URL sync |
 | `src/scripts/wall.ts` | client | LED wall buffers, animations, billboard, noise, ripples, spectrum |
 | `src/scripts/audio.ts` | client | Web Audio graph and per-frame tick |
@@ -169,8 +171,8 @@ One state object (frequency `f`, `target`, nearest station, distance, strength, 
 ### Data Model And State
 
 - **Station (build time):** `id` ("work/elancer"), `band`, `key` (LED label), `freq`, `title`, `kicker`, `lede`, `image` + `imageAlt`, `href`, `placeholder`, Markdown body. Phase 1 adds optional `facts` (label/value list), `actions` (label + target station id or URL), `gallery` (images with alt and caption), and `layout` (about | gallery | case | list | poem | contact) so panels match the mock.
-- **Embedded client data:** each page includes a small JSON array of stations (`id`, `band`, `key`, `freq`, `path`, `image?`) in a `<script type="application/json">` and one `<template id="st-<id>">` per station with its rendered panel HTML. No runtime fetch.
-- **Runtime state (one object):** `f`, `target`, `dragging`, `lastMove`, `near`, `dist`, `strength`, `locked`, `afc`, `reduceMotion`, `audio { ready, playing, fx, volume }`.
+- **Embedded client data:** each page includes a small JSON list of stations in dial order (`id`, `row`, `key`, `freq`, `path`, `title`, `name`) plus the current station id in a `<script type="application/json" id="radio-data">`, and one `<template data-panel="<id>">` per other station (and one for the idle panel) with its rendered panel HTML. No runtime fetch.
+- **Runtime state (one object):** `stations`, `f`, `target`, `dragging`, `lastMove`, `near`, `dist`, `strength`, `locked`, `afc`, `row`, `df`, `current`, `reduceMotion`; Phase 4 adds `audio { ready, playing, fx, volume }`.
 - **Tracks:** `src/data/tracks.ts` exports `[]` until a licensed excerpt exists; then `{ title, src: '/audio/<file>.mp3', credit }`.
 
 ### Interfaces And Integrations
@@ -196,7 +198,7 @@ Each phase ends with: `npm run check` clean, `npm run build` clean, a browser ch
 - **Outcome:** repository, Astro 7 + TypeScript, content collection with 14 stations and build guards, readable baseline pages, DSEG fonts self-hosted with the OFL licence, CI on every push, manual deploy workflow with a placeholder gate, AGENTS.md, PRODUCT.md, docs.
 - **Verification done:** `npm run build` (15 pages), `npx astro check` (0 errors), spacing and band guards proven to fail the build with a bad station.
 
-### Phase 1: Radio shell and panels (static, no client JS)
+### Phase 1: Radio shell and panels (static, no client JS) (done 2026-11-19)
 
 - **Outcome:** every page looks like the reference mock at rest, tuned to its own station, with no JavaScript: the radio on the left and the program area on the right, with the panel styled per station.
 - **Dependencies:** Phase 0.
@@ -213,7 +215,7 @@ Each phase ends with: `npm run check` clean, `npm run build` clean, a browser ch
 - **Acceptance:** Ahmed agrees the static radio matches the mock.
 - **Rollback:** revert the phase commits; the Phase 0 baseline still works.
 
-### Phase 2: Tuner engine
+### Phase 2: Tuner engine (done 2026-11-20)
 
 - **Outcome:** the radio works: knob, wheel, keys, links and keyboard tune the dial; AFC and lock behave as in the mock; panels swap with decode and static; URLs follow the dial.
 - **Dependencies:** Phase 1.
@@ -381,6 +383,7 @@ If current code contradicts the plan or a material decision is missing, stop and
 
 - **2026-11-18:** Plan approved (direction, stack, hosting, scope). Phase 0 done: Astro 7.4 scaffold, 14 stations, baseline pages, guards, fonts, CI, manual deploy, docs. Public repository created. CI passed on the first push. GitHub had auto-enabled legacy Jekyll publishing for the *.github.io repository; the Pages source is now "GitHub Actions", so the site stays 404 until the first manual deploy.
 - **2026-11-19:** Phase 1 accepted by Ahmed, who asked to go live with it; the first deploy runs as a preview with `allow_placeholders` (13 stations are still placeholders). Static radio shell and panels with no client JavaScript: station schema extended (`layout`, `facts`, `actions`, `gallery`, `tag`, `imagePending`; action targets checked at build) and the mock's panel copy moved into the Markdown (FR-02); `Radio.astro` with band keys, station marks, preset keys and seek buttons as links, a server-rendered LCD and meter, a build-time dial scale SVG and speaker grille, and a CSS-only fit (FR-03 static, QR-01); `Program.astro`, six panel layouts and `RadioLayout.astro` replacing `StationPage.astro` (FR-06 static, FR-11, FR-12 structure); interface strings in `src/lib/ui.ts` and logical properties outside the radio (QR-08). Checks: `npm run check` 0 errors, 0 warnings, 0 hints; `npm run build` 15 pages, 0 scripts, about 5.5 KB gzip HTML plus 5 KB CSS per page; axe 0 violations on all 15 pages at 1280×800 and 390×844, with the contrast cases axe could not decide (gradients, dot grid, SVG scale) computed by hand at ≥ 4.5:1; every page links all 14 stations and every link resolves; only same-origin requests (QR-05); `npm audit` 0 vulnerabilities. Browser check at 1456×910 (screenshot scale), 1280×800, 1024×768 and 390×844. Port choices recorded in `docs/DECISIONS.md` (2026-11-19).
+- **2026-11-20:** Phase 2 done and pushed to `main` at Ahmed's request (not deployed yet; deploys stay manual). The radio tunes: knob drag (one turn = 2 MHz), wheel on the dial window and knob, keys 1–5 and ← → anywhere, the knob as a slider (arrows ±0.1 MHz, Page Up/Down, Home/End), and every station link (band keys, marks, preset keys, seek, panel actions) tune instead of loading, while modifier clicks and external links behave normally (FR-04). AFC pulls in from within 0.35 MHz after the dial rests 0.42 s; lock below 0.06 MHz; seek wraps around the dial. The URL, title and a polite announcement change only when the dial settles; back and forward retune without pushing (FR-05). Panels swap from templates with slide-in, decode and pixel resolve; static over the panel between stations, then the idle panel on a solid plate (FR-06). LCD, lamps, meter, scrambled key, preset keys, knob rotation, antenna spring and tip, stage head (FR-10 antenna and keys). Reduced motion: instant tuning, no scramble, jitter, slide, decode or resolve, still static, and the loop sleeps (QR-02, QR-03). Pure tuning math in `src/lib/tuning.ts`, DOM modules in `src/scripts/`, one state object (QR-09). Checks: `npm test` 25/25 (also in CI); `npm run check` 0 errors, 0 warnings, 0 hints; `npm run build` 15 pages, one script of 13.0 KB raw, 5.7 KB gzip (budget 40 KB), pages about 7.5 KB gzip HTML with the embedded panels; a scripted browser run (headless Edge, 35/35) covering every input, AFC, history, deep links, reduced motion, the no-JS fallback and a clean console; axe 0 violations on all 15 pages at 1280×800 and 390×844 and between stations, with the idle plate's text computed by hand at ≥ 5.3:1; `npm audit` 0 vulnerabilities. Performance (QR-04), tuning sweeps at 1456×910: script and render cost per frame median 1.2 ms, p95 2.1 ms, no frame over 16 ms at full CPU speed (before the static and layout fixes: median 5.8 ms, p95 10.5 ms); with the CPU slowed 4×, median 2.6 ms, p95 33 ms (before: 13 ms and 103 ms); the loop sleeps at rest and while the tab is hidden. Screenshots at 1456×910, 1024×768 and 390×844 match the mock. Open for Phase 5: the interim phone layout still shows the keyboard-shortcut hint. Choices recorded in `docs/DECISIONS.md` (2026-11-20).
 
 ### Closure Checklist
 

@@ -16,14 +16,41 @@ export const BANDS = [
 export type BandId = (typeof BANDS)[number]['id'];
 export const BAND_IDS = BANDS.map((b) => b.id) as [BandId, ...BandId[]];
 
-/** Tuner behaviour constants (reference mock). */
+/** What the client tuner knows about a station (embedded as JSON in every page, in dial order). */
+export interface StationInfo {
+  id: string;
+  /** Band row, 0–4. */
+  row: number;
+  key: string;
+  freq: number;
+  path: string;
+  /** Document title of the station's page. */
+  title: string;
+  /** Spoken name for assistive text: "Work, Elancer". */
+  name: string;
+}
+
+/** Tuner behaviour constants (reference mock; docs/design/direction.md, "Tuning model"). */
 export const TUNING = {
-  ease: 0.075, // per-frame exponential approach of f toward target
+  ease: 0.075, // per 60 Hz frame: exponential approach of f toward target
+  snapWithin: 0.002, // MHz: f jumps to target when this close
   lockWithin: 0.06, // MHz: station counts as locked
   afcWithin: 0.35, // MHz: auto frequency control snaps to the nearest station when the dial rests
+  afcMin: 0.004, // MHz: closer than this, AFC has nothing to correct
+  afcSettled: 0.01, // MHz: |target - f| below this counts as resting
   afcRestMs: 420, // the dial must rest this long before AFC snaps
   strengthSpan: 0.4, // MHz: signal strength = 1 - distance / strengthSpan
+  mhzPerTurn: 2, // one full turn of the tuning knob
+  wheelMhzPerPx: 0.0025, // mouse wheel on the dial window or knob
+  keyStep: 0.1, // MHz: arrow keys on the focused knob
+  seekGap: 0.05, // MHz: seek skips a station closer than this to the dial
+  keyReadoutMs: 70, // the station key readout re-rolls this often while searching
 } as const;
+
+/** Band row (0–4) under a frequency; 108.0 belongs to the last row. */
+export const rowOf = (freq: number) => Math.max(0, Math.min(BANDS.length - 1, Math.floor((freq - LO) / PER)));
+
+export const clampFreq = (freq: number) => Math.max(LO, Math.min(HI, freq));
 
 /** Stations must be further apart than two AFC radii, or AFC would fight between them. */
 export const MIN_SPACING = 0.8; // MHz: 2 × afcWithin (0.35) + margin

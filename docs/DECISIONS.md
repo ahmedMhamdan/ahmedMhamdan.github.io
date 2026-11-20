@@ -2,6 +2,24 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-20: Phase 2 tuner details (for Ahmed's review)
+
+- **Context:** Making the radio tune (plan Phase 2) needed some calls the mock and the plan leave open, and two places where the mock's look failed the accessibility rules.
+- **Decisions:**
+  - The dial scale stays the SVG rendered with the page (`src/lib/scale.ts`); the script moves the needle and recolours ticks and marks. The plan named a canvas module (`dial-canvas.ts`); the module is `src/scripts/dial.ts` and draws nothing, so the no-JS dial and the live dial are the same drawing.
+  - Easing and AFC use the mock's numbers per 60 Hz frame, converted so they feel the same at any refresh rate. The antenna spring runs in fixed 60 Hz steps.
+  - Seek (← →, Page Up/Down, the seek links) counts from where the dial is heading, so repeated presses walk station by station during a glide. Grabbing the knob mid-glide holds the dial where it is.
+  - The address bar, title and screen-reader announcement change only when the dial settles on a station, never during a sweep; back and forward retune the dial. The slider's value follows the target. Home and End on the knob go to the first and last station.
+  - Reduced motion: tuning is instant, the station key and meter do not scramble or jitter, the antenna stays still, panels swap without slide, decode or pixel resolve, and the static is a still frame.
+  - Between stations the idle words sit on a solid plate above the static, like a set's on-screen display. In the mock the static covered them; that failed AA on real text.
+  - After a mouse drag the knob keeps focus without a focus ring (`:focus-visible`); the amber ring shows for keyboard focus.
+  - The volume knob stays decorative (`aria-hidden`) until the player exists (Phase 4).
+  - The script does not wait for `document.fonts.ready`: the first frame runs at once, so the slider has its value immediately. Nothing measures text, so late fonts change nothing.
+  - Every page embeds the other stations' panels as `<template data-panel>` (about +2 KB gzip per page) instead of fetching them.
+  - Unit tests use `node:test` on the TypeScript sources (`npm test`, also in CI); `@types/node` is the one new dev dependency.
+  - Static is drawn from a precomputed pool of noise pixels, and the panel swap never reads layout mid-frame; this cut tuning frame cost about fourfold in the profiler.
+- **Consequences:** The site ships one client script (about 5.7 KB gzip). Without it every page still works as in Phase 1.
+
 ## 2026-11-19: Phase 1 port details (for Ahmed's review)
 
 - **Context:** Porting the reference mock's radio and panels to static Astro pages (plan Phase 1) needed a few small calls the mock does not make.

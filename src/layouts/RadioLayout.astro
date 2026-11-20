@@ -1,9 +1,9 @@
 ---
 // Every station page: the radio on the left, the program area on the right (reference mock).
-// Complete without JavaScript; the client scripts (Phase 2 onward) enhance this markup.
+// Complete without JavaScript; the tuner script (src/scripts/main.ts) enhances this markup.
 import Program from '../components/Program.astro';
 import Radio from '../components/Radio.astro';
-import type { Station } from '../lib/stations';
+import { stationInfo, type Station } from '../lib/stations';
 import { ui } from '../lib/ui';
 import Base from './Base.astro';
 
@@ -15,6 +15,9 @@ interface Props {
 }
 
 const { title, description, station, stations } = Astro.props;
+
+// The station list for the tuner, in dial order. "<" is escaped so the JSON can never close the tag.
+const data = JSON.stringify({ current: station.id, stations: stations.map(stationInfo) }).replace(/</g, '\\u003c');
 ---
 
 <Base title={title} description={description}>
@@ -23,6 +26,12 @@ const { title, description, station, stations } = Astro.props;
     <Radio station={station} stations={stations} />
     <Program station={station} stations={stations} />
   </div>
+  {/* Announces the station once the dial settles on it (never every frame). */}
+  <p class="sr-only" aria-live="polite" data-tuner-status></p>
+  <script type="application/json" id="radio-data" is:inline set:html={data} />
+  <script>
+    import '../scripts/main';
+  </script>
 </Base>
 
 <style>

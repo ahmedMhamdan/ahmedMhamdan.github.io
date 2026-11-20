@@ -1,6 +1,6 @@
 ---
 import RadioLayout from '../layouts/RadioLayout.astro';
-import { getStations, HOME_ID } from '../lib/stations';
+import { getStations, HOME_ID, pageTitle } from '../lib/stations';
 
 // One real, static HTML page per station: /work/elancer/, /poetry/poem-i/, ...
 // The home station (me/about) lives at "/" instead.
@@ -16,7 +16,7 @@ const { data } = station;
 ---
 
 <RadioLayout
-  title={`${data.title} · Ahmed Hamdan`}
+  title={pageTitle(station)}
   description={data.lede ?? `${data.kicker ?? data.band} · Ahmed Hamdan, cybersecurity graduate and full-stack developer.`}
   station={station}
   stations={stations}

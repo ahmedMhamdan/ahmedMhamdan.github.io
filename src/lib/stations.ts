@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { BANDS, assertSpacing, type BandId } from './dial';
+import { BANDS, assertSpacing, bandIndex, type BandId, type StationInfo } from './dial';
+import { ui } from './ui';
 
 export type Station = CollectionEntry<'stations'>;
 
@@ -48,3 +49,18 @@ export function spokenName(s: Station) {
       .join(' ');
   return `${soft(bandLabel(s.data.band))}, ${soft(s.data.key)}`;
 }
+
+/** Document title of a station's page. */
+export const pageTitle = (s: Station) =>
+  s.id === HOME_ID ? `${ui.siteName} · ${ui.siteTagline}` : `${s.data.title} · ${ui.siteName}`;
+
+/** The station as the client tuner sees it (embedded in every page). */
+export const stationInfo = (s: Station): StationInfo => ({
+  id: s.id,
+  row: bandIndex(s.data.band),
+  key: s.data.key,
+  freq: s.data.freq,
+  path: stationPath(s.id),
+  title: pageTitle(s),
+  name: spokenName(s),
+});

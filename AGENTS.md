@@ -25,6 +25,7 @@ Live URL (after the first manual deploy): https://ahmedmhamdan.github.io
 | Install | `npm ci` |
 | Dev server (background) | `npx astro dev --background`, then `npx astro dev status`, `npx astro dev logs`, `npx astro dev stop` |
 | Type and template check | `npm run check` |
+| Unit tests (tuning math, `node:test`) | `npm test` |
 | Production build | `npm run build` (outputs `dist/`) |
 | Preview the build | `npm run preview` |
 
@@ -37,8 +38,16 @@ src/
   content.config.ts        station collection schema (band, key, freq, title, ...) with build-time guards
   content/stations/<band>/<slug>.md   one file per station; id = URL (/work/elancer/), me/about is "/"
   lib/dial.ts              dial constants (88–108 MHz, 4 MHz per band, tuning numbers) and spacing guard
-  lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName
+  lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName, stationInfo()
+  lib/tuning.ts            pure tuning math (nearest, strength, lock, AFC, seek, readouts, antenna); tests in tuning.test.ts
+  lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts (run time)
   lib/ui.ts                interface strings in one place (Arabic-ready)
+  scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden
+  scripts/state.ts         the one shared state object (tuner writes, everything else reads)
+  scripts/tuner.ts         inputs (knob, wheel, keys, links, back/forward), easing, AFC, lock
+  scripts/dial.ts          moves the SVG scale: needle, lit row, marks, preset keys, seek links
+  scripts/readouts.ts      LCD, lamps, meter, knob slider, antenna, stage head
+  scripts/panel.ts         panel swap from <template>, decode, pixel resolve, static, idle, URL/title/announcement
   layouts/Base.astro       html shell, fonts, meta
   layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
   components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time)
@@ -54,7 +63,7 @@ docs/                      plan, design contract, reference mock, content invent
 .github/workflows/         ci.yml (every push), deploy.yml (manual only)
 ```
 
-Planned client modules (phase 2 onward, see `docs/PLAN.md`): `src/scripts/tuner.ts`, `dial.ts` canvas, `wall.ts`, `panel.ts`, `audio.ts`, `player.ts`, loaded from one `<script>` in the radio layout. Keep them framework-free TypeScript.
+Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scripts/main.ts`); each returns a render function that reports whether it still needs frames. Still to come (see `docs/PLAN.md`): `wall.ts` (Phase 3), `audio.ts` and `player.ts` (Phase 4). Keep them framework-free TypeScript.
 
 ## Hard rules
 
@@ -87,7 +96,7 @@ Planned client modules (phase 2 onward, see `docs/PLAN.md`): `src/scripts/tuner.
 
 ## Working rules
 
-- Build phase by phase from `docs/PLAN.md`. Each phase ends with `npm run check` and `npm run build` passing and a browser check of the affected stations.
+- Build phase by phase from `docs/PLAN.md`. Each phase ends with `npm run check`, `npm test` and `npm run build` passing and a browser check of the affected stations.
 - Commit and push only when Ahmed asks. Use clear conventional messages (`feat(radio): ...`, `docs: ...`).
 - Deploy is manual: Actions tab → "Deploy to GitHub Pages" → Run workflow. It refuses to deploy while any station has `placeholder: true` unless `allow_placeholders` is ticked.
 - Record new decisions in `docs/DECISIONS.md` (newest first) and update `docs/CONTENT.md` when content arrives.

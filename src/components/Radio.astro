@@ -2,7 +2,9 @@
 // The radio object from the reference mock (docs/design/reference/g-radio-wall.html), rendered at rest:
 // tuned and locked to the current station. Works without JavaScript: band keys, station marks,
 // preset keys and seek buttons are plain links. Ghost cells, scale and speaker are aria-hidden.
-import { BANDS, LO, PER, bandIndex, rowPosition } from '../lib/dial';
+import { BANDS, bandIndex, rowPosition } from '../lib/dial';
+import { MARK_LOCK, MARK_OFF, MARK_ON, TICK_OFF, TICK_ON, W, H, markAt, needlePaths, needleX, tickPath } from '../lib/scale';
+import { freqCells, keyCells, knobAngle } from '../lib/tuning';
 import {
   firstOfBand,
   freqText,
@@ -24,54 +26,18 @@ const activeRow = bandIndex(station.data.band);
 const { prev, next } = neighbours(stations, station.id);
 
 // Seven/fourteen-segment text: "!" is a blank cell the same width as a lit one.
-const digits = freqText(f).padStart(5, '!');
-const alpha = station.data.key.padEnd(9, ' ').replace(/ /g, '!');
+const digits = freqCells(f);
+const alpha = keyCells(station.data.key);
 
-// Dial window geometry, in the radio's own pixels (the whole radio scales as one object).
-// Mirrors the mock's canvas: padding 6/12, band key column 78px, five equal rows.
-const W = 408;
-const H = 204;
-const PAD_X = 12;
-const PAD_Y = 6;
-const KEY_W = 78;
-const ROW_H = (H - 2 * PAD_Y) / 5;
-const TRACK_X = PAD_X + KEY_W;
-const TRACK_W = W - 2 * PAD_X - KEY_W;
+// Dial scale (src/lib/scale.ts): ticks, station marks and the needle, tuned to this station.
+const ticks = BANDS.map((_, i) => ({ d: tickPath(i), on: i === activeRow }));
+const marks = stations.map((s) => ({
+  id: s.id,
+  ...markAt(s.data.freq),
+  fill: s.id === station.id ? MARK_LOCK : bandIndex(s.data.band) === activeRow ? MARK_ON : MARK_OFF,
+}));
+const needle = needlePaths(activeRow);
 const n2 = (v: number) => +v.toFixed(2);
-const rowTop = (i: number) => PAD_Y + i * ROW_H;
-const baseline = (i: number) => rowTop(i) + ROW_H - 11;
-
-// 41 ticks per row, a major tick every 10.
-const ticks = BANDS.map((_, i) => {
-  let d = '';
-  for (let t = 0; t <= 40; t++) {
-    const x = TRACK_X + (t / 40) * TRACK_W;
-    const h = t % 10 === 0 ? 10 : 5;
-    d += `M${n2(x - 1)} ${n2(baseline(i) - h)}h2v${h}h-2z`;
-  }
-  return { d, on: i === activeRow };
-});
-
-// Station marks: 5×6px, amber when locked, red on the active row.
-const marks = stations.map((s) => {
-  const i = bandIndex(s.data.band);
-  const x = TRACK_X + rowPosition(s.data.freq, s.data.band) * TRACK_W;
-  return {
-    x: n2(x - 2.5),
-    y: n2(baseline(i) - 19),
-    fill: s.id === station.id ? 'var(--amber)' : i === activeRow ? 'var(--lit)' : '#3a201a',
-  };
-});
-
-// Needle: dashed (4px on, 3px off) across all rows; 4px solid red inside the active row.
-const needleX = TRACK_X + ((f - LO - activeRow * PER) / PER) * TRACK_W;
-let needleIn = '';
-let needleOut = '';
-for (let y = PAD_Y + 6; y < rowTop(4) + ROW_H - 4; y += 7) {
-  const inRow = y >= rowTop(activeRow) && y <= rowTop(activeRow) + ROW_H;
-  if (inRow) needleIn += `M${n2(needleX - 2)} ${n2(y)}h4v4h-4z`;
-  else needleOut += `M${n2(needleX - 1)} ${n2(y)}h2v4h-2z`;
-}
 
 // Speaker grille: rings of holes r = 12…92 step 10, about one hole per 10px, alternate rings offset.
 const holes: { cx: string; cy: string }[] = [];
@@ -83,12 +49,11 @@ for (let r = 12; r <= 96; r += 10) {
   }
 }
 
-const knobAngle = ((f - LO) / 2) * 360; // one full turn = 2 MHz
 const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
 ---
 
 <header class="stand">
-  <div class="radio">
+  <div class="radio" data-radio>
     <div class="antenna rx" aria-hidden="true"><span class="tip"></span></div>
     <div class="handle" aria-hidden="true"></div>
     {/* Preset keys repeat the band keys below for pointer users; the band keys carry the names. */}
@@ -110,15 +75,15 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
       <i class="screw s3" aria-hidden="true"></i><i class="screw s4" aria-hidden="true"></i>
 
       <div class="lcd">
-        <p class="sr-only">{ui.tunedTo} {freqText(f)} {ui.mhz}: {spokenName(station)}</p>
+        <p class="sr-only" data-lcd-text>{ui.tunedTo} {freqText(f)} {ui.mhz}: {spokenName(station)}</p>
         <span class="fm" aria-hidden="true">{ui.fm}</span>
         <span class="seg digits" aria-hidden="true"><span class="g">188.8</span><span class="l">{digits}</span></span>
         <span class="mhz" aria-hidden="true">{ui.mhz}</span>
         <div class="stat" aria-hidden="true">
           <span class="seg alpha"><span class="g">~~~~~~~~~</span><span class="l">{alpha}</span></span>
           <div class="meters">
-            <span class="lamp on">{ui.tuned}</span>
-            <span class="lamp amber">{ui.afc}</span>
+            <span class="lamp on" data-lamp="tuned">{ui.tuned}</span>
+            <span class="lamp amber" data-lamp="afc">{ui.afc}</span>
             <span class="sigm">{Array.from({ length: 10 }, (_, i) => <i class:list={['on', { hi: i > 7 }]} />)}</span>
           </div>
         </div>
@@ -126,10 +91,12 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
 
       <nav class="dialwin" aria-label={ui.stations}>
         <svg class="scale" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
-          {ticks.map((t) => <path d={t.d} fill={t.on ? 'rgba(255,59,31,.55)' : 'var(--ghost)'} />)}
-          {marks.map((m) => <rect x={m.x} y={m.y} width="5" height="6" fill={m.fill} />)}
-          <path d={needleOut} fill="rgba(255,59,31,.35)" />
-          <path d={needleIn} fill="var(--lit)" />
+          {ticks.map((t) => <path data-ticks d={t.d} fill={t.on ? TICK_ON : TICK_OFF} />)}
+          {marks.map((m) => <rect data-mark={m.id} x={m.x} y={m.y} width="5" height="6" fill={m.fill} />)}
+          <g data-needle transform={`translate(${needleX(f)} 0)`}>
+            <path d={needle.outRow} fill="rgba(255,59,31,.35)" />
+            <path d={needle.inRow} fill="var(--lit)" />
+          </g>
         </svg>
         <ol class="rows">
           {
@@ -150,6 +117,7 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
                           <a
                             class:list={['stn', { lock: s.id === station.id }]}
                             href={stationPath(s.id)}
+                            data-station={s.id}
                             style={`left:${n2(rowPosition(s.data.freq, s.data.band) * 100)}%`}
                             aria-current={s.id === station.id ? 'page' : undefined}
                           >
@@ -178,20 +146,20 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
           </svg>
         </div>
         <div class="ctrls">
-          {/* The knob and volume become sliders when the tuner script runs (Phase 2 and 4). */}
-          <div class="knob" aria-hidden="true">
+          {/* The tuner script turns the knob into a slider; the volume knob waits for the player (Phase 4). */}
+          <div class="knob" aria-hidden="true" data-knob>
             <div class="ring"></div>
-            <div class="grip" style={`transform:rotate(${n2(knobAngle)}deg)`}></div>
+            <div class="grip" style={`transform:rotate(${n2(knobAngle(f))}deg)`}></div>
           </div>
           <span class="klabel" aria-hidden="true">{ui.tuning}</span>
           <div class="sub">
-            <a class="seek" href={stationPath(prev.id)} aria-label={`${ui.previousStation}: ${spokenName(prev)}`}>
+            <a class="seek" data-seek="prev" href={stationPath(prev.id)} aria-label={`${ui.previousStation}: ${spokenName(prev)}`}>
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h3v16H5zM21 4v16L9 12z"></path></svg>
             </a>
             <div class="vol" aria-hidden="true">
               <div class="grip" style={`transform:rotate(${volumeAngle}deg)`}></div>
             </div>
-            <a class="seek" href={stationPath(next.id)} aria-label={`${ui.nextStation}: ${spokenName(next)}`}>
+            <a class="seek" data-seek="next" href={stationPath(next.id)} aria-label={`${ui.nextStation}: ${spokenName(next)}`}>
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 4h3v16h-3zM3 4v16l12-8z"></path></svg>
             </a>
           </div>
@@ -609,6 +577,15 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
     inset: 14px;
     border-radius: 50%;
     border: 1px solid #3a3431;
+  }
+  /* The tuner script makes the knob a slider you can drag, scroll and key. */
+  .knob[role='slider'] {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+  .knob[role='slider']:active {
+    cursor: grabbing;
   }
   .klabel {
     font-weight: 700;

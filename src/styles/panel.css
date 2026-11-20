@@ -256,6 +256,59 @@
   color: var(--quiet);
 }
 
+/* idle: between stations. The words sit on a solid plate above the static (like a set's
+   on-screen display), so they stay readable while the noise fills the rest of the panel. */
+.view .idle {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-height: 100%;
+}
+.view .idle .osd {
+  display: grid;
+  gap: 8px;
+  padding: 20px 24px;
+  border-radius: 6px;
+  background: var(--ground);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.view .idle .big {
+  margin: 0;
+  color: var(--quiet);
+}
+
+/* Tuner motion (src/scripts/panel.ts). Slide-in after a panel swap: 550 ms, 60 ms stagger.
+   Pixel resolve: a canvas over each new image steps from big blocks to the real picture.
+   With reduced motion the script adds neither. */
+.view.in > * {
+  animation: slide-in 0.55s var(--ease-out) both;
+}
+.view.in > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+.view.in > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+.view.in > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(3px);
+  }
+}
+.view .pic canvas.res {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
 @container (max-width: 600px) {
   .view .about,
   .view .case2 {

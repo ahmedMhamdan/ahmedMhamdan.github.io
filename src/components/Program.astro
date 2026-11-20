@@ -2,6 +2,7 @@
 // The program area: LED wall behind a stage head, the content panel and the footer.
 // The wall canvas stays empty until the wall script (Phase 3); its unlit dot grid is a CSS
 // background so the page looks complete without JavaScript.
+// Every other station's panel ships as an inert <template>, so the tuner swaps panels without a fetch.
 import { bandLabel, freqText, type Station } from '../lib/stations';
 import { ui } from '../lib/ui';
 import Panel from './Panel.astro';
@@ -14,6 +15,7 @@ interface Props {
 
 const { station, stations } = Astro.props;
 const { data } = station;
+const others = stations.filter((s) => s.id !== station.id);
 ---
 
 <main class="program">
@@ -21,17 +23,34 @@ const { data } = station;
   <div class="over">
     <div class="stagehead" aria-hidden="true">
       <span>{ui.signal}</span>
-      <span><b>{bandLabel(data.band)} · {data.key}</b> · {freqText(data.freq)} {ui.mhz}</span>
+      <span data-stagehead><b>{bandLabel(data.band)} · {data.key}</b> · {freqText(data.freq)} {ui.mhz}</span>
     </div>
     <div class="panel">
       <section class="view" id="content" tabindex="0" aria-labelledby="station-title">
         <Panel station={station} stations={stations} />
       </section>
+      <canvas class="static" width="200" height="120" aria-hidden="true"></canvas>
     </div>
     <footer class="foot">
-      <p class="hint"><b>{ui.hintStatic.strong}</b>{ui.hintStatic.rest}</p>
+      <p class="hint" data-hint><b>{ui.hintStatic.strong}</b>{ui.hintStatic.rest}</p>
     </footer>
   </div>
+  {
+    others.map((s) => (
+      <template data-panel={s.id}>
+        <Panel station={s} stations={stations} />
+      </template>
+    ))
+  }
+  <template data-panel="idle">
+    <div class="idle">
+      <div class="osd">
+        <p class="k">{ui.idleKicker}</p>
+        <h1 id="station-title" class="big">{ui.idleHeading}</h1>
+        <p class="txt">{ui.idleText}</p>
+      </div>
+    </div>
+  </template>
 </main>
 
 <style>
@@ -92,6 +111,17 @@ const { data } = station;
   }
   .view:focus-visible {
     outline-offset: -4px;
+  }
+  /* Static over the panel while the signal is weak (the tuner draws it; transparent at rest). */
+  .static {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    image-rendering: pixelated;
+    opacity: 0;
+    mix-blend-mode: screen;
   }
   .foot {
     display: flex;

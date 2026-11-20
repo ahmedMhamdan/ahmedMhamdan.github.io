@@ -1,14 +1,15 @@
 ---
 import RadioLayout from '../layouts/RadioLayout.astro';
-import { getStations, HOME_ID } from '../lib/stations';
+import { getStations, HOME_ID, pageTitle } from '../lib/stations';
+import { ui } from '../lib/ui';
 
 const stations = await getStations();
 const station = stations.find((s) => s.id === HOME_ID)!;
 ---
 
 <RadioLayout
-  title="Ahmed Hamdan · Cybersecurity graduate and full-stack developer"
-  description={station.data.lede ?? 'Cybersecurity graduate and full-stack developer.'}
+  title={pageTitle(station)}
+  description={station.data.lede ?? `${ui.siteTagline}.`}
   station={station}
   stations={stations}
 />
