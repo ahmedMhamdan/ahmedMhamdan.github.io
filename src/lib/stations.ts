@@ -1,3 +1,4 @@
+import { getImage } from 'astro:assets';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { BANDS, assertSpacing, bandIndex, type BandId, type StationInfo } from './dial';
 import { ui } from './ui';
@@ -54,13 +55,30 @@ export function spokenName(s: Station) {
 export const pageTitle = (s: Station) =>
   s.id === HOME_ID ? `${ui.siteName} · ${ui.siteTagline}` : `${s.data.title} · ${ui.siteName}`;
 
+/**
+ * The image the LED wall shows as a billboard while the station is tuned: a case study's image or a
+ * gallery's first photo (the reference mock: ELANCER and PHOTOS). Other stations show their band animation.
+ */
+export function billboardImage(s: Station) {
+  if (s.data.layout === 'case') return s.data.image;
+  if (s.data.layout === 'gallery') return s.data.gallery.find((g) => g.image)?.image;
+  return undefined;
+}
+
+/** The wall samples billboards at one LED per 8px, so a small copy is plenty even on wide screens. */
+const BILLBOARD_WIDTH = 320;
+
 /** The station as the client tuner sees it (embedded in every page). */
-export const stationInfo = (s: Station): StationInfo => ({
-  id: s.id,
-  row: bandIndex(s.data.band),
-  key: s.data.key,
-  freq: s.data.freq,
-  path: stationPath(s.id),
-  title: pageTitle(s),
-  name: spokenName(s),
-});
+export async function stationInfo(s: Station): Promise<StationInfo> {
+  const image = billboardImage(s);
+  return {
+    id: s.id,
+    row: bandIndex(s.data.band),
+    key: s.data.key,
+    freq: s.data.freq,
+    path: stationPath(s.id),
+    title: pageTitle(s),
+    name: spokenName(s),
+    billboard: image && (await getImage({ src: image, width: BILLBOARD_WIDTH, format: 'webp' })).src,
+  };
+}

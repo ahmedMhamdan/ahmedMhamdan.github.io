@@ -28,6 +28,8 @@ export interface StationInfo {
   title: string;
   /** Spoken name for assistive text: "Work, Elancer". */
   name: string;
+  /** Small copy of the station's image, shown on the LED wall as a billboard while tuned (absent: band animation). */
+  billboard?: string;
 }
 
 /** Tuner behaviour constants (reference mock; docs/design/direction.md, "Tuning model"). */

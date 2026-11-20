@@ -17,7 +17,8 @@ interface Props {
 const { title, description, station, stations } = Astro.props;
 
 // The station list for the tuner, in dial order. "<" is escaped so the JSON can never close the tag.
-const data = JSON.stringify({ current: station.id, stations: stations.map(stationInfo) }).replace(/</g, '\\u003c');
+const infos = await Promise.all(stations.map(stationInfo));
+const data = JSON.stringify({ current: station.id, stations: infos }).replace(/</g, '\\u003c');
 ---
 
 <Base title={title} description={description}>
