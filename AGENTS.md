@@ -40,15 +40,16 @@ src/
   lib/dial.ts              dial constants (88–108 MHz, 4 MHz per band, tuning numbers) and spacing guard
   lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName, stationInfo() (with the billboard image)
   lib/tuning.ts            pure tuning math (nearest, strength, lock, AFC, seek, readouts, antenna); tests in tuning.test.ts
-  lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts (run time)
+  lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts and tuner.ts (run time: the needle, the frequency under a pointer); tests in scale.test.ts
   lib/sound.ts             pure sound and player math (per-frame sound targets, marquee, time, volume); tests in sound.test.ts
   lib/ui.ts                interface strings in one place (Arabic-ready)
   data/tracks.ts           the player's tracks: one approved excerpt (public/audio/lock-in.mp3); a git-ignored tracks.local.ts may list a local file for development
   scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden
   scripts/state.ts         the one shared state object (tuner writes, everything else reads)
-  scripts/tuner.ts         inputs (knob, wheel, keys, links, back/forward), easing, AFC, lock
+  scripts/tuner.ts         inputs (knob, dial drag, wheel, keys, links, back/forward), easing, AFC, lock
   scripts/dial.ts          moves the SVG scale: needle, lit row, marks, preset keys, seek links
-  scripts/readouts.ts      LCD, lamps, meter, knob slider, antenna, stage head, speaker cone
+  scripts/readouts.ts      LCD (and the docked LCD), lamps, meter, knob slider, antenna, stage head, speaker cone
+  scripts/dock.ts          phones: the LCD docked at the top once the dial scrolls away, seek follow, the panel's height held between stations
   scripts/panel.ts         panel swap from <template>, decode, pixel resolve, static, idle, URL/title/announcement
   scripts/wall.ts          LED wall: band animations, billboards, noise, ripples, music spectrum; one canvas pixel per dot, scaled and masked by CSS
   scripts/audio.ts         Web Audio graph (music through the radio, static, whistle, lock click) and its per-frame tick; made on the first press only
@@ -56,7 +57,7 @@ src/
   scripts/rotary.ts        turning a knob by hand (pointer capture, angle deltas): tuning and volume knobs
   layouts/Base.astro       html shell, fonts, meta
   layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
-  components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time)
+  components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time), its phone head unit and the docked LCD
   components/Program.astro LED wall (dot grid, canvas, mask), stage head, panel, footer hint and player
   components/Player.astro  music player markup, rendered only when tracks.ts lists a track
   components/Panel*.astro  panel layouts: about, gallery, case, list, poem, contact (+ PanelHead, Pic, Actions)

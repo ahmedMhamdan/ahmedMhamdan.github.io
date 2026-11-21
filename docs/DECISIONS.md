@@ -2,6 +2,31 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-21: The phone layout (Phase 5)
+
+- **Context:** The plan's phone proposal (Phase 5, task 1) was drawn as `docs/design/reference/phone-mock.html` and shown to Ahmed with five points that go beyond the plan. Ahmed approved the mock and all five points on 2026-11-21 (Open Question 8).
+- **Decision:** Build the mock for screens up to 699px wide and for phones held sideways (landscape, at most 520px tall, coarse pointer). The five approved points:
+  1. No tuning knob, speaker or volume knob on phones: the dial is dragged instead, and phones have volume buttons.
+  2. No stage head ("SIGNAL · BAND · KEY") on phones: the LCD and the panel already name the station, and no text sits over lit dots.
+  3. The wall strip is 144px tall (the plan said 160–200px), and the panel overlaps its last 16px.
+  4. Dial rows are 32px, not 44px. A station's target is its row cell (at least 32px tall and about 50px wide at 390px), above the WCAG 2.2 AA minimum of 24px, and a tap on the track tunes to the nearest station in that row. This keeps the panel's heading on the first screen.
+  5. Once half the dial has scrolled away, its LCD docks at the top with the seek buttons.
+- **Build details:**
+  - Dragging along the dial window tunes, by touch, pen or mouse, on every screen size: a press becomes a drag once it has moved 6px sideways and more sideways than down. The needle follows the pointer along the row under it (`freqAtPoint` in `src/lib/scale.ts`), and on release AFC takes over. On a phone that can vibrate, each lock during a drag gives an 8ms tick. `touch-action: pan-y` leaves vertical swipes to the page. A tap on a station link tunes as a link does, a tap on the track tunes to the nearest station in that row, and the click that ends a mouse drag is ignored. On a desktop the dial window shows a sideways-arrow cursor. This adds an input to the desktop, which the mock does not have.
+  - The docked LCD (`src/scripts/dock.ts`) is a second copy of the seek links and the LCD cells; `dial.ts` and `readouts.ts` update both. A press on its LCD scrolls back to the dial and focuses the current station's mark. A seek from it brings the new panel into view under it (`scroll-margin-top: 64px`). It shows on upright phones only, and stays hidden without JavaScript.
+  - Between stations the panel keeps its last height on phones, so the page never shrinks under a finger on the dial. The height comes from a `ResizeObserver`, never from a read in a frame.
+  - The wall's stage now ends at the panel's top edge (`panel.offsetTop`) on every layout. On a desktop that is the same line as before.
+  - In a panel narrower than 600px, the About portrait (96px) sits beside the kicker and the heading, so "Ahmed Hamdan" is on the first screen (its top at 651px of 844 on a 390×844 screen).
+  - The phone panel has no backdrop blur, so a wall frame never makes the browser repaint it; it is 96% opaque instead.
+  - The player is a bar fixed to the bottom of the screen: 64px, or 56px on a phone held sideways, plus the home-indicator area. The page ends above it.
+  - Safe areas: the viewport meta has `viewport-fit=cover`, and the head unit, the dock and the player keep clear of the notch and the home indicator with `env(safe-area-inset-*)`.
+  - On touch screens (`(hover: none) and (pointer: coarse)`) the footer hint reads "Drag along the dial or tap a station" and the idle panel "Let go near a station and it locks in." Both wordings are in the HTML (`src/lib/ui.ts`), and CSS shows one.
+  - Under 360px wide, the band names and station names have tighter letter spacing, so they clear the first stations at 320px.
+  - On a phone held sideways, the page has two columns: on the left, the head unit stays in place, centred in the screen height, without antenna or keys; on the right, the program scrolls (wall strip 112px). There is no dock in this layout.
+  - Tablets (700–959px) keep the interim stacked layout until task 2.
+- **Rationale:** The dial is the site's one idea, so on a phone it gets the full width and the finger, and the parts a phone does not need (knob, speaker, volume) give it room. The dock and the panel hold keep the radio at hand while reading without a layout jump.
+- **Consequences:** The client script is 12.0 KB gzip (was 10.9). The desktop looks as before; its one change is that the dial can be dragged. Not tested yet: a real phone, Safari and iOS, and the vibration.
+
 ## 2026-11-21: The music goes live as an excerpt
 
 - **Context:** Ahmed asked to see Phase 4 on the live site with its one track. The track is a 66-minute jazz piano mix (95 MB) downloaded from YouTube; its source and licence are unknown. Live audio has to be in the public repository, and a takedown could make GitHub disable the repository and the site. Ahmed chose a short excerpt over the full mix and confirmed it may be published.

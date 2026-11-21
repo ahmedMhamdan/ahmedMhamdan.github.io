@@ -54,11 +54,31 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
 - **Program** (right): wall canvas fills the column. Overlay grid rows `300px | 1fr | 104px`, side padding 48px.
   - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING".
   - Panel: radius 10px, `rgba(18,17,16,.9)`, 1px `--rule` inset edge, `backdrop-filter: blur(2px)`, padding 28/32, internal scroll, static canvas overlay (`mix-blend-mode: screen`).
-  - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station"; player on the right.
+  - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station" (touch screens: the phone wording below); player on the right.
 - **Panel layouts:** about (240px portrait 4:5 + text, facts list, two actions), gallery (4 columns, 4:5), case (image 16:8 + text, meta row, actions), list (rows with right-aligned category labels), poem, contact (large link rows with right-aligned labels; active row in `--lit`).
 - **Buttons:** 44px tall, radius 6px, `--rubber` with a 3px bottom shadow; primary = `--lit` with dark text. Pressed state moves 2px down.
 
-Phone and tablet layouts are not designed yet (plan Phase 5).
+## Layout (phone, approved 2026-11-21)
+
+From `reference/phone-mock.html`, for screens up to 699px wide and for phones held sideways (`(orientation: landscape) and (max-height: 520px) and (pointer: coarse)`). Measurements at 390×844.
+
+- **Page:** scrolls; 10px side margins; `viewport-fit=cover`, with the notch and the home indicator kept clear by `env(safe-area-inset-*)`.
+- **Head unit** across the top. Above the case: five preset keys 48×26px with the digit at the top (each key's target reaches 20px higher) and a short antenna 6×54px near the right edge; no handle.
+- **Case:** radius 22px, padding 12px, gap 8px, areas `lcd` / `dial` / `prev plate next` (44px seek buttons either side of the plate).
+  - **LCD:** "FM", the frequency (DSEG7, `clamp(34px, 13.5cqi, 46px)`), "MHz" with the TUNED and AFC lamps under it; below, the station key (DSEG14 17px) and the signal meter.
+  - **Dial window:** full width at 408:204, the desktop drawing scaled as one. Its padding and the band-key column are the scale's proportions (12/408, 6/408 and 78/384 of the width), so the SVG scale and the HTML labels line up at any width. Rows are 32px at 390px wide.
+  - **Plate:** name 14px, 0.24em; subtitle as on the desktop.
+  - No speaker, tuning knob or volume knob: the dial is dragged, and phones have volume buttons.
+- **Program:** the LED wall is a 144px strip; the panel starts 16px above its bottom edge (128px). No stage head. Panel: radius 12px, `rgba(18,17,16,.96)`, no backdrop blur, padding 22/18/26, as tall as its content (the page scrolls, not the panel). In a panel under 600px wide, the About portrait is 96px, beside the kicker and the heading.
+- **Docked LCD:** once half the dial is under the top edge, a 56px bar slides down (0.3s, `--ease-out`): seek, a mini LCD (FM, frequency DSEG7 22px, key DSEG14 15px, TUNED lamp), seek. A press on the mini LCD scrolls back to the dial and focuses the current station's mark; a seek from it brings the new panel into view under it.
+- **Between stations** the panel keeps its last height, so the page never shrinks under a finger.
+- **Player:** a bar fixed to the bottom, 64px plus the home-indicator area, `#181615` with a `--rule` top edge; play button 44px, marquee 15px, time 12px. The page ends 8px above it.
+- **Touch wording** (`(hover: none) and (pointer: coarse)`): hint "**Drag along the dial** or tap a station"; idle panel "Let go near a station and it locks in."
+- **Under 360px:** band names and station names track tighter (0 and 0.02em, gap 4px) so they clear the first stations.
+- **Sideways:** two columns. On the left (`minmax(330px, 42%)`) the head unit stays in place, centred in the screen height above the 56px player, without antenna or keys; on the right the program scrolls (wall 112px, panel from 96px). No dock.
+- **Targets:** every button, seek link, preset key and the dock at least 44×44px. A dial station's target is its row cell (at least 32px tall, about 50px wide at 390px), above the WCAG 2.2 AA minimum of 24px; a tap on the track picks the nearest station in that row.
+
+The tablet layout (700–959px) is not designed yet (plan Phase 5); until then it is the interim stack: radio, then program.
 
 ## Tuning model
 
@@ -68,6 +88,7 @@ Phone and tablet layouts are not designed yet (plan Phase 5).
 | Easing | each frame `f += (target − f) × 0.075`; snap when `|target − f| < 0.002`; reduced motion: `f = target` |
 | Knob | one full turn = 2 MHz; while dragging `f = target` (direct) |
 | Wheel | `target −= deltaY × 0.0025` on the dial window and knob |
+| Dial drag | touch, pen or mouse on the dial window: a drag starts after 6px sideways (and more sideways than down; vertical swipes scroll the page); while dragging `f = target` = the frequency under the pointer in the row under it; release hands over to AFC; a tap on the track tunes to the nearest station in that row; 8ms vibration on each lock during a drag, where supported |
 | Keyboard | 1–5 band presets (first station of the band); ← → previous/next station (wraps); knob focused: arrows ±0.1 MHz, Page Up/Down next/previous |
 | AFC | when not dragging, ≥ 420 ms since the last move, `|target − f| < 0.01`, and the nearest station is 0.004–0.35 MHz away: `target = station.freq`, AFC lamp on (also on while gliding to a station target within 0.35) |
 | Lock | distance < 0.06 MHz |

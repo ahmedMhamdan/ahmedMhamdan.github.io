@@ -37,7 +37,7 @@ The site itself is the proof of skill: a working radio you tune by hand, an LED 
 - Static only: no backend, no database, no accounts, no tracking.
 - Audio plays only after a visitor action.
 - Coursework answers are never published before deadlines; lab write-ups only from labs on Ahmed's own machines.
-- Undecided: final project and security list, poem selection, photo set, public email, LinkedIn URL, music rights and excerpt, code licence, phone layout details.
+- Undecided: final project and security list, poem selection, photo set, public email, LinkedIn URL, the music's source and credit line, code licence.
 
 ## Brand Commitments
 
