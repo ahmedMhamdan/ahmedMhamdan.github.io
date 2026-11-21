@@ -43,7 +43,7 @@ src/
   lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts (run time)
   lib/sound.ts             pure sound and player math (per-frame sound targets, marquee, time, volume); tests in sound.test.ts
   lib/ui.ts                interface strings in one place (Arabic-ready)
-  data/tracks.ts           the player's tracks: [] until Ahmed confirms the music rights (no player, no sound); a git-ignored tracks.local.ts may list a local file for development
+  data/tracks.ts           the player's tracks: one approved excerpt (public/audio/lock-in.mp3); a git-ignored tracks.local.ts may list a local file for development
   scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden
   scripts/state.ts         the one shared state object (tuner writes, everything else reads)
   scripts/tuner.ts         inputs (knob, wheel, keys, links, back/forward), easing, AFC, lock
@@ -82,7 +82,7 @@ Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scrip
 - English at launch. Keep text out of images and canvases so an Arabic (RTL) version can follow: use logical CSS properties (`margin-inline`, `inset-inline-start`) in new CSS.
 
 ### Privacy and safety (public repository)
-- Never commit audio files, unreleased photos, private notes, credentials or `.env` files. `public/audio/` and `*.mp3` are git-ignored on purpose. Music ships only after Ahmed confirms the rights and the excerpt (see `docs/CONTENT.md`).
+- Never commit audio files, unreleased photos, private notes, credentials or `.env` files. `public/audio/` and `*.mp3` are git-ignored on purpose; the one exception is the excerpt Ahmed approved, `public/audio/lock-in.mp3`, allowed by name in `.gitignore`. Any other music ships only after Ahmed confirms its rights and excerpt (see `docs/CONTENT.md`).
 - Never commit Ahmed's personal email address, phone number, student ID, or local machine paths. Contact details are added only when Ahmed confirms them.
 - Lab write-ups only from labs on Ahmed's own machines; no coursework answers before their deadlines; nothing that targets third-party systems.
 - No analytics, trackers, third-party embeds, or external font/CDN requests. Self-host everything.

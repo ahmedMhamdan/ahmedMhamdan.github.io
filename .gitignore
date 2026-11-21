@@ -24,10 +24,12 @@ pnpm-debug.log*
 .idea/
 
 # audio and private assets: never commit until rights and the final excerpt are confirmed
-public/audio/
+public/audio/*
 *.mp3
 *.wav
 *.flac
+# the one published excerpt (Ahmed approved it on 2026-11-21; docs/CONTENT.md, Music)
+!public/audio/lock-in.mp3
 private/
 # local development track list (points at public/audio/)
 src/data/tracks.local.ts

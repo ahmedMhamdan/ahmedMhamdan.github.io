@@ -2,6 +2,13 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-21: The music goes live as an excerpt
+
+- **Context:** Ahmed asked to see Phase 4 on the live site with its one track. The track is a 66-minute jazz piano mix (95 MB) downloaded from YouTube; its source and licence are unknown. Live audio has to be in the public repository, and a takedown could make GitHub disable the repository and the site. Ahmed chose a short excerpt over the full mix and confirmed it may be published.
+- **Decision:** Publish the mix's first song, 0:00 to 3:24, as `public/audio/lock-in.mp3`. It ends in the silence before the second song, so the player never cuts off mid-phrase. That made it 4.9 MB, not the 2:45 and 4 MB first proposed. The file is cut on MP3 frame boundaries without re-encoding (192 kbps; its length header is rewritten), is the one audio file allowed in git (by name in `.gitignore`), and is listed in `src/data/tracks.ts`. There is no credit line while the source is unknown.
+- **Rationale:** An excerpt keeps git history and phone data small (it loads only on a press of play) and limits what is exposed while the rights are unclear; a natural ending sounds finished.
+- **Consequences:** The live site has the player and the radio sound. If a takedown comes, empty `published` in `tracks.ts`, remove the file and redeploy. Still open: the source and a credit line.
+
 ## 2026-11-21: Phase 4 sound and player details (for Ahmed's review)
 
 - **Context:** Porting the mock's sound and player (plan Phase 4) needed some calls the mock and the plan leave open.

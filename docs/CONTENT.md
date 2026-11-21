@@ -27,10 +27,12 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 
 ## Music
 
-- Track: "you got a lot to finish. let's lock in." (jazz piano), about 66 minutes, source and licence unknown.
-- **Not in the repository** (git-ignored). It may be used locally during development from `public/audio/`, listed in a git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`). The committed `src/data/tracks.ts` stays empty, so the live site has no player and no sound.
-- To publish a track: put the excerpt in `public/audio/` (and allow that one file in `.gitignore`), add `{ title, src, credit }` to `published` in `src/data/tracks.ts`, and decide where a visible credit goes if the licence requires one.
-- Before it ships: confirm the right to publish it (or its licence), pick an excerpt (suggested 2–4 minutes, 128 kbps MP3 or Opus, ≤ 4 MB), and write the credit line. If rights can't be confirmed, choose a licensed track or launch without music (the player hides when `src/data/tracks.ts` is empty).
+- Track: "you got a lot to finish. let's lock in." (jazz piano), a 66-minute mix downloaded from YouTube; its source and licence are unknown.
+- **Published excerpt** (Ahmed approved it on 2026-11-21): `public/audio/lock-in.mp3`, the mix's first song from 0:00 to 3:24, ending in the silence before the second song; 192 kbps MP3 cut on frame boundaries without re-encoding, 4.9 MB, loaded only when a visitor presses play. It is the one audio file allowed in git (by name in `.gitignore`) and is listed in `src/data/tracks.ts`. No credit line while the source is unknown.
+- Risk Ahmed accepted: if the rights holder files a takedown, GitHub can disable the repository and the site. Then remove the file from `tracks.ts` and the repository (the player hides when the list is empty) and redeploy.
+- Still open: the source and credit line (add `credit` in `tracks.ts`, and decide where a visible credit goes if a licence requires one).
+- The full mix stays out of git. Development may still use it from `public/audio/`, listed in the git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`), which replaces the published list in local builds.
+- Another track: same steps (excerpt in `public/audio/` and allowed by name in `.gitignore`, `{ title, src, credit }` in `published`), only after Ahmed confirms its rights.
 
 ## Images
 

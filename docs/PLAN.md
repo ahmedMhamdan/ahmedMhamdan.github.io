@@ -176,7 +176,7 @@ One state object (frequency `f`, `target`, nearest station, distance, strength, 
 - **Station (build time):** `id` ("work/elancer"), `band`, `key` (LED label), `freq`, `title`, `kicker`, `lede`, `image` + `imageAlt`, `href`, `placeholder`, Markdown body. Phase 1 adds optional `facts` (label/value list), `actions` (label + target station id or URL), `gallery` (images with alt and caption), and `layout` (about | gallery | case | list | poem | contact) so panels match the mock.
 - **Embedded client data:** each page includes a small JSON list of stations in dial order (`id`, `row`, `key`, `freq`, `path`, `title`, `name`) plus the current station id in a `<script type="application/json" id="radio-data">`, and one `<template data-panel="<id>">` per other station (and one for the idle panel) with its rendered panel HTML. No runtime fetch.
 - **Runtime state (one object):** `stations`, `f`, `target`, `dragging`, `lastMove`, `near`, `dist`, `strength`, `locked`, `afc`, `row`, `df`, `current`, `reduceMotion`; Phase 4 added `audio { ready, playing, fx, volume, level, bins }` (the player and the audio write it; `level` drives the cone, `bins` the wall's spectrum).
-- **Tracks:** `src/data/tracks.ts` exports `[]` until a licensed excerpt exists; then `{ title, src: '/audio/<file>.mp3', credit }`.
+- **Tracks:** `src/data/tracks.ts` lists `{ title, src: '/audio/<file>.mp3', credit? }`; one approved excerpt since 2026-11-21 (an empty list removes the player).
 
 ### Interfaces And Integrations
 
@@ -334,7 +334,7 @@ Per phase, as listed. Browsers: Chrome, Firefox, Safari (or WebKit through Playw
 | --- | --- |
 | Canvas wall too heavy on phones | 30 fps cap, batching, visibility pause, lower density or a static wall on small or low-power screens |
 | Effects hurt readability | Readable-first rule; panel background opaque enough; reduced-motion path |
-| Music rights unclear | No audio ships until rights are confirmed; the player is hidden with an empty track list |
+| Music rights unclear | Only a 3:24 excerpt Ahmed approved is published; on a takedown, empty the track list (the player hides), remove the file and redeploy |
 | Placeholders go live | Deploy gate; launch checklist |
 | Private data committed to a public repo | AGENTS.md rules; `.gitignore`; staged-diff review |
 | Novelty confuses recruiters | Home is already tuned to ABOUT with a clear pitch and contact button; plain links on the dial |
@@ -354,7 +354,7 @@ Per phase, as listed. Browsers: Chrome, Firefox, Safari (or WebKit through Playw
 3. Security: which lab write-ups to publish; what can be shared about the research paper and when?
 4. Work: confirm the Laravel and React lists; Elancer screenshots, source link (public or private?), case study timing.
 5. Contact: which public email address, and the LinkedIn URL?
-6. Music: is the track licensed for publishing? If yes, which excerpt (length, start) and the credit line? If not, choose another track or ship without music.
+6. Music: Ahmed approved publishing an excerpt of the track (0:00–3:24) on 2026-11-21. Still open: its source and credit line.
 7. Code licence: all rights reserved (default), MIT for the code with content excluded, or something else?
 8. Phone layout: approve the proposed layout (Phase 5) or choose another.
 9. Timeline for the Arabic version and a custom domain.
