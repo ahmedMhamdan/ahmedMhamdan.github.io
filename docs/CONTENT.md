@@ -28,7 +28,8 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 ## Music
 
 - Track: "you got a lot to finish. let's lock in." (jazz piano), about 66 minutes, source and licence unknown.
-- **Not in the repository** (git-ignored). It may be used locally during development from `public/audio/`.
+- **Not in the repository** (git-ignored). It may be used locally during development from `public/audio/`, listed in a git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`). The committed `src/data/tracks.ts` stays empty, so the live site has no player and no sound.
+- To publish a track: put the excerpt in `public/audio/` (and allow that one file in `.gitignore`), add `{ title, src, credit }` to `published` in `src/data/tracks.ts`, and decide where a visible credit goes if the licence requires one.
 - Before it ships: confirm the right to publish it (or its licence), pick an excerpt (suggested 2–4 minutes, 128 kbps MP3 or Opus, ≤ 4 MB), and write the credit line. If rights can't be confirmed, choose a licensed track or launch without music (the player hides when `src/data/tracks.ts` is empty).
 
 ## Images

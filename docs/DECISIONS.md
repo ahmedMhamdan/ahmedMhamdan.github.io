@@ -2,6 +2,29 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-21: Phase 4 sound and player details (for Ahmed's review)
+
+- **Context:** Porting the mock's sound and player (plan Phase 4) needed some calls the mock and the plan leave open.
+- **Decisions:**
+  - The audio graph, the per-frame numbers, the glide times, the lock click and the default volume are the mock's (`direction.md`, Sound). Every change glides (`setTargetAtTime`), and a parameter is sent only when its target moves, so a radio at rest sends nothing. Dial speed is measured as in the mock (MHz per 60 Hz frame, smoothed) at any refresh rate.
+  - Nothing exists before a press: the first press of play or DIAL FX makes the audio context inside the click, which also unlocks iOS. The track file loads on the first press of play only (its URL waits in a data attribute, so nothing is fetched before).
+  - The first play turns DIAL FX on, as in the mock, unless the visitor has already set DIAL FX themselves.
+  - The audio context sleeps while there is neither music nor DIAL FX (battery), and wakes on the next press.
+  - The player and the sound exist only when `src/data/tracks.ts` lists a track. With the committed empty list there is no player, the volume knob stays decorative and the radio is silent (DIAL FX lives in the player).
+  - The player is rendered hidden and the script shows it: without JavaScript it could not play.
+  - Volume knob: a slider from 0 to 100% (arrows ±5, Page Up/Down ±10, Home/End), turned by hand like the tuning knob (a 270° sweep covers the range), remembered for the session only (`sessionStorage`). Both knobs share the drag code (`src/scripts/rotary.ts`).
+  - Speaker cone: the mock's peak level with a short fall-off, so it pulses rather than jitters. The grille's SVG scales on its own compositor layer, so the pulse never repaints the holes.
+  - Wall spectrum: the mock's 48 bins, up to 6 cells, 35% amber, standing on the stage's last row.
+  - Reduced motion: music and dial sounds work as usual, but the marquee holds still, the cone does not pulse, the wall shows no spectrum and the frame loop sleeps while the music plays. The time readout still counts.
+  - Marquee: a "." lights the decimal point of the cell before it, as DSEG14 draws it, so it takes no cell of its own; other punctuation is dropped, as in the mock.
+  - A track that cannot load stops the player instead of showing "playing".
+  - Footer: when the column is too narrow for the hint and the player side by side (1024×768, for example), the player wraps below the hint and the footer row grows. Below 480px the player tightens its gaps and its marquee to 16px. Phase 5 designs the phone player.
+  - Segment readouts always run left to right (`direction: ltr` on `.seg`), so the player's cells stay over their ghosts in a right-to-left page.
+  - Screen readers: the player is a region named "What I listen to"; the visible caption with the same words is hidden from them; the track title (and credit, when there is one) is visually hidden text; DIAL FX is a toggle button with `aria-pressed`, its visible text as its name.
+  - Development uses a git-ignored `src/data/tracks.local.ts` that lists a git-ignored file in `public/audio/`. The committed `tracks.ts` stays empty, and CI never has either file.
+- **Open for Ahmed:** if the music's licence requires a visible credit, where it goes (today it is read with the title by screen readers only; the README credits come in Phase 6).
+- **Consequences:** The client script is 10.9 KB gzip (was 8.4). With the committed empty track list the pages look and behave as in Phase 3.
+
 ## 2026-11-20: Phase 3 LED wall details (for Ahmed's review)
 
 - **Context:** Porting the mock's LED wall (plan Phase 3) needed a drawing method that stays cheap on phones, and some calls the mock and the plan leave open.

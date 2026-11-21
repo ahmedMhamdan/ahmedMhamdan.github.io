@@ -41,18 +41,24 @@ src/
   lib/stations.ts          getStations() in dial order (with guards), stationPath(), HOME_ID, neighbours, spokenName, stationInfo() (with the billboard image)
   lib/tuning.ts            pure tuning math (nearest, strength, lock, AFC, seek, readouts, antenna); tests in tuning.test.ts
   lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts (run time)
+  lib/sound.ts             pure sound and player math (per-frame sound targets, marquee, time, volume); tests in sound.test.ts
   lib/ui.ts                interface strings in one place (Arabic-ready)
+  data/tracks.ts           the player's tracks: [] until Ahmed confirms the music rights (no player, no sound); a git-ignored tracks.local.ts may list a local file for development
   scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden
   scripts/state.ts         the one shared state object (tuner writes, everything else reads)
   scripts/tuner.ts         inputs (knob, wheel, keys, links, back/forward), easing, AFC, lock
   scripts/dial.ts          moves the SVG scale: needle, lit row, marks, preset keys, seek links
-  scripts/readouts.ts      LCD, lamps, meter, knob slider, antenna, stage head
+  scripts/readouts.ts      LCD, lamps, meter, knob slider, antenna, stage head, speaker cone
   scripts/panel.ts         panel swap from <template>, decode, pixel resolve, static, idle, URL/title/announcement
-  scripts/wall.ts          LED wall: band animations, billboards, noise, ripples; one canvas pixel per dot, scaled and masked by CSS
+  scripts/wall.ts          LED wall: band animations, billboards, noise, ripples, music spectrum; one canvas pixel per dot, scaled and masked by CSS
+  scripts/audio.ts         Web Audio graph (music through the radio, static, whistle, lock click) and its per-frame tick; made on the first press only
+  scripts/player.ts        "What I listen to" player: play/pause, marquee, time, DIAL FX, and the volume knob on the radio
+  scripts/rotary.ts        turning a knob by hand (pointer capture, angle deltas): tuning and volume knobs
   layouts/Base.astro       html shell, fonts, meta
   layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
   components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time)
-  components/Program.astro LED wall (dot grid, canvas, mask), stage head, panel, footer hint
+  components/Program.astro LED wall (dot grid, canvas, mask), stage head, panel, footer hint and player
+  components/Player.astro  music player markup, rendered only when tracks.ts lists a track
   components/Panel*.astro  panel layouts: about, gallery, case, list, poem, contact (+ PanelHead, Pic, Actions)
   pages/index.astro        home (ME · ABOUT)
   pages/[...slug].astro    every other station
@@ -64,7 +70,7 @@ docs/                      plan, design contract, reference mock, content invent
 .github/workflows/         ci.yml (every push), deploy.yml (manual only)
 ```
 
-Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scripts/main.ts`); each returns a render function that reports whether it still needs frames. Still to come (see `docs/PLAN.md`): `audio.ts` and `player.ts` (Phase 4). Keep them framework-free TypeScript.
+Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scripts/main.ts`); each returns a render function that reports whether it still needs frames. Sound and the player start only when the page has a player. Keep them framework-free TypeScript.
 
 ## Hard rules
 
