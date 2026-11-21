@@ -4,6 +4,7 @@
 // preset keys and seek buttons are plain links. Ghost cells, scale and speaker are aria-hidden.
 import { BANDS, bandIndex, rowPosition } from '../lib/dial';
 import { MARK_LOCK, MARK_OFF, MARK_ON, TICK_OFF, TICK_ON, W, H, markAt, needlePaths, needleX, tickPath } from '../lib/scale';
+import { SOUND, volumeAngle } from '../lib/sound';
 import { freqCells, keyCells, knobAngle } from '../lib/tuning';
 import {
   firstOfBand,
@@ -49,7 +50,6 @@ for (let r = 12; r <= 96; r += 10) {
   }
 }
 
-const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
 ---
 
 <header class="stand">
@@ -138,15 +138,17 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
 
       <div class="lower">
         <div class="spk" aria-hidden="true">
-          <svg viewBox="0 0 212 212" focusable="false">
-            <g class="cone" fill="#050404">
+          {/* The cone: pulses with the music (src/scripts/readouts.ts). */}
+          <svg class="cone" viewBox="0 0 212 212" focusable="false" data-cone>
+            <g fill="#050404">
               {holes.map((h) => <circle cx={h.cx} cy={h.cy} r="2.6" />)}
               <circle cx="106" cy="106" r="5" />
             </g>
           </svg>
         </div>
         <div class="ctrls">
-          {/* The tuner script turns the knob into a slider; the volume knob waits for the player (Phase 4). */}
+          {/* The tuner script turns the knob into a slider; the player script does the same for the volume
+              knob, only when there is music (src/data/tracks.ts). */}
           <div class="knob" aria-hidden="true" data-knob>
             <div class="ring"></div>
             <div class="grip" style={`transform:rotate(${n2(knobAngle(f))}deg)`}></div>
@@ -156,8 +158,8 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
             <a class="seek" data-seek="prev" href={stationPath(prev.id)} aria-label={`${ui.previousStation}: ${spokenName(prev)}`}>
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h3v16H5zM21 4v16L9 12z"></path></svg>
             </a>
-            <div class="vol" aria-hidden="true">
-              <div class="grip" style={`transform:rotate(${volumeAngle}deg)`}></div>
+            <div class="vol" aria-hidden="true" data-volume>
+              <div class="grip" style={`transform:rotate(${volumeAngle(SOUND.volume)}deg)`}></div>
             </div>
             <a class="seek" data-seek="next" href={stationPath(next.id)} aria-label={`${ui.nextStation}: ${spokenName(next)}`}>
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 4h3v16h-3zM3 4v16l12-8z"></path></svg>
@@ -538,8 +540,10 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
     position: absolute;
     inset: 0;
   }
+  /* Its own layer, so the pulse never repaints the grille. */
   .cone {
     transform-origin: 50% 50%;
+    will-change: transform;
   }
   .ctrls {
     display: grid;
@@ -629,6 +633,15 @@ const volumeAngle = -135 + 0.8 * 270; // default volume 0.8
   .vol .grip {
     position: absolute;
     inset: 0;
+  }
+  /* The player script makes the volume knob a slider you can turn and key. */
+  .vol[role='slider'] {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+  .vol[role='slider']:active {
+    cursor: grabbing;
   }
   .vol .grip::after {
     content: '';

@@ -3,9 +3,12 @@
 // The wall's unlit dot grid is a CSS background, so the page looks complete without JavaScript;
 // the wall script (src/scripts/wall.ts) lights dots on the canvas above it.
 // Every other station's panel ships as an inert <template>, so the tuner swaps panels without a fetch.
+// The music player sits in the footer only when src/data/tracks.ts lists a track.
+import { tracks } from '../data/tracks';
 import { bandLabel, freqText, type Station } from '../lib/stations';
 import { ui } from '../lib/ui';
 import Panel from './Panel.astro';
+import Player from './Player.astro';
 import '../styles/panel.css';
 
 interface Props {
@@ -16,6 +19,7 @@ interface Props {
 const { station, stations } = Astro.props;
 const { data } = station;
 const others = stations.filter((s) => s.id !== station.id);
+const track = tracks[0];
 ---
 
 <main class="program">
@@ -33,6 +37,7 @@ const others = stations.filter((s) => s.id !== station.id);
     </div>
     <footer class="foot">
       <p class="hint" data-hint><b>{ui.hintStatic.strong}</b>{ui.hintStatic.rest}</p>
+      {track && <Player track={track} />}
     </footer>
   </div>
   {
@@ -85,7 +90,7 @@ const others = stations.filter((s) => s.id !== station.id);
     position: relative;
     height: 100%;
     display: grid;
-    grid-template-rows: 300px minmax(0, 1fr) 104px;
+    grid-template-rows: 300px minmax(0, 1fr) minmax(104px, auto);
     padding: 0 48px;
   }
   .stagehead {
@@ -136,11 +141,14 @@ const others = stations.filter((s) => s.id !== station.id);
     opacity: 0;
     mix-blend-mode: screen;
   }
+  /* Hint and player side by side; when the column is too narrow for both, the player wraps below. */
   .foot {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 8px 24px;
+    padding-block: 14px;
   }
   .hint {
     font-weight: 500;
@@ -177,7 +185,7 @@ const others = stations.filter((s) => s.id !== station.id);
       padding: 22px 20px;
     }
     .foot {
-      padding-top: 20px;
+      padding-block: 20px 0;
     }
     /* The lit wall is only the strip behind the stage head here (the stage head's min-height).
        Behind the panel it would be hidden anyway, and it would make the browser redo the panel's

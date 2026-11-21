@@ -1,0 +1,131 @@
+---
+// The "What I listen to" player from the reference mock (FR-08): play/pause, the track title as a
+// 12-cell fourteen-segment marquee, elapsed time, and the DIAL FX toggle. Rendered only when
+// src/data/tracks.ts lists a track, and hidden until src/scripts/player.ts wires it (it needs the script).
+// The audio file loads on the first press of play, never before.
+import type { Track } from '../data/tracks';
+import { marqueeCells, timeCells } from '../lib/sound';
+import { ui } from '../lib/ui';
+
+interface Props {
+  track: Track;
+}
+
+const { track } = Astro.props;
+---
+
+<section class="player" aria-label={ui.listen} data-player data-title={track.title} hidden>
+  <button class="pbtn" type="button" data-play aria-label={ui.play}>
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4v16l13-8z"></path></svg>
+  </button>
+  <div class="ptxt">
+    <span class="seg marq" aria-hidden="true"
+      ><span class="g">~~~~~~~~~~~~</span><span class="l" data-marquee>{marqueeCells(track.title, 0)}</span></span
+    >
+    <span class="pcap">
+      <span class="sr-only">{ui.track}: {track.title}{track.credit && `. ${track.credit}`}</span>
+      <span aria-hidden="true">{ui.listen}</span>
+      <span class="seg ptime" aria-hidden="true"><span class="g">88:88</span><span class="l" data-time>{timeCells(0)}</span></span>
+    </span>
+  </div>
+  <button class="mini" type="button" data-fx aria-pressed="false"><i aria-hidden="true"></i>{ui.dialFx}</button>
+  <audio preload="none" data-src={track.src}></audio>
+</section>
+
+<style>
+  .player {
+    flex: none;
+    margin-inline-start: auto;
+    height: 76px;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    gap: 16px;
+    padding-inline: 10px 16px;
+    border-radius: 10px;
+    background: rgba(24, 22, 21, 0.94);
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .player[hidden] {
+    display: none;
+  }
+  .pbtn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--rubber);
+    box-shadow:
+      0 3px 0 #0a0908,
+      0 5px 10px rgba(0, 0, 0, 0.5);
+    display: grid;
+    place-items: center;
+  }
+  .pbtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #0a0908;
+  }
+  .pbtn svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--text);
+  }
+  .ptxt {
+    display: grid;
+    gap: 6px;
+  }
+  .marq {
+    font-family: var(--font-seg14);
+    font-size: 20px;
+    letter-spacing: 0.04em;
+  }
+  .pcap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+  .ptime {
+    font-family: var(--font-seg7);
+    font-size: 15px;
+    letter-spacing: normal;
+  }
+  /* A 44px target around the small label and lamp. */
+  .mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-inline: 2px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--label);
+  }
+  .mini:hover {
+    color: var(--text);
+  }
+  .mini i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #4a302a;
+  }
+  .mini[aria-pressed='true'] i {
+    background: var(--lit);
+  }
+
+  /* Interim phone width until the phone design (plan Phase 5): the player fits a 358px column. */
+  @media (max-width: 479px) {
+    .player {
+      gap: 8px;
+      padding-inline: 8px 12px;
+    }
+    .marq {
+      font-size: 16px;
+    }
+  }
+</style>

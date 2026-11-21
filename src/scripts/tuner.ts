@@ -7,7 +7,6 @@ import {
   afcGliding,
   afcPending,
   afcPull,
-  angleDelta,
   ease,
   isLocked,
   nearest,
@@ -17,6 +16,7 @@ import {
   strengthAt,
 } from '../lib/tuning';
 import { ui } from '../lib/ui';
+import { rotary } from './rotary';
 import { need, type RadioState } from './state';
 
 export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void) {
@@ -46,36 +46,23 @@ export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void)
   knob.setAttribute('aria-valuemax', String(HI));
   knob.tabIndex = 0;
 
-  // Rotary drag with pointer capture. Grabbing the knob mid-glide holds the dial where it is.
-  let drag: { cx: number; cy: number; a: number } | null = null;
-  knob.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return;
-    knob.setPointerCapture(e.pointerId);
-    const r = knob.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    drag = { cx, cy, a: Math.atan2(e.clientY - cy, e.clientX - cx) };
-    s.dragging = true;
-    s.target = s.f;
-    moved();
+  // Rotary drag. Grabbing the knob mid-glide holds the dial where it is.
+  rotary(knob, {
+    start() {
+      s.dragging = true;
+      s.target = s.f;
+      moved();
+    },
+    turn(rad) {
+      s.target = clampFreq(s.target + (rad / (2 * Math.PI)) * TUNING.mhzPerTurn);
+      s.f = s.target;
+      moved();
+    },
+    end() {
+      s.dragging = false;
+      moved();
+    },
   });
-  knob.addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    const a = Math.atan2(e.clientY - drag.cy, e.clientX - drag.cx);
-    s.target = clampFreq(s.target + (angleDelta(drag.a, a) / (2 * Math.PI)) * TUNING.mhzPerTurn);
-    s.f = s.target;
-    drag.a = a;
-    moved();
-  });
-  const release = () => {
-    if (!drag) return;
-    drag = null;
-    s.dragging = false;
-    moved();
-  };
-  knob.addEventListener('pointerup', release);
-  knob.addEventListener('pointercancel', release);
-  knob.addEventListener('lostpointercapture', release);
 
   // Wheel on the dial window and the knob (non-passive only there, so the page still scrolls elsewhere).
   const wheel = (e: WheelEvent) => {

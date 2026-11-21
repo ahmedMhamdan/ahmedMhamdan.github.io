@@ -1,5 +1,22 @@
-// The one state object. The tuner writes it once per frame; every other module only reads it.
+// The one state object. The tuner writes the signal once per frame; the player and the audio write
+// `audio`; every other module only reads it.
 import type { StationInfo } from '../lib/dial';
+import { SOUND } from '../lib/sound';
+
+export interface AudioState {
+  /** The Web Audio graph exists (made on the first press of play or DIAL FX, never before). */
+  ready: boolean;
+  /** The music is playing. */
+  playing: boolean;
+  /** DIAL FX: static, whistle, filters and the lock click follow the dial. */
+  fx: boolean;
+  /** 0..1 */
+  volume: number;
+  /** Music level 0..1 for the speaker cone (0 with reduced motion). */
+  level: number;
+  /** Analyser bins 0..255, low to high, for the wall's spectrum (empty until the graph exists). */
+  bins: Uint8Array<ArrayBuffer>;
+}
 
 export interface RadioState {
   /** All stations in dial order. */
@@ -30,6 +47,8 @@ export interface RadioState {
   current: StationInfo;
 
   reduceMotion: boolean;
+
+  audio: AudioState;
 }
 
 export function createState(stations: StationInfo[], currentId: string, reduceMotion: boolean): RadioState {
@@ -49,6 +68,7 @@ export function createState(stations: StationInfo[], currentId: string, reduceMo
     df: 0,
     current,
     reduceMotion,
+    audio: { ready: false, playing: false, fx: false, volume: SOUND.volume, level: 0, bins: new Uint8Array(0) },
   };
 }
 

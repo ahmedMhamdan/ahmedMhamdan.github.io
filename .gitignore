@@ -29,3 +29,5 @@ public/audio/
 *.wav
 *.flac
 private/
+# local development track list (points at public/audio/)
+src/data/tracks.local.ts

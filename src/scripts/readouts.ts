@@ -1,6 +1,7 @@
 // Everything on the radio that reads the signal: the LCD (frequency, station key, TUNED and AFC
 // lamps, 10-bar meter), the knob's rotation and slider value, the antenna's spring and tip, the
-// stage head over the wall, and the LCD's text for screen readers. DOM is touched only on change.
+// stage head over the wall, and the LCD's text for screen readers. Also the speaker cone, which
+// pulses with the music (FR-10). DOM is touched only on change.
 import { BANDS, TUNING, type StationInfo } from '../lib/dial';
 import {
   FRAME_MS,
@@ -19,6 +20,7 @@ import { ui } from '../lib/ui';
 import { need, type RadioState } from './state';
 
 const steady = () => 0;
+const CONE_PULSE = 0.07; // the cone grows by up to 7% on a peak (mock)
 
 export function createReadouts(radio: HTMLElement, program: HTMLElement, s: RadioState) {
   const digits = need(radio, '.digits .l');
@@ -31,6 +33,7 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
   const grip = need(knob, '.grip');
   const antenna = need(radio, '.antenna');
   const stagehead = need(program, '[data-stagehead]');
+  const cone = need<SVGSVGElement>(radio, '[data-cone]');
 
   let shownF = '';
   let angle = NaN;
@@ -43,6 +46,7 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
   let springTime = 0;
   let springDf = 0;
   let tilt = NaN;
+  let coneScale = 1;
 
   const tunedText = (st: StationInfo) => `${st.freq.toFixed(1)} ${ui.mhz}, ${st.name}`;
 
@@ -111,6 +115,11 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
     }
     const t = antennaAngle(spring.a);
     if (t !== tilt) antenna.style.transform = `rotate(${(tilt = t).toFixed(2)}deg)`;
+
+    // Speaker cone: the music's level (0 when silent or with reduced motion; the audio keeps the frames coming).
+    const c = 1 + s.audio.level * CONE_PULSE;
+    if (c !== coneScale && (c === 1 || Math.abs(c - coneScale) > 0.001))
+      cone.style.transform = (coneScale = c) === 1 ? '' : `scale(${c.toFixed(3)})`;
 
     return (searching && s.strength > 0) || swinging;
   };

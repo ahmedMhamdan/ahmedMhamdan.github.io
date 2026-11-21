@@ -1,6 +1,7 @@
 // The LED wall (FR-07): a dot matrix behind the program area that answers the signal.
 // Each band has its own animation; a station with an image shows it as an LED billboard; noise and
-// flickering neighbour columns fill the gaps between stations; the pointer and every lock send ripples.
+// flickering neighbour columns fill the gaps between stations; the pointer and every lock send ripples;
+// while music plays, its spectrum stands along the foot of the stage.
 // Numbers: docs/design/direction.md, "LED wall".
 // Drawing: the unlit dots are the CSS background of .program. The canvas has one pixel per LED; CSS scales
 // it up 8× without smoothing and a CSS mask cuts each cell down to its 5×5 dot, so a frame is one
@@ -21,6 +22,9 @@ const FAMILY = '"Barlow Semi Condensed", system-ui, sans-serif';
 const STILL_T = [0, 3, 3, 3, 3]; // reduced motion: animation time of the still frame per band (ME starts at the name)
 const MAX_RIPPLES = 12;
 const RIPPLE_GROWTH = 0.045; // cells per ms
+const SPECTRUM_BINS = 48; // the lowest analyser bins (up to about 8 kHz), spread across the width
+const SPECTRUM_ROWS = 6;
+const SPECTRUM_V = 0.35;
 
 // Packed RGB as ImageData stores it (little-endian ABGR, as in every browser): --lit and --amber.
 const RED = 0x1f3bff;
@@ -315,6 +319,16 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (!(e.target as Element | null)?.closest?.('a, button, input, [tabindex], .panel')) fromPointer(e, 1, 40);
   });
 
+  // ---- the music: amber bars up to 6 cells tall standing on the stage's last row ----
+  function spectrum() {
+    const bins = s.audio.bins;
+    if (bins.length < SPECTRUM_BINS) return;
+    for (let x = 0; x < W; x++) {
+      const h = Math.round((bins[Math.floor((x / W) * SPECTRUM_BINS)] / 255) * SPECTRUM_ROWS);
+      for (let y = 0; y < h; y++) put(amber, x, STG - 1 - y, SPECTRUM_V);
+    }
+  }
+
   // ---- one picture of the signal into the buffers ----
   function compose(time: number, now: number, still: boolean) {
     const st = s.near;
@@ -324,7 +338,9 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (s.locked && bb) drawBillboard(bb, weight, now, still);
     else bands[st.row](time, weight);
     noise(s.locked ? 0 : 1 - weight);
-    if (!still) drawRipples(now);
+    if (still) return;
+    drawRipples(now);
+    if (s.audio.playing) spectrum();
   }
 
   // ---- buffers to canvas: amber over red, alpha = brightness; uploaded only when a pixel changed ----

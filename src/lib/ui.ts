@@ -35,4 +35,11 @@ export const ui = {
   contactAddress: 'ADDRESS',
   contactProfile: 'PROFILE',
   contactToConfirm: 'TO CONFIRM',
+  // Music player (shown only when src/data/tracks.ts lists a track) and the volume knob.
+  listen: 'What I listen to',
+  track: 'Track',
+  play: 'Play',
+  pause: 'Pause',
+  dialFx: 'DIAL FX',
+  volume: 'Volume',
 } as const;
