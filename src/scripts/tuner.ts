@@ -1,8 +1,11 @@
 // Tuning inputs and the per-frame tuning step (FR-04, FR-05).
-// Inputs: knob drag (one turn = 2 MHz), wheel on the dial window and knob, keys 1–5 and ← →,
-// the knob as a slider, every station link (band keys, marks, preset keys, seek, panel actions),
-// and the browser's back and forward buttons. Numbers: docs/design/direction.md, "Tuning model".
+// Inputs: knob drag (one turn = 2 MHz), dragging along the dial window (the needle follows the pointer;
+// a tap on the track tunes to the nearest station in that row), wheel on the dial window and knob,
+// keys 1–5 and ← →, the knob as a slider, every station link (band keys, marks, preset keys, seek,
+// panel actions), and the browser's back and forward buttons. Numbers: docs/design/direction.md,
+// "Tuning model".
 import { HI, LO, TUNING, clampFreq, rowOf } from '../lib/dial';
+import { H, W, freqAtPoint } from '../lib/scale';
 import {
   afcGliding,
   afcPending,
@@ -18,6 +21,9 @@ import {
 import { ui } from '../lib/ui';
 import { rotary } from './rotary';
 import { need, type RadioState } from './state';
+
+const DRAG_START_PX = 6; // a press must move this far sideways before it tunes (taps and swipes stay taps and swipes)
+const LOCK_BUZZ_MS = 8; // a tick under the finger when a drag reaches a station (phones that can vibrate)
 
 export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void) {
   const { stations } = s;
@@ -64,13 +70,75 @@ export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void)
     },
   });
 
+  // Drag along the dial window: the needle follows the pointer along the row under it, as on a slide-rule
+  // dial. touch-action: pan-y (Radio.astro) leaves vertical swipes to the page, so a press tunes only once
+  // it moves sideways. A tap on a station link tunes as a link; a tap on the track tunes to the nearest
+  // station in that row. Layout is read in these handlers, never in a frame.
+  const dialwin = need(radio, '.dialwin');
+  const scale = need<SVGSVGElement>(dialwin, 'svg.scale');
+  dialwin.dataset.drag = '';
+  const pointAt = (e: MouseEvent) => {
+    const r = scale.getBoundingClientRect();
+    return freqAtPoint(((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H);
+  };
+  let press: { id: number; x: number; y: number; moved: boolean } | null = null;
+  let swallowClick = false;
+  dialwin.addEventListener('pointerdown', (e) => {
+    swallowClick = false;
+    if (e.button !== 0 || (e.target as Element).closest('.bandkey')) return;
+    press = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+  });
+  dialwin.addEventListener('pointermove', (e) => {
+    if (!press || e.pointerId !== press.id) return;
+    if (!press.moved) {
+      const dx = Math.abs(e.clientX - press.x);
+      if (dx < DRAG_START_PX || dx < Math.abs(e.clientY - press.y)) return;
+      press.moved = true;
+      dialwin.setPointerCapture(e.pointerId);
+      s.dragging = true;
+    }
+    s.target = s.f = clampFreq(pointAt(e).freq);
+    moved();
+  });
+  const release = (e: PointerEvent) => {
+    // A touch starts captured by the link under it; taking the capture fires lostpointercapture there.
+    if (!press || e.pointerId !== press.id || (e.type === 'lostpointercapture' && e.target !== dialwin)) return;
+    const dragged = press.moved;
+    press = null;
+    if (!dragged) return;
+    swallowClick = e.type === 'pointerup';
+    s.dragging = false;
+    moved();
+  };
+  dialwin.addEventListener('pointerup', release);
+  dialwin.addEventListener('pointercancel', release);
+  dialwin.addEventListener('lostpointercapture', release);
+  dialwin.addEventListener(
+    'click',
+    (e) => {
+      // The click that ends a mouse drag is not a tap.
+      if (swallowClick) {
+        swallowClick = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if ((e.target as Element).closest('a')) return;
+      const { row, freq } = pointAt(e);
+      let best: (typeof stations)[number] | undefined;
+      for (const st of stations) if (st.row === row && (!best || Math.abs(st.freq - freq) < Math.abs(best.freq - freq))) best = st;
+      if (best) tuneTo(best.freq);
+    },
+    true,
+  );
+
   // Wheel on the dial window and the knob (non-passive only there, so the page still scrolls elsewhere).
   const wheel = (e: WheelEvent) => {
     e.preventDefault();
     const px = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
     tuneTo(s.target - px * TUNING.wheelMhzPerPx);
   };
-  need(radio, '.dialwin').addEventListener('wheel', wheel, { passive: false });
+  dialwin.addEventListener('wheel', wheel, { passive: false });
   knob.addEventListener('wheel', wheel, { passive: false });
 
   // The knob as a slider: arrows ±0.1 MHz on a 0.1 grid, Page Up/Down next/previous station,
@@ -134,10 +202,12 @@ export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void)
     if (pull !== null) s.target = pull;
     s.afc = pull !== null || afcGliding(s.f, s.target, near.freq);
 
+    const wasLocked = s.locked;
     s.near = near;
     s.dist = Math.abs(near.freq - s.f);
     s.strength = strengthAt(s.dist);
     s.locked = isLocked(s.dist) ? near : null;
+    if (s.dragging && s.locked && s.locked !== wasLocked && 'vibrate' in navigator) navigator.vibrate(LOCK_BUZZ_MS);
     s.row = rowOf(s.f);
     s.df = s.f - prevF;
     // Settled on a station: it becomes the page (URL, title, announcement).

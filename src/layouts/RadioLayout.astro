@@ -42,11 +42,33 @@ const data = JSON.stringify({ current: station.id, stations: infos }).replace(/<
     display: grid;
     grid-template-columns: 520px minmax(0, 1fr);
   }
-  /* Interim narrow layout until the phone design (plan Phase 5): radio, then program, page scrolls. */
+  /* Interim narrow layout until the tablet design (plan Phase 5): radio, then program, page scrolls.
+     Phones get their own layout from the same rules (Radio.astro, Program.astro, Player.astro). */
   @media (max-width: 959px) {
     .page {
       position: static;
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Phone on its side: the head unit on the left, the program on the right. */
+  @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .page {
+      position: static;
+      grid-template-columns: minmax(330px, 42%) minmax(0, 1fr);
+      column-gap: 12px;
+    }
+  }
+  /* Phones: the page ends above the fixed player bar. */
+  @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    :global(body:has(.player:not([hidden]))) {
+      padding-bottom: calc(64px + env(safe-area-inset-bottom) + 8px);
+    }
+  }
+  /* On its side the bar is 56px, and the head unit fills the height above it exactly, so the page must
+     end right at the bar or the sticky head unit is nudged up at the bottom of the page. */
+  @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    :global(body:has(.player:not([hidden]))) {
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }
   }
 </style>

@@ -52,7 +52,7 @@ const track = tracks[0];
       <div class="osd">
         <p class="k">{ui.idleKicker}</p>
         <h1 id="station-title" class="big">{ui.idleHeading}</h1>
-        <p class="txt">{ui.idleText}</p>
+        <p class="txt"><span class="for-keys">{ui.idleText}</span><span class="for-touch">{ui.idleTextTouch}</span></p>
       </div>
     </div>
   </template>
@@ -64,8 +64,8 @@ const track = tracks[0];
     overflow: hidden;
     min-width: 0;
     /* Unlit LED dots: pitch 8px, 5×5px dot inset 1.5px (direction.md, LED wall). */
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='1.5' y='1.5' width='5' height='5' fill='%231d1310'/%3E%3C/svg%3E")
-      var(--ground);
+    --dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='1.5' y='1.5' width='5' height='5' fill='%231d1310'/%3E%3C/svg%3E");
+    background: var(--dots) var(--ground);
   }
   /* The area the LED wall may light. Its canvas has one pixel per dot (src/scripts/wall.ts sets its
      size in whole cells): scaled up without smoothing, then cut to 5×5 dots by the same grid as the
@@ -192,6 +192,71 @@ const track = tracks[0];
        backdrop blur on every wall frame: the main cost on phones. */
     .wall {
       height: 120px;
+    }
+  }
+
+  /* Phone (plan Phase 5; docs/design/reference/phone-mock.html): the LED wall is a 144px strip under the
+     head unit, the panel overlaps its last 16px, and there is no stage head (the LCD and the panel already
+     name the station, and no text sits over lit dots). The panel has no blur, so the wall never makes the
+     browser redo it. The player is a bar fixed to the bottom of the screen (Player.astro). */
+  @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .program {
+      overflow: visible;
+      margin-top: 10px;
+      background: var(--ground);
+    }
+    .wall {
+      inset: 0 0 auto;
+      height: 144px;
+      background: var(--dots);
+    }
+    .over {
+      height: auto;
+      grid-template-rows: auto auto;
+      padding: 128px 0 0;
+    }
+    .stagehead {
+      display: none;
+    }
+    .panel {
+      margin-inline: 10px;
+      border-radius: 12px;
+      background: rgba(18, 17, 16, 0.96);
+      box-shadow:
+        inset 0 0 0 1px var(--rule),
+        0 -6px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: none;
+      overflow: hidden;
+      overflow: clip;
+      /* Below the docked LCD when a seek from it brings the panel into view (src/scripts/dock.ts). */
+      scroll-margin-top: 64px;
+    }
+    .view {
+      height: auto;
+      overflow: visible;
+      padding: 22px 18px 26px;
+    }
+    .foot {
+      justify-content: center;
+      padding: 18px 10px 8px;
+    }
+    .hint {
+      text-align: center;
+    }
+  }
+  /* Phone on its side: the program is the right-hand column, beside the head unit. */
+  @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .program {
+      padding-inline-end: max(10px, env(safe-area-inset-right));
+    }
+    .wall {
+      height: 112px;
+    }
+    .over {
+      padding-top: 96px;
+    }
+    .panel {
+      margin-inline: 0;
     }
   }
 </style>

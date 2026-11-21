@@ -2,7 +2,7 @@
 // scales as one object). Used at build time by Radio.astro and at run time by the tuner, so the
 // needle the script moves lines up with the scale the page was rendered with.
 // Mirrors the mock's canvas: padding 6/12, band key column 78px, five equal rows.
-import { BANDS, LO, PER, rowOf } from './dial.ts';
+import { BANDS, HI, LO, PER, rowOf } from './dial.ts';
 
 export const W = 408;
 export const H = 204;
@@ -40,6 +40,17 @@ export function tickPath(row: number): string {
 export function markAt(freq: number) {
   const row = rowOf(freq);
   return { x: n2(TRACK_X + ((freq - LO - row * PER) / PER) * TRACK_W - 2.5), y: n2(baseline(row) - 19) };
+}
+
+/**
+ * The frequency under a point of the scale (viewBox units), for drag-to-tune on the dial window:
+ * the band row under the point, and the place along that row's track. Points outside the scale
+ * clamp to the nearest row and the ends of its track.
+ */
+export function freqAtPoint(x: number, y: number): { row: number; freq: number } {
+  const row = Math.max(0, Math.min(BANDS.length - 1, Math.floor((y - PAD_Y) / ROW_H)));
+  const along = Math.max(0, Math.min(1, (x - TRACK_X) / TRACK_W));
+  return { row, freq: Math.min(HI, LO + (row + along) * PER) };
 }
 
 /** Horizontal position of the needle for a frequency (on its own row). */

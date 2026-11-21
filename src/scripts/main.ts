@@ -5,6 +5,7 @@
 import type { StationInfo } from '../lib/dial';
 import { createAudio } from './audio';
 import { createDial } from './dial';
+import { createDock } from './dock';
 import { createPanel } from './panel';
 import { createPlayer } from './player';
 import { createReadouts } from './readouts';
@@ -44,6 +45,7 @@ function start() {
     createDial(radio, s),
     createReadouts(radio, program, s),
     createPanel(program, s),
+    createDock(radio, program, s),
     createWall(program, s, wake),
     ...(player && sound ? [createPlayer(player, radio, s, sound, wake)] : []),
   ];

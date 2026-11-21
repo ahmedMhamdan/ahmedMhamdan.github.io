@@ -119,6 +119,18 @@ button {
   color: var(--lit);
 }
 
+/* Words for the input at hand: keyboard shortcuts, or dragging and tapping on a touch screen. */
+.for-touch {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .for-keys {
+    display: none;
+  }
+  .for-touch {
+    display: inline;
+  }
+}
 /* Shared label styles */
 .k {
   font-weight: 700;

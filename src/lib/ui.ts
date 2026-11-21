@@ -16,6 +16,8 @@ export const ui = {
   searchingText: 'Searching between stations',
   previousStation: 'Previous station',
   nextStation: 'Next station',
+  // The LCD docked at the top of a phone screen: a press scrolls back up to the dial.
+  backToDial: 'Back to the dial',
   tuning: 'TUNING',
   tuned: 'TUNED',
   afc: 'AFC',
@@ -26,10 +28,13 @@ export const ui = {
   hintStatic: { strong: 'Pick a station', rest: ' on the dial' },
   // Footer hint once the tuner script runs and the keyboard shortcuts work.
   hintLive: { strong: 'Turn the dial', rest: ' · 1–5 jump to a band · ← → next station' },
+  // The same on a touch screen, where the dial window is dragged.
+  hintTouch: { strong: 'Drag along the dial', rest: ' or tap a station' },
   // Panel between stations.
   idleKicker: 'BETWEEN STATIONS',
   idleHeading: 'Turn the dial',
   idleText: 'Or press 1 to 5 to jump to a band.',
+  idleTextTouch: 'Let go near a station and it locks in.',
   placeholder: 'PLACEHOLDER',
   contactHeading: 'Reply on this frequency',
   contactAddress: 'ADDRESS',

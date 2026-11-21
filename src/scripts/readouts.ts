@@ -34,6 +34,10 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
   const antenna = need(radio, '.antenna');
   const stagehead = need(program, '[data-stagehead]');
   const cone = need<SVGSVGElement>(radio, '[data-cone]');
+  // The LCD docked at the top of a phone screen (dock.ts) shows the same cells.
+  const dockFreq = document.querySelector('[data-dock-freq]');
+  const dockKey = document.querySelector('[data-dock-key]');
+  const dockLamp = document.querySelector('[data-dock-lamp]');
 
   let shownF = '';
   let angle = NaN;
@@ -54,7 +58,10 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
     const searching = !s.locked && !s.reduceMotion;
 
     const f = freqCells(s.f);
-    if (f !== shownF) digits.textContent = shownF = f;
+    if (f !== shownF) {
+      digits.textContent = shownF = f;
+      if (dockFreq) dockFreq.textContent = f;
+    }
 
     const a = knobAngle(s.f);
     if (a !== angle) grip.style.transform = `rotate(${(angle = a).toFixed(2)}deg)`;
@@ -69,6 +76,7 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
     }
 
     tuned.classList.toggle('on', !!s.locked);
+    dockLamp?.classList.toggle('on', !!s.locked);
     afc.classList.toggle('on', s.afc);
 
     const n = meterBars(s.strength, !!s.locked, s.reduceMotion ? 0 : Math.random());
@@ -95,7 +103,10 @@ export function createReadouts(radio: HTMLElement, program: HTMLElement, s: Radi
     if (lockChanged || now - keyAt >= TUNING.keyReadoutMs) {
       keyAt = now;
       const k = keyCells(keyReadout(s.near.key, s.strength, !!s.locked, s.reduceMotion ? steady : Math.random));
-      if (k !== keyText) alpha.textContent = keyText = k;
+      if (k !== keyText) {
+        alpha.textContent = keyText = k;
+        if (dockKey) dockKey.textContent = k;
+      }
     }
 
     // Antenna: a spring kicked by the dial's movement, stepped at 60 Hz whatever the screen rate.

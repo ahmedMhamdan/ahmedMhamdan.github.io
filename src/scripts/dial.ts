@@ -18,8 +18,10 @@ export function createDial(radio: HTMLElement, s: RadioState) {
   const needle = need<SVGGElement>(radio, '[data-needle]');
   const [needleOut, needleIn] = [...needle.children];
   const needles = BANDS.map((_, i) => needlePaths(i));
-  const seekPrev = need<HTMLAnchorElement>(radio, '[data-seek="prev"]');
-  const seekNext = need<HTMLAnchorElement>(radio, '[data-seek="next"]');
+  // The radio's seek links and the docked LCD's (phones).
+  const seeks = (dir: string) => [...document.querySelectorAll<HTMLAnchorElement>(`a[data-seek="${dir}"]`)];
+  const seekPrev = seeks('prev');
+  const seekNext = seeks('next');
 
   let row = -1;
   let x = NaN;
@@ -58,10 +60,14 @@ export function createDial(radio: HTMLElement, s: RadioState) {
       links.forEach((el, id) => (id === current!.id ? el.setAttribute('aria-current', 'page') : el.removeAttribute('aria-current')));
       const prev = prevStation(s.stations, current.freq);
       const next = nextStation(s.stations, current.freq);
-      seekPrev.href = prev.path;
-      seekPrev.setAttribute('aria-label', `${ui.previousStation}: ${prev.name}`);
-      seekNext.href = next.path;
-      seekNext.setAttribute('aria-label', `${ui.nextStation}: ${next.name}`);
+      for (const a of seekPrev) {
+        a.href = prev.path;
+        a.setAttribute('aria-label', `${ui.previousStation}: ${prev.name}`);
+      }
+      for (const a of seekNext) {
+        a.href = next.path;
+        a.setAttribute('aria-label', `${ui.nextStation}: ${next.name}`);
+      }
     }
     return false;
   };

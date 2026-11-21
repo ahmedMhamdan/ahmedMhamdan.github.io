@@ -315,8 +315,37 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
+  /* A small portrait beside the kicker and heading, so the heading stays on a phone's first screen
+     (plan Phase 5; docs/design/reference/phone-mock.html); the rest of the text runs full width. */
+  .view .about {
+    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    gap: 0 16px;
+  }
+  .view .about > div {
+    display: contents;
+  }
   .view .about .pic {
-    max-width: 160px;
+    grid-row: 1 / span 2;
+  }
+  .view .about .pic.empty {
+    letter-spacing: 0.1em;
+  }
+  .view .about .k {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+  .view .about h1 {
+    grid-column: 2;
+    grid-row: 2;
+    margin-bottom: 0;
+  }
+  .view .about > div > :not(.k, h1) {
+    grid-column: 1 / -1;
+  }
+  .view .about .lede {
+    margin-top: 16px;
   }
   .view .grid4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -26,10 +26,17 @@ export function createPanel(program: HTMLElement, s: RadioState) {
   const status = need(document, '[data-tuner-status]');
   const hint = need(program, '[data-hint]');
 
-  // The keyboard shortcuts work now, so the footer can mention them.
-  const strong = document.createElement('b');
-  strong.textContent = ui.hintLive.strong;
-  hint.replaceChildren(strong, ui.hintLive.rest);
+  // The keyboard shortcuts and dragging the dial work now, so the footer can mention them
+  // (global.css shows the words for the input at hand).
+  const variant = (className: string, words: { strong: string; rest: string }) => {
+    const span = document.createElement('span');
+    const strong = document.createElement('b');
+    span.className = className;
+    strong.textContent = words.strong;
+    span.append(strong, words.rest);
+    return span;
+  };
+  hint.replaceChildren(variant('for-keys', ui.hintLive), variant('for-touch', ui.hintTouch));
 
   const templates = new Map<string, HTMLTemplateElement>();
   for (const t of program.querySelectorAll<HTMLTemplateElement>('template[data-panel]')) templates.set(t.dataset.panel!, t);

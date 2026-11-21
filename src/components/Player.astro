@@ -118,14 +118,57 @@ const { track } = Astro.props;
     background: var(--lit);
   }
 
-  /* Interim phone width until the phone design (plan Phase 5): the player fits a 358px column. */
-  @media (max-width: 479px) {
+  /* Phone (plan Phase 5; docs/design/reference/phone-mock.html): a slim bar fixed to the bottom of the
+     screen, under the thumb, clear of the home indicator. */
+  @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
     .player {
-      gap: 8px;
-      padding-inline: 8px 12px;
+      position: fixed;
+      z-index: 20;
+      inset-inline: 0;
+      bottom: 0;
+      height: calc(64px + env(safe-area-inset-bottom));
+      margin: 0;
+      padding: 0 max(10px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px, env(safe-area-inset-left));
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 12px;
+      border-radius: 0;
+      direction: ltr;
+      background: #181615;
+      box-shadow:
+        inset 0 1px 0 var(--rule),
+        0 -10px 24px rgba(0, 0, 0, 0.45);
+    }
+    .pbtn {
+      width: 44px;
+      height: 44px;
+    }
+    .pbtn svg {
+      width: 17px;
+      height: 17px;
+    }
+    .ptxt {
+      gap: 5px;
+      min-width: 0;
     }
     .marq {
-      font-size: 16px;
+      font-size: 15px;
+    }
+    .pcap {
+      gap: 10px;
+      letter-spacing: 0.18em;
+      white-space: nowrap;
+    }
+    .ptime {
+      font-size: 12px;
+    }
+    .mini {
+      padding-inline: 8px 4px;
+      letter-spacing: 0.18em;
+    }
+  }
+  @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .player {
+      height: calc(56px + env(safe-area-inset-bottom));
     }
   }
 </style>

@@ -12,7 +12,7 @@ import { ui } from '../lib/ui';
 import { need, type RadioState } from './state';
 
 const P = 8; // dot pitch, CSS px (the dot shape itself is the CSS mask in Program.astro)
-const STAGE_GAP = 8; // the stage stops this far above the panel (300 px row → 36 rows)
+const STAGE_GAP = 8; // the stage stops this far above the panel (300 px row → 36 rows; phone strip → 15)
 const FRAME_MS = 1000 / 30;
 const MIN_GAP_MS = FRAME_MS - 4; // a little slack for rAF jitter: every 2nd frame at 60 Hz, every 4th at 120 Hz
 const DECAY = 0.74; // per 30 fps frame
@@ -66,6 +66,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   const box = need(program, '.wall'); // the area the wall may light (CSS decides it)
   const canvas = need<HTMLCanvasElement>(box, 'canvas');
   const stagehead = need(program, '.stagehead');
+  const panel = need(program, '.panel');
   const ctx = canvas.getContext('2d');
   if (!ctx) return () => false;
 
@@ -94,8 +95,10 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
 
   // ---- size: measured when it changes, applied at the next frame (never read layout mid-frame) ----
   // Pixel ratio does not matter: the canvas has one pixel per cell and CSS scales it.
+  // The stage is the wall above the panel: below the stage head on a desktop, the strip above the
+  // panel's top edge on a phone (where there is no stage head).
   const measure = () => {
-    pending = { w: box.clientWidth, h: box.clientHeight, stage: stagehead.offsetTop + stagehead.offsetHeight };
+    pending = { w: box.clientWidth, h: box.clientHeight, stage: panel.offsetTop };
     wake();
   };
   const resize = new ResizeObserver(measure);
