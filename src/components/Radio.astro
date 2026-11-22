@@ -213,6 +213,8 @@ for (let r = 12; r <= 96; r += 10) {
     height: 722px;
     /* Stays centred even when the column is narrower than the unscaled radio. */
     margin-inline: calc((100% - 452px) / 2);
+    /* Takes up only its scaled height, so a short screen never pushes its bottom out of sight. */
+    margin-block-start: calc(722px * (var(--fit) - 1));
     transform-origin: bottom center;
     transform: scale(var(--fit));
   }
