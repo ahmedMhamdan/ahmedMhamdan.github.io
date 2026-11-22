@@ -688,11 +688,12 @@ for (let r = 12; r <= 96; r += 10) {
     background: var(--text);
   }
 
-  /* Interim narrow layout until the phone design (plan Phase 5): the radio fits the width. */
+  /* Tablet (700–959px): the whole radio as on the desktop, scaled to fit the height and at most half the
+     width, in a column as wide as the scaled radio plus 24px each side (RadioLayout.astro). */
   @media (max-width: 959px) {
     .stand {
-      --fit: min(1, tan(atan2(100vw - 24px, 452px)));
-      height: calc(918px * var(--fit) + 24px);
+      --fit: min(1, tan(atan2(100dvh - 30px, 918px)), tan(atan2(50vw - 48px, 452px)));
+      width: calc(452px * var(--fit) + 48px);
     }
   }
 
@@ -709,6 +710,7 @@ for (let r = 12; r <= 96; r += 10) {
   @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
     .stand {
       --fit: 1;
+      width: auto;
       display: block;
       /* The desktop's centring would also shrink the radio in block layout. */
       place-items: normal;

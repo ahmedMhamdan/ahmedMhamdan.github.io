@@ -160,38 +160,24 @@ const track = tracks[0];
     font-weight: 700;
   }
 
-  /* Interim narrow layout until the phone design (plan Phase 5): panel in the page flow. */
+  /* Tablet (700–959px): the desktop program in a narrower column. The panel has no backdrop blur (as on
+     phones), so a wall frame never makes the browser redo it; it is a little more opaque instead. */
   @media (max-width: 959px) {
-    .program {
-      overflow: visible;
-    }
     .over {
-      height: auto;
-      grid-template-rows: auto auto auto;
-      padding: 0 16px 24px;
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0 16px;
     }
     .stagehead {
-      min-height: 120px;
-      padding-top: 20px;
+      gap: 16px;
       font-size: 12px;
       letter-spacing: 0.2em;
     }
     .panel {
-      overflow: visible;
+      background: rgba(18, 17, 16, 0.94);
+      backdrop-filter: none;
     }
     .view {
-      height: auto;
-      overflow: visible;
-      padding: 22px 20px;
-    }
-    .foot {
-      padding-block: 20px 0;
-    }
-    /* The lit wall is only the strip behind the stage head here (the stage head's min-height).
-       Behind the panel it would be hidden anyway, and it would make the browser redo the panel's
-       backdrop blur on every wall frame: the main cost on phones. */
-    .wall {
-      height: 120px;
+      padding: 24px 22px;
     }
   }
 

@@ -42,9 +42,15 @@ const data = JSON.stringify({ current: station.id, stations: infos }).replace(/<
     display: grid;
     grid-template-columns: 520px minmax(0, 1fr);
   }
-  /* Interim narrow layout until the tablet design (plan Phase 5): radio, then program, page scrolls.
-     Phones get their own layout from the same rules (Radio.astro, Program.astro, Player.astro). */
+  /* Tablet (700–959px): the desktop layout with the radio scaled to at most half the width; its column is
+     as wide as the scaled radio (Radio.astro sets the width), and the program takes the rest. */
   @media (max-width: 959px) {
+    .page {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+  }
+  /* Phone upright: the head unit, then the program; the page scrolls. */
+  @media (max-width: 699px) {
     .page {
       position: static;
       grid-template-columns: minmax(0, 1fr);

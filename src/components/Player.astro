@@ -118,25 +118,15 @@ const { track } = Astro.props;
     background: var(--lit);
   }
 
-  /* Phone (plan Phase 5; docs/design/reference/phone-mock.html): a slim bar fixed to the bottom of the
-     screen, under the thumb, clear of the home indicator. */
-  @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+  /* Tablet and phone: the compact player of the phone mock (docs/design/reference/phone-mock.html). On a
+     tablet it fills the footer row under the hint; on a phone it is a bar fixed to the bottom. */
+  @media (max-width: 959px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
     .player {
-      position: fixed;
-      z-index: 20;
-      inset-inline: 0;
-      bottom: 0;
-      height: calc(64px + env(safe-area-inset-bottom));
-      margin: 0;
-      padding: 0 max(10px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px, env(safe-area-inset-left));
+      width: 100%;
+      height: 64px;
       grid-template-columns: 44px minmax(0, 1fr) auto;
       gap: 12px;
-      border-radius: 0;
-      direction: ltr;
-      background: #181615;
-      box-shadow:
-        inset 0 1px 0 var(--rule),
-        0 -10px 24px rgba(0, 0, 0, 0.45);
+      padding-inline: 10px 8px;
     }
     .pbtn {
       width: 44px;
@@ -164,6 +154,25 @@ const { track } = Astro.props;
     .mini {
       padding-inline: 8px 4px;
       letter-spacing: 0.18em;
+    }
+  }
+  /* Phone: a slim bar fixed to the bottom of the screen, under the thumb, clear of the home indicator. */
+  @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .player {
+      position: fixed;
+      z-index: 20;
+      inset-inline: 0;
+      bottom: 0;
+      width: auto;
+      height: calc(64px + env(safe-area-inset-bottom));
+      margin: 0;
+      padding: 0 max(10px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px, env(safe-area-inset-left));
+      border-radius: 0;
+      direction: ltr;
+      background: #181615;
+      box-shadow:
+        inset 0 1px 0 var(--rule),
+        0 -10px 24px rgba(0, 0, 0, 0.45);
     }
   }
   @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
