@@ -2,6 +2,24 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
+## 2026-11-22: The tablet layout (Phase 5; built, awaiting Ahmed's verdict)
+
+- **Context:** Plan Phase 5, task 2: "radio scaled, program narrower", for screens 700–959px wide. Until now this range had the interim stack (the full radio, then the program, and the page scrolled), so on a 768×1024 iPad the panel started below the bottom of the screen.
+- **Decision:** The desktop layout, adapted (`RadioLayout.astro`, `Radio.astro`, `Program.astro`, `Player.astro`, all under `(max-width: 959px)`, with the phone rules after them):
+  - The whole radio as on the desktop (handle, antenna, preset keys, LCD, dial, plate, speaker, tuning knob, seek buttons, volume knob), scaled to fit the screen height, as on the desktop, and at most half the width. Its column is as wide as the scaled radio plus 24px each side, and it stands at the bottom of the column, as on the desktop. At 768×1024 it is scaled to 0.74 (336px wide), at 820×1180 to 0.81.
+  - The program takes the rest of the width: the full-height LED wall, the stage head (12px, 0.2em tracking), the panel and the footer, with 16px side margins. The page does not scroll; the panel scrolls inside, as on the desktop.
+  - The panel has no backdrop blur, as on phones, so a wall frame never makes the browser repaint it; it is 94% opaque instead of 90%.
+  - The player uses the phone's compact size (44px play button, 15px marquee, 64px tall) across the footer, under the hint: the desktop player, about 415px wide, does not fit a column of 350–480px.
+  - No docked LCD and no panel hold, since the page does not scroll. Touch tablets get the touch wording, as phones do.
+  - Found on the way, a desktop fix: on screens shorter than about 746px (1366×657, a common laptop window, or 1280×720) the bottom of the radio was cut off, because the radio is scaled with a transform while its layout box stayed 722px tall. A negative top margin of the height the scale removes makes it take up only its scaled height. At 746px tall and above the desktop is pixel-identical to before.
+- **Rationale:** The plan's wording. A tablet keeps the whole instrument, knob and speaker included, and the panel's heading is on the first screen.
+- **Open for Ahmed (Open Question 10):**
+  1. Approve the layout.
+  2. On tall tablets the radio stands at the bottom with empty space above the antenna (about 430px at 820×1180). Keep it, or centre the radio vertically?
+  3. Scaled, the radio's controls fall under the 44px target rule on touch tablets. At 768px wide the seek buttons are 30px, the dial rows 29px, the preset keys 33×15px and the volume knob 37px (the tuning knob is 91px). All but the preset keys meet the WCAG 2.2 AA minimum of 24px, and the preset keys repeat the band keys on the dial. Proposed: enlarge the seek buttons' and preset keys' tap areas on touch screens without changing their look, as the phone's preset keys do.
+  4. An 800×600 window leaves the panel 180px tall, because the stage stays at the desktop's 300px (the desktop has the same on short screens). Shrink the stage on short tablet screens?
+- **Consequences:** The desktop at 960px and up is unchanged, apart from the short-screen fix. Only CSS changed; the client script is still 12.0 KB gzip. Not tested on a real tablet or in Safari.
+
 ## 2026-11-21: The phone layout (Phase 5)
 
 - **Context:** The plan's phone proposal (Phase 5, task 1) was drawn as `docs/design/reference/phone-mock.html` and shown to Ahmed with five points that go beyond the plan. Ahmed approved the mock and all five points on 2026-11-21 (Open Question 8).

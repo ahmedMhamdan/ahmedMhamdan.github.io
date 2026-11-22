@@ -44,7 +44,7 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
 ## Layout (desktop reference 1280×800)
 
 - Page: CSS grid `520px | 1fr`, full viewport, no page scroll; the panel scrolls internally.
-- **Radio** 452×722 (plus about 196px of antenna, handle and keys above), bottom-centred in its column, scaled down to fit the viewport height (`scale = min(1, (innerHeight − 30) / 918)`).
+- **Radio** 452×722 (plus about 196px of antenna, handle and keys above), bottom-centred in its column, scaled down to fit the viewport height (`scale = min(1, (innerHeight − 30) / 918)`); it takes up only its scaled height, so on a short screen its bottom stays in sight.
 - **Case:** radius 28px, padding 22/22/24, rows `144px 204px 30px 1fr`, gap 12px, four screws in the corners.
   - **LCD** (row 1): "FM" label, frequency (DSEG7 56px), "MHz" top right; status line: station key (DSEG14 22px), TUNED lamp (`--lit` when locked), AFC lamp (`--amber` while AFC pulls), 10-bar signal meter (bars 9–10 amber).
   - **Dial window** (row 2): five rows `78px | 1fr`; band key = band number (DSEG7) + band name; station marks positioned at `(freq − 88 − band×4) / 4 × 100%`. Canvas overlay: 41 ticks per row (major every 10), active row ticks `rgba(255,59,31,.55)`, others `--ghost`; station marks 5×6px (amber when locked, red on the active row, `#3a201a` otherwise); needle dashed 4px-on/3px-off across all rows, 4px wide and solid red inside the active row, 2px at 35% elsewhere.
@@ -78,7 +78,15 @@ From `reference/phone-mock.html`, for screens up to 699px wide and for phones he
 - **Sideways:** two columns. On the left (`minmax(330px, 42%)`) the head unit stays in place, centred in the screen height above the 56px player, without antenna or keys; on the right the program scrolls (wall 112px, panel from 96px). No dock.
 - **Targets:** every button, seek link, preset key and the dock at least 44×44px. A dial station's target is its row cell (at least 32px tall, about 50px wide at 390px), above the WCAG 2.2 AA minimum of 24px; a tap on the track picks the nearest station in that row.
 
-The tablet layout (700–959px) is not designed yet (plan Phase 5); until then it is the interim stack: radio, then program.
+## Layout (tablet, built 2026-11-22, awaiting Ahmed's verdict)
+
+For screens 700–959px wide (plan Phase 5: "radio scaled, program narrower"); `../DECISIONS.md`, 2026-11-22. At 960px and up it is the desktop layout above.
+
+- **Page:** the desktop's two columns, full viewport, no page scroll; the panel scrolls internally.
+- **Radio:** the whole desktop radio, scaled with `scale = min(1, (innerHeight − 30) / 918, (innerWidth / 2 − 48) / 452)`, standing at the bottom of a column as wide as the scaled radio plus 24px each side. It takes up only its scaled height (also on the desktop), so a short screen never cuts its bottom off.
+- **Program:** the rest of the width, side padding 16px; rows as on the desktop (`300px | 1fr | auto`). Stage head 12px, 0.2em. Panel `rgba(18,17,16,.94)` without backdrop blur, padding 24/22.
+- **Footer:** the hint, then the player across the full width at the phone's compact size (64px; play button 44px, marquee 15px, time 12px).
+- No docked LCD and no panel hold. Touch tablets get the touch wording.
 
 ## Tuning model
 
