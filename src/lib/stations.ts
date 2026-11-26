@@ -42,11 +42,12 @@ export const freqText = (freq: number) => freq.toFixed(1);
  * LED keys and band labels are capitals; screen readers may spell capitals out.
  */
 export function spokenName(s: Station) {
+  const brands: Record<string, string> = { github: 'GitHub', linkedin: 'LinkedIn' };
   const soft = (text: string) =>
     text
       .toLowerCase()
       .split(' ')
-      .map((w) => (/^[ivx]+$/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+      .map((w) => brands[w] ?? (/^[ivx]+$/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
       .join(' ');
   return `${soft(bandLabel(s.data.band))}, ${soft(s.data.key)}`;
 }

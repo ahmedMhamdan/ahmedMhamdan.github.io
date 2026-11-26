@@ -149,6 +149,17 @@ button {
   vertical-align: middle;
 }
 
+/* Windows High Contrast (forced colours): the radio, its docked LCD and the player are drawn objects
+   whose own colours already meet WCAG AA, so they keep them and still look like a radio; the panel and the
+   rest of the page take the visitor's colours. */
+@media (forced-colors: active) {
+  .radio,
+  .dock,
+  .player {
+    forced-color-adjust: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

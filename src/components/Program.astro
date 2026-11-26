@@ -90,7 +90,9 @@ const track = tracks[0];
     position: relative;
     height: 100%;
     display: grid;
-    grid-template-rows: 300px minmax(0, 1fr) minmax(104px, auto);
+    /* The stage is 300px on every screen 657px tall and up (a 1366×768 laptop's window); on shorter ones,
+       such as a 1920×1080 screen zoomed to 200%, it gives way so the panel keeps the 253px it has there. */
+    grid-template-rows: clamp(144px, 100dvh - 357px, 300px) minmax(0, 1fr) minmax(104px, auto);
     padding: 0 48px;
   }
   .stagehead {
@@ -105,7 +107,8 @@ const track = tracks[0];
     color: var(--quiet);
     pointer-events: none;
   }
-  .stagehead b {
+  /* :global, because readouts.ts writes a new <b> on every lock (it has no scope attribute). */
+  .stagehead :global(b) {
     color: var(--lit);
   }
   .panel {
@@ -141,7 +144,8 @@ const track = tracks[0];
     opacity: 0;
     mix-blend-mode: screen;
   }
-  /* Hint and player side by side; when the column is too narrow for both, the player wraps below. */
+  /* Hint and player side by side; the hint wraps first (as in the mock), and only when the column is
+     too narrow for the player beside a 14rem hint does the player wrap below. */
   .foot {
     display: flex;
     flex-wrap: wrap;
@@ -151,6 +155,8 @@ const track = tracks[0];
     padding-block: 14px;
   }
   .hint {
+    flex: 1 1 14rem;
+    min-width: 0;
     font-weight: 500;
     font-size: 15px;
     color: var(--quiet);
@@ -165,6 +171,9 @@ const track = tracks[0];
   @media (max-width: 959px) {
     .over {
       grid-template-columns: minmax(0, 1fr);
+      /* On short screens the stage gives up height first, so the panel keeps about 330px; it never gets
+         shorter than the phone's wall strip. From 756px tall it is the desktop's 300px. */
+      grid-template-rows: clamp(144px, 100dvh - 456px, 300px) minmax(0, 1fr) minmax(104px, auto);
       padding: 0 16px;
     }
     .stagehead {
@@ -178,6 +187,14 @@ const track = tracks[0];
     }
     .view {
       padding: 24px 22px;
+    }
+  }
+  /* A stage under 240px (desktop under 597px tall, tablet under 696px) is a strip, as on phones, and like
+     phones it has no stage head: the wall's name scroll would run into its text, and the LCD and the
+     panel already name the station. Hidden, not removed, so the panel keeps its grid row. */
+  @media (max-height: 596px), (max-width: 959px) and (max-height: 695px) {
+    .stagehead {
+      visibility: hidden;
     }
   }
 
@@ -214,8 +231,8 @@ const track = tracks[0];
       backdrop-filter: none;
       overflow: hidden;
       overflow: clip;
-      /* Below the docked LCD when a seek from it brings the panel into view (src/scripts/dock.ts). */
-      scroll-margin-top: 64px;
+      /* A seek from the docked LCD brings the panel into view under it (src/scripts/dock.ts): the page's
+         scroll-padding keeps it clear of the dock (RadioLayout.astro). */
     }
     .view {
       height: auto;

@@ -155,6 +155,10 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   }
 
   // ---- the band animations: (time in s, weight 0..1) ----
+  // What faces the radio (the scan cursor's run, the firewall, the pings) sits on the radio's side of the
+  // wall: the left, or the right in a right-to-left page. Text and the name scroll never mirror.
+  let rtl = false;
+  const side = (x: number) => (rtl ? W - 1 - x : x);
   const bands: ((t: number, w: number) => void)[] = [
     // ME: the name scrolls 14 cells/s.
     (t, w) => {
@@ -175,13 +179,14 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
         const h = 3 + Math.floor((Math.sin(k * 1.7) * 0.5 + 0.5) * (Math.sin(k * 0.27) * 0.5 + 0.5) * (STG - 5));
         for (let y = 0; y < h; y++) put(red, x, STG - 1 - y, w * (y === h - 1 ? 1 : 0.55));
       }
-      const cx = W - 1 - (Math.floor(t * 40) % W);
+      const cx = side(W - 1 - (Math.floor(t * 40) % W));
       for (let y = 0; y < STG; y++) put(amber, cx, y, w * 0.6);
     },
     // SECURITY: packets run right to left in lanes; every sixth is malicious and bursts on the amber firewall.
     (t, w) => {
+      // Computed as if the radio were on the left; side() mirrors each column for a right-to-left page.
       const fw = Math.floor(W * 0.26);
-      for (let y = 0; y < H; y += 2) put(amber, fw, y, w * 0.7);
+      for (let y = 0; y < H; y += 2) put(amber, side(fw), y, w * 0.7);
       const loop = W + 50;
       for (let lane = 0; lane < Math.floor(STG / 3); lane++) {
         const y = 1 + lane * 3;
@@ -190,19 +195,19 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
           const raw = t * speed + p * 71 + lane * 43;
           const x = W - 1 - (raw % loop);
           if ((p + lane * 2 + Math.floor(raw / loop)) % 6 !== 0) {
-            put(red, x, y, w);
-            put(red, x + 1, y, w);
-            put(red, x + 2, y, w * 0.5);
+            put(red, side(x), y, w);
+            put(red, side(x + 1), y, w);
+            put(red, side(x + 2), y, w * 0.5);
           } else if (x > fw + 1) {
-            put(amber, x, y, w);
-            put(amber, x + 1, y, w);
-            put(amber, x + 2, y, w);
+            put(amber, side(x), y, w);
+            put(amber, side(x + 1), y, w);
+            put(amber, side(x + 2), y, w);
           } else {
             const k = (fw + 1 - x) / 4;
             if (k < 4)
               for (let j = 0; j < 8; j++) {
                 const a = (j / 8) * Math.PI * 2;
-                put(amber, fw + 1 + Math.cos(a) * k * 1.6, y + Math.sin(a) * k, w * (1 - k / 4));
+                put(amber, side(fw + 1 + Math.cos(a) * k * 1.6), y + Math.sin(a) * k, w * (1 - k / 4));
               }
           }
         }
@@ -218,7 +223,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
         put(red, x, H * 0.8 + Math.sin(x * 0.033 - t * 0.42) * H * 0.06, w * 0.16);
       }
     },
-    // CONTACT: Morse "HELLO" scrolls 9 cells/s across the stage; two amber pings spread from the left edge.
+    // CONTACT: Morse "HELLO" scrolls 9 cells/s across the stage; two amber pings spread from the radio's edge.
     (t, w) => {
       const off = Math.floor(t * 9);
       const my = Math.floor(STG / 2);
@@ -228,7 +233,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
       for (let k = 0; k < 2; k++) {
         const r = ((t + k * 1.1) * 34) % reach;
         const v = w * (1 - r / reach) * 0.7;
-        for (let a = -1.4; a <= 1.4; a += 0.02) put(amber, r * Math.cos(a), H * 0.45 + r * Math.sin(a) * 0.8, v);
+        for (let a = -1.4; a <= 1.4; a += 0.02) put(amber, side(r * Math.cos(a)), H * 0.45 + r * Math.sin(a) * 0.8, v);
       }
     },
   ];
@@ -285,7 +290,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     }
   }
 
-  // ---- ripples: amber rings from the pointer and from the left edge on every lock ----
+  // ---- ripples: amber rings from the pointer and from the radio's edge on every lock ----
   function ripple(x: number, y: number, t0: number, strength: number, max: number) {
     ripples.push({ x, y, t0, s: strength, max });
     if (ripples.length > MAX_RIPPLES) ripples.shift();
@@ -334,6 +339,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
 
   // ---- one picture of the signal into the buffers ----
   function compose(time: number, now: number, still: boolean) {
+    rtl = document.dir === 'rtl';
     const st = s.near;
     const weight = s.locked ? 1 : s.strength * 0.6;
     // The image starts loading as the dial approaches; until it is ready the band animation stands in.

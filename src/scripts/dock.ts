@@ -2,7 +2,8 @@
 // the top and the panel below it. Three things keep the radio at hand while reading:
 // - Once half the dial has scrolled under the top edge, its LCD docks at the top with the seek buttons
 //   (readouts.ts keeps its cells in step with the radio's); a press on it goes back up to the dial.
-// - A seek from the dock brings the new station's panel into view under it.
+// - A seek from the dock brings the new station's panel into view under it (the page's scroll-padding,
+//   RadioLayout.astro, keeps it clear of the dock).
 // - Between stations the panel keeps its height, so the page never shrinks under a finger on the dial.
 // Layout is read only by observers and event handlers, never in a frame.
 import { need, type RadioState } from './state';
@@ -10,6 +11,8 @@ import { need, type RadioState } from './state';
 const SIDE = '(orientation: landscape) and (max-height: 520px) and (pointer: coarse)';
 /** The phone layouts: the same media queries as Radio.astro, Program.astro and Player.astro. */
 const PHONE = `(max-width: 699px), ${SIDE}`;
+/** A short window with a mouse in the phone layout (a zoomed desktop): no dock (Player.astro, RadioLayout.astro). */
+const SHORT = '(max-width: 699px) and (max-height: 399px) and (pointer: fine)';
 const DOCK_H = 56; // 44px LCD and buttons + 6px above and below (Radio.astro)
 
 export function createDock(radio: HTMLElement, program: HTMLElement, s: RadioState) {
@@ -18,12 +21,13 @@ export function createDock(radio: HTMLElement, program: HTMLElement, s: RadioSta
   const dock = document.querySelector<HTMLElement>('[data-dock]');
   const phone = matchMedia(PHONE);
   const side = matchMedia(SIDE);
+  const short = matchMedia(SHORT);
 
   // ---- the dock: shown on an upright phone once the dial is half out of sight ----
   let dialAway = false;
   const showDock = () => {
     if (!dock) return;
-    const upright = phone.matches && !side.matches;
+    const upright = phone.matches && !side.matches && !short.matches;
     dock.hidden = !upright;
     dock.classList.toggle('on', upright && dialAway);
   };
@@ -36,6 +40,7 @@ export function createDock(radio: HTMLElement, program: HTMLElement, s: RadioSta
   ).observe(dialwin);
   phone.addEventListener('change', showDock);
   side.addEventListener('change', showDock);
+  short.addEventListener('change', showDock);
   showDock();
 
   let follow = false;

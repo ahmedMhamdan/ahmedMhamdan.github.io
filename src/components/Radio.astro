@@ -121,8 +121,7 @@ for (let r = 12; r <= 96; r += 10) {
                             style={`left:${n2(rowPosition(s.data.freq, s.data.band) * 100)}%`}
                             aria-current={s.id === station.id ? 'page' : undefined}
                           >
-                            {s.data.key}
-                            <span class="sr-only">, {freqText(s.data.freq)} {ui.mhz}</span>
+                            {s.data.key}<span class="sr-only">, {freqText(s.data.freq)} {ui.mhz}</span>
                           </a>
                         </li>
                       ))}
@@ -689,11 +688,47 @@ for (let r = 12; r <= 96; r += 10) {
   }
 
   /* Tablet (700–959px): the whole radio as on the desktop, scaled to fit the height and at most half the
-     width, in a column as wide as the scaled radio plus 24px each side (RadioLayout.astro). */
+     width, in a column as wide as the scaled radio plus 24px each side (RadioLayout.astro). It is centred
+     in the screen height, antenna tip to case bottom: the padding above holds the antenna, which stands
+     outside the case's box (its tip is 176px above the case at full size; the fit reserves 196px), and 15px
+     each side is the 30px the height fit leaves. */
   @media (max-width: 959px) {
     .stand {
       --fit: min(1, tan(atan2(100dvh - 30px, 918px)), tan(atan2(50vw - 48px, 452px)));
       width: calc(452px * var(--fit) + 48px);
+      place-items: center;
+      padding-block: calc(176px * var(--fit) + 15px) 15px;
+    }
+  }
+  /* Touch tablets: the scaled seek buttons, volume knob and preset keys get tap areas of about 44px without
+     changing their look. A seek button reaches outwards, away from the volume knob; the two meet halfway
+     across the 12px gap. 44px / fit is 44 screen pixels at the radio's scale. */
+  @media (max-width: 959px) and (any-pointer: coarse) {
+    .seek,
+    .pk {
+      position: relative;
+    }
+    .seek::before,
+    .vol::before,
+    .pk::before {
+      content: '';
+      position: absolute;
+    }
+    .seek::before {
+      inset-block: calc(20px - 22px / var(--fit));
+    }
+    .seek[data-seek='prev']::before {
+      inset-inline: min(-6px, 46px - 44px / var(--fit)) -6px;
+    }
+    .seek[data-seek='next']::before {
+      inset-inline: -6px min(-6px, 46px - 44px / var(--fit));
+    }
+    .vol::before {
+      inset: min(-6px, 25px - 22px / var(--fit)) -6px;
+    }
+    /* A taller target, reaching up from the key into the handle (as on phones). */
+    .pk::before {
+      inset: min(0px, 20px - 44px / var(--fit)) -3px 0;
     }
   }
 
@@ -918,6 +953,10 @@ for (let r = 12; r <= 96; r += 10) {
       width: 44px;
       height: 44px;
       align-self: center;
+    }
+    /* Already 44px: no larger tap area (the touch tablet rule above also matches phones). */
+    .seek::before {
+      content: none;
     }
     .case .seek[data-seek='prev'] {
       grid-area: prev;

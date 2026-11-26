@@ -29,11 +29,29 @@ import Base from '../layouts/Base.astro';
     font-size: 1.6rem;
     color: var(--text);
   }
+  /* The panel's rubber button (panel.css, .act): amber is kept for lock, AFC and focus. */
   a {
+    display: inline-grid;
+    place-items: center;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 6px;
+    background: var(--rubber);
+    box-shadow:
+      0 3px 0 #0a0908,
+      0 5px 10px rgba(0, 0, 0, 0.5);
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    text-decoration: none;
     font-size: 13px;
-    color: var(--amber);
+    color: var(--text);
+  }
+  a:hover {
+    color: #fff;
+  }
+  a:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #0a0908;
   }
 </style>

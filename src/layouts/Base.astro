@@ -15,12 +15,27 @@ interface Props {
 
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Content Security Policy (plan QR-06). Everything is same-origin: one external module script (the JSON
+// page data is a data block, never run), stylesheets plus inline styles, self-hosted fonts and audio, and
+// data: URIs for the LED dot grid and mask. base-uri and form-action do not fall back to default-src, so
+// they are set too. Production only: the dev server injects its own scripts.
+const csp = [
+  "default-src 'self'",
+  "img-src 'self' data:",
+  "media-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
 ---
 
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
+    {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={csp} />}
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />

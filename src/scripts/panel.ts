@@ -123,7 +123,8 @@ export function createPanel(program: HTMLElement, s: RadioState) {
       current = s.current;
       if (normalizePath(location.pathname) !== current.path) history.pushState({ station: current.id }, '', current.path);
       document.title = current.title;
-      status.textContent = `${ui.tunedTo} ${current.name}`;
+      // The tuning knob, when it has focus, already speaks the station in its value text: say it once.
+      status.textContent = document.activeElement?.matches('[data-knob]') ? '' : `${ui.tunedTo} ${current.name}`;
     }
 
     return decodes.length > 0 || (animate && op > 0.02);

@@ -77,4 +77,27 @@ const data = JSON.stringify({ current: station.id, stations: infos }).replace(/<
       padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }
   }
+  /* Phones: whatever the browser scrolls into view (a link reached with Tab, the skip link's target, the
+     panel after a seek from the dock) stops 8px clear of the docked LCD (56px) and the player bar (64px),
+     so neither covers it (WCAG 2.2, focus not obscured). */
+  @media (max-width: 699px) {
+    :global(html) {
+      scroll-padding-block: calc(env(safe-area-inset-top) + 64px) calc(72px + env(safe-area-inset-bottom));
+    }
+  }
+  /* On its side there is no dock, and the bar is 56px. */
+  @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    :global(html) {
+      scroll-padding-block: 8px calc(64px + env(safe-area-inset-bottom));
+    }
+  }
+  /* A short window with a mouse (a desktop zoomed to 200–400%): no dock and no fixed bar (Player.astro). */
+  @media (max-width: 699px) and (max-height: 399px) and (pointer: fine) {
+    :global(html) {
+      scroll-padding-block: 8px;
+    }
+    :global(body:has(.player:not([hidden]))) {
+      padding-bottom: 8px;
+    }
+  }
 </style>
