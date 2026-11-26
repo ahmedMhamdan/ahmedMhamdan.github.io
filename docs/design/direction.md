@@ -51,10 +51,10 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
   - **Plate** (row 3): "AHMED HAMDAN" (800, 15px, 0.26em) and "CYBERSECURITY · FULL-STACK" (600, 12px, 0.12em), no wrapping.
   - **Lower** (row 4): speaker 212px (SVG grille: rings r = 12…96 step 10, holes r 2.6, about one hole per 10px of circumference, alternate rings offset) and controls: tuning knob 122px with red grip dot, "TUNING" label, previous/next seek buttons 40px, volume knob 50px (−135° to +135°).
 - **Above the case:** antenna 7×180px at −13°, chrome gradient, ball tip, red tip lamp when locked; carry handle; five piano preset keys 44×20px (pressed key drops 7px and lights red).
-- **Program** (right): wall canvas fills the column. Overlay grid rows `300px | 1fr | 104px`, side padding 48px.
-  - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING".
+- **Program** (right): wall canvas fills the column. Overlay grid rows `300px | 1fr | 104px`, side padding 48px. On windows under 657px tall the stage gives way first (`clamp(144px, 100dvh − 357px, 300px)`), so the panel keeps the 253px it has at 1366×657 (a 1920×1080 screen at 200% zoom is 960×540); `../DECISIONS.md`, 2026-11-25.
+  - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING". Hidden (its row kept) when the stage is under 240px, as on phones.
   - Panel: radius 10px, `rgba(18,17,16,.9)`, 1px `--rule` inset edge, `backdrop-filter: blur(2px)`, padding 28/32, internal scroll, static canvas overlay (`mix-blend-mode: screen`).
-  - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station" (touch screens: the phone wording below); player on the right.
+  - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station" (touch screens: the phone wording below); player on the right. The hint wraps first (a flexible column of at least 14rem); the player drops below it only when the column is too narrow for both.
 - **Panel layouts:** about (240px portrait 4:5 + text, facts list, two actions), gallery (4 columns, 4:5), case (image 16:8 + text, meta row, actions), list (rows with right-aligned category labels), poem, contact (large link rows with right-aligned labels; active row in `--lit`).
 - **Buttons:** 44px tall, radius 6px, `--rubber` with a 3px bottom shadow; primary = `--lit` with dark text. Pressed state moves 2px down.
 
@@ -77,15 +77,19 @@ From `reference/phone-mock.html`, for screens up to 699px wide and for phones he
 - **Under 360px:** band names and station names track tighter (0 and 0.02em, gap 4px) so they clear the first stations.
 - **Sideways:** two columns. On the left (`minmax(330px, 42%)`) the head unit stays in place, centred in the screen height above the 56px player, without antenna or keys; on the right the program scrolls (wall 112px, panel from 96px). No dock.
 - **Targets:** every button, seek link, preset key and the dock at least 44×44px. A dial station's target is its row cell (at least 32px tall, about 50px wide at 390px), above the WCAG 2.2 AA minimum of 24px; a tap on the track picks the nearest station in that row.
+- **Scroll padding:** the page keeps whatever the browser scrolls into view (a focused link, the skip link's target, the panel after a seek from the dock) 8px clear of the dock and the player bar: `scroll-padding-block` 64px / 72px upright, 8px / 64px sideways.
+- **Zoomed desktop** (the phone layout with a mouse, under 400px tall): no dock and no fixed bar; the player sits at the end of the page at the tablet's compact size.
+- **Forced colours** (Windows High Contrast): the radio, the dock and the player keep their own colours (`forced-color-adjust: none`); the panel takes the visitor's.
 
-## Layout (tablet, built 2026-11-22, awaiting Ahmed's verdict)
+## Layout (tablet, approved 2026-11-25)
 
-For screens 700–959px wide (plan Phase 5: "radio scaled, program narrower"); `../DECISIONS.md`, 2026-11-22. At 960px and up it is the desktop layout above.
+For screens 700–959px wide (plan Phase 5: "radio scaled, program narrower"); `../DECISIONS.md`, 2026-11-22 and 2026-11-25. At 960px and up it is the desktop layout above.
 
 - **Page:** the desktop's two columns, full viewport, no page scroll; the panel scrolls internally.
-- **Radio:** the whole desktop radio, scaled with `scale = min(1, (innerHeight − 30) / 918, (innerWidth / 2 − 48) / 452)`, standing at the bottom of a column as wide as the scaled radio plus 24px each side. It takes up only its scaled height (also on the desktop), so a short screen never cuts its bottom off.
-- **Program:** the rest of the width, side padding 16px; rows as on the desktop (`300px | 1fr | auto`). Stage head 12px, 0.2em. Panel `rgba(18,17,16,.94)` without backdrop blur, padding 24/22.
+- **Radio:** the whole desktop radio, scaled with `scale = min(1, (innerHeight − 30) / 918, (innerWidth / 2 − 48) / 452)`, in a column as wide as the scaled radio plus 24px each side, centred in the height from the antenna tip to the bottom of the case (padding `176px × scale + 15px` above, 15px below). It takes up only its scaled height (also on the desktop), so a short screen never cuts its bottom off.
+- **Program:** the rest of the width, side padding 16px; rows `clamp(144px, 100dvh − 456px, 300px) | 1fr | auto`: from 756px tall the desktop's 300px stage, on shorter screens the stage gives way first so the panel keeps about 336px. Stage head 12px, 0.2em; under 696px tall (a stage under 240px) it is hidden, as on phones. Panel `rgba(18,17,16,.94)` without backdrop blur, padding 24/22.
 - **Footer:** the hint, then the player across the full width at the phone's compact size (64px; play button 44px, marquee 15px, time 12px).
+- **Targets on touch tablets** (`any-pointer: coarse`): the seek buttons, the volume knob and the preset keys keep their drawn size but get invisible tap areas of `44px / scale` (seek buttons reach outwards; seek and volume meet halfway across their 12px gap; preset keys reach up into the handle). Dial rows stay as drawn (29px at 768px wide); a tap on the track picks the nearest station in its row.
 - No docked LCD and no panel hold. Touch tablets get the touch wording.
 
 ## Tuning model

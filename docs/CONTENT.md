@@ -23,6 +23,10 @@ Rules: no invented claims, clients, metrics or testimonials; no nickname; "cyber
 
 The number of stations per band can change (for example two poems or five). Frequencies must stay inside their band and at least 0.8 MHz apart; the build checks both.
 
+ABOUT's pitch and facts share the panel with its two buttons: at 1280×800 the placeholder copy leaves GET IN TOUCH 5px short of the panel's bottom edge. With the final copy, check that both buttons show without scrolling at 1280×800 (shorter pitch or facts on one line each).
+
+A band's first station needs room on narrow phones: its label sits after the band's name on the dial. LAB NOTES at 96.8 MHz is the tightest (4px from "SECURITY" on 320–360px phones, and touching it when a visitor enlarges letter spacing, WCAG 1.4.12). When the SECURITY stations are chosen, start the band at 97.2 MHz or higher (about 20px more room); the other bands' first stations already have 20px or more.
+
 Station frontmatter (validated in `src/content.config.ts`): `layout` picks the panel (about, gallery, case, list, poem, contact); `facts` are label/value pairs (the facts list, the meta row, or list rows); `actions` are buttons (`to` a station id, `href` a URL, neither = shown disabled); `gallery` holds photos with `alt` and `caption`; `tag` is the small amber label after the heading (for example "Draft list"); `imagePending: true` shows a marked empty frame until the image arrives (placeholder stations only).
 
 ## Music

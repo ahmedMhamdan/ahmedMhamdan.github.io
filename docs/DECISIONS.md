@@ -2,7 +2,70 @@
 
 Newest first. Each entry: context, decision, rationale, consequences. Do not reopen a decision without Ahmed.
 
-## 2026-11-22: The tablet layout (Phase 5; built, awaiting Ahmed's verdict)
+## 2026-11-27: Ahmed's answers to the critique, and Phase 5 accepted
+
+- **Context:** The Impeccable critique (2026-11-26, below) left four concept points for Ahmed. One more was put to him: the small label above each panel heading (the kicker, such as "ME · ABOUT"), which Impeccable's craft rules discourage but both approved mocks use. Phase 5's acceptance was Ahmed trying the site on his own phone.
+- **Decision:** Ahmed approved all four points as built and kept the kickers:
+  1. The dial's labels scale with the radio, as in the approved mock, even where that puts them under 12px (about 10px at 1280×800, 8px at 1366×657). This is the one accepted exception to the 12px minimum; the stations are also named in the seek buttons, the LCD and the panel.
+  2. The stage head and the footer hint stay as they are, over the wall.
+  3. The 404 stays as built: its own "NO SIGNAL" page with a "Back to the dial" button.
+  4. The home page's GET IN TOUCH jumps to CONTACT, as now.
+  5. The kicker above each panel heading stays.
+- **Acceptance:** Ahmed tried the site on his own phone and approved it. Phase 5 is done.
+- **Consequences:** No code changes. The music's credit line and the code licence come from Ahmed later (Open Questions 6 and 7); nothing is added for them until he gives them. Next is Phase 6, content, station by station.
+
+## 2026-11-26: Impeccable critique and fixes (Phase 5, task 5)
+
+- **Context:** Plan Phase 5, task 5: an Impeccable critique against the reference mock, `docs/design/direction.md` and `PRODUCT.md`, from two independent assessments. A design review (screens at desktop, tablet and phone sizes, every band, between stations, the keyboard and the 404) rated the site 29 of 36 on its heuristics, "good": the strongest parts are the states (searching, locked, the idle plate), the phone translation of the radio and the accessibility work. The Impeccable detector found nothing in the source; in the browser it flagged only what `direction.md` already accepts (ghost segments, the LCD inside the case, the wide tracking of short uppercase labels) and false positives (the empty photo frame, the dial's SVG).
+- **Decision (craft, fixed):**
+  1. **The stage head's band and key are red again.** `readouts.ts` writes a new `<b>` on every lock, and the scoped rule did not reach it, so after the first lock they were grey. The rule is now global inside the stage head, as in the mock.
+  2. **The footer hint wraps before the player does,** as in the mock: the hint is a flexible column of at least 14rem. At 1280×800 the player stays beside the hint, the footer is 104px instead of 132px and the panel grows from 368px to 396px; the home page's GET IN TOUCH, cut off by 33px before, now loses only its last 5px with the placeholder copy. Every other desktop size is pixel-identical to `main` (1456×910, 1440×900, 1024×768, 960×1024, 1920×1080, on three stations).
+  3. **The 404's link is the panel's rubber button** (44px), not amber text: amber stays for lock, AFC and focus.
+  4. **Spoken names:** the dial's station links lost a stray space before the frequency ("ABOUT, 88.7 MHz", was "ABOUT , 88.7 MHz"); seek buttons say "GitHub" and "LinkedIn" (were "Github", "Linkedin").
+- **Left for Ahmed (concept, not craft):** the dial's labels fall under the 12px minimum when the radio scales to the window (about 10px at 1280×800, 8px at 1366×657), because the approved design scales the whole radio; the stage head and the footer are real text over lit dots; a 404 inside the radio instead of a bare page; whether the home page's GET IN TOUCH should glide across the whole dial or jump.
+- **Consequences:** With the final ABOUT copy, check again that GET IN TOUCH shows without scrolling at 1280×800 (`docs/CONTENT.md`). On 1366×657 and 1024×768 the panel has to scroll to reach it.
+
+## 2026-11-25: Content Security Policy (Phase 5, task 6; QR-06)
+
+- **Context:** QR-06 asks for a policy in a `<meta http-equiv>` tag (GitHub Pages cannot set headers), adjusted only if Astro's output needs hashes.
+- **Decision:** `default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; form-action 'none'`, as the first tag after the charset in `Base.astro`, in production builds only (the dev server injects its own scripts). No hashes are needed: each page has one external module script, and its JSON page data is a data block the browser never runs. `'unsafe-inline'` for styles covers Astro's small inlined stylesheets (the 404 page) and the inline `style` the scripts set. `data:` images are the LED dot grid and its mask. `base-uri` and `form-action` are additions to the plan's list: they do not fall back to `default-src`, and the site has no forms.
+- **Consequences:** A meta policy cannot set `frame-ancestors` (browsers ignore it there), so other sites could still frame the pages; GitHub Pages offers no header for it. Checked on all 15 built pages: no violation on load, while tuning, with the music and Web Audio, DIAL FX, the volume, wall ripples and the phone dock.
+
+## 2026-11-25: Right-to-left check (Phase 5, task 4; QR-08)
+
+- **Context:** Before an Arabic version, every layout and panel was rendered with `<html dir="rtl" lang="ar">`.
+- **Found:** The page already mirrors: the radio moves to the right, the program to the left, panels, lists, facts and contact rows start on the right, and the tablet and desktop players follow the page direction. The radio, the segment readouts, the dock and the phone's player bar stay left to right on purpose (a physical dial). Outside the radio, the only physical CSS is the wall canvas's `left: 0` (on purpose: the dot grid starts at the top left either way).
+- **Decisions:**
+  - The short-window player (zoomed desktop, 2026-11-25) uses logical padding and follows the page direction, like the tablet's.
+  - On the LED wall, what faces the radio mirrors with it, as the lock ripple already did: WORK's scan cursor runs towards the radio, SECURITY's firewall stands on the radio's side with the packets running into it, and CONTACT's pings spread from the radio's edge. Text (the name scroll) never mirrors.
+- **Consequences:** English text in a right-to-left page puts its final full stop on the left (".from the start"); that is how browsers lay out English in a right-to-left paragraph and goes away with Arabic text. The left-to-right site is unchanged (the wall run passes as before).
+
+## 2026-11-25: Accessibility pass fixes (Phase 5, task 3)
+
+- **Context:** The accessibility pass (keyboard, focus, skip link, live region, reduced motion, 200% and 400% zoom, target size, text spacing, forced colours; WCAG 2.2 AA) found five things to change. NVDA is not installed on this machine, so the screen-reader check was done on the browser's accessibility tree, not by ear.
+- **Decisions:**
+  1. **Focus never hides under the phone's bars** (WCAG 2.4.11). On phones the page has `scroll-padding`: 64px at the top for the docked LCD and 72px at the bottom for the player bar (8px and 64px on a phone held sideways), so a link reached with Tab, the skip link's target and the panel after a seek from the dock all stop clear of both. It replaces the panel's `scroll-margin-top`, which did the last of these.
+  2. **Short desktop windows: the stage gives way.** A 1920×1080 screen zoomed to 200% is a 960×540 window, where the 300px stage left the panel 136px tall. The desktop stage is now `clamp(144px, 100dvh − 357px, 300px)`: 300px on every window 657px tall and up (so every common laptop window, 1366×657 included, is pixel-identical to before), and below that the panel keeps the 253px it has at 1366×657. A stage under 240px (desktop under 597px tall) has no stage head, as on short tablets.
+  3. **No fixed bars in a zoomed phone layout.** In the phone layout with a mouse and under 400px tall (a desktop zoomed to 200–400%: 1280×800 at 200% with the browser's toolbars is about 640×357, at 400% 320×200), the dock and the fixed player bar would cover a third to two thirds of the screen. There the player sits at the end of the page, as on a tablet, and the dock stays hidden (`dock.ts`). Phones never match: upright they are taller, held sideways they are touch.
+  4. **One announcement, not two.** When the tuning knob has focus, its value text already says the station ("95.4 MHz, Work, React"), so the live region stays quiet instead of repeating "Tuned to Work, React".
+  5. **Windows High Contrast keeps the radio.** In forced colours the radio, the docked LCD and the player keep their own colours (`forced-color-adjust: none`; their text already meets AA), so they still look like a radio; the panel and the rest of the page take the visitor's colours.
+- **Known and left for Ahmed:**
+  - On phones 320–360px wide, LAB NOTES (96.8 MHz) sits 4px after the band name "SECURITY", and touches it when a visitor enlarges letter spacing (WCAG 1.4.12). The dial is a fixed drawing and positions come from frequencies, so the fix is in the content: start SECURITY at 97.2 MHz or higher when its stations are chosen (`docs/CONTENT.md`).
+  - Zoom enlarges the panel's text but not the radio's on the desktop and the tablet: the radio scales to fit the window's height, so at 200% its labels stay about the size they were. Every station is also reachable by keyboard (1–5, arrows), and the phone layout, which a 1280px-wide window reaches at 200%, shows the dial full width.
+- **Consequences:** CSS and two small script changes (`dock.ts`, `panel.ts`); the client script is still 12.0 KB gzip (11,990 bytes, 53 more). Desktop windows 657px tall and up are pixel-identical to before.
+
+## 2026-11-25: The tablet layout approved, with Ahmed's four answers (Open Question 10)
+
+- **Context:** The tablet layout (2026-11-22, below) left four points open for Ahmed.
+- **Decision:** Ahmed approved the layout and answered the other three:
+  1. **Approved** as built.
+  2. **Centre the radio.** On every tablet the radio is centred in the screen height, from the antenna tip to the bottom of the case: the column's padding holds the antenna above the case (176px at full size, scaled) and 15px each side. At 768×1024 that leaves about 180px above and below; at 820×1180 about 230px. When the height is what limits the scale (an 800×600 window), it fills the height as before.
+  3. **Larger tap areas on touch tablets.** On touch screens (`any-pointer: coarse`) the seek buttons, the volume knob and the preset keys get tap areas of about 44px without changing their look: invisible pseudo-elements sized 44px divided by the radio's scale. A seek button reaches outwards, away from the volume knob, and the volume knob 6px each side, so they meet halfway across the 12px gap. Measured at 768×1024: seek buttons 44×44 (drawn 30), volume knob 46×46 (drawn 37), preset keys 37×42 (drawn 33×15; the width is the key pitch, and the case covers the key's last 2px). The dial rows stay 29px, as drawn; a tap on the track tunes to the nearest station in its row.
+  4. **A shorter stage on short screens.** On tablet screens shorter than 756px the stage gives up height first, `clamp(144px, 100dvh − 456px, 300px)`, so the panel keeps about 336px; it never gets shorter than the phone's 144px strip. At 800×600 the panel is 338px tall (was 180px).
+- **Added with point 4, for Ahmed's review:** under 696px tall the stage is under 240px, and the stage head is hidden there, as on phones. The ME band's name scroll is sized to the stage, and at 144px its letters ran into the stage head's text. The LCD and the panel's heading already name the station. The stage head keeps its grid row, so nothing moves.
+- **Consequences:** CSS only (`Radio.astro`, `Program.astro`); the client script is unchanged. The desktop at 960px and up is pixel-identical to before, and phones are unchanged (their seek buttons are already 44px and their preset keys keep their own taller target). Still not tested on a real tablet or in Safari.
+
+## 2026-11-22: The tablet layout (Phase 5; approved 2026-11-25 with the answers above)
 
 - **Context:** Plan Phase 5, task 2: "radio scaled, program narrower", for screens 700–959px wide. Until now this range had the interim stack (the full radio, then the program, and the page scrolled), so on a 768×1024 iPad the panel started below the bottom of the screen.
 - **Decision:** The desktop layout, adapted (`RadioLayout.astro`, `Radio.astro`, `Program.astro`, `Player.astro`, all under `(max-width: 959px)`, with the phone rules after them):
