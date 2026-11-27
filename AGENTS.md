@@ -83,7 +83,7 @@ Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scrip
 - English at launch. Keep text out of images and canvases so an Arabic (RTL) version can follow: use logical CSS properties (`margin-inline`, `inset-inline-start`) in new CSS.
 
 ### Privacy and safety (public repository)
-- Never commit audio files, unreleased photos, private notes, credentials or `.env` files. `public/audio/` and `*.mp3` are git-ignored on purpose; the one exception is the excerpt Ahmed approved, `public/audio/lock-in.mp3`, allowed by name in `.gitignore`. Any other music ships only after Ahmed confirms its rights and excerpt (see `docs/CONTENT.md`).
+- Never commit audio files, unreleased photos, private notes, credentials or `.env` files. `public/audio/` and `*.mp3` are git-ignored on purpose; the exceptions are allowed by name in `.gitignore`: the excerpt Ahmed approved, `public/audio/lock-in.mp3`, and the seven full songs he chose on 2026-11-27 for the playlist, accepting the takedown risk (list in `docs/CONTENT.md`, "Music"). Any other music ships only after Ahmed confirms it. Push each song in its own commit (his upload is slow).
 - Never commit Ahmed's personal email address, phone number, student ID, or local machine paths. Contact details are added only when Ahmed confirms them.
 - Lab write-ups only from labs on Ahmed's own machines; no coursework answers before their deadlines; nothing that targets third-party systems.
 - No analytics, trackers, third-party embeds, or external font/CDN requests. Self-host everything.

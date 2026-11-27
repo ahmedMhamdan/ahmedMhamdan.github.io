@@ -43,7 +43,7 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
 
 ## Layout (desktop reference 1280×800)
 
-- Page: CSS grid `520px | 1fr`, full viewport, no page scroll; the panel scrolls internally.
+- Page: CSS grid `auto | 1fr`, full viewport, no page scroll; the panel scrolls internally. The radio's column is as wide as the scaled radio plus 34px each side (`452px × fit + 68px`): 520px at full size, 413px on a 1536×730 window, so a short window's radio stands near the left edge and the program gets the width (`../DECISIONS.md`, 2026-11-27).
 - **Radio** 452×722 (plus about 196px of antenna, handle and keys above), bottom-centred in its column, scaled down to fit the viewport height (`scale = min(1, (innerHeight − 30) / 918)`); it takes up only its scaled height, so on a short screen its bottom stays in sight.
 - **Case:** radius 28px, padding 22/22/24, rows `144px 204px 30px 1fr`, gap 12px, four screws in the corners.
   - **LCD** (row 1): "FM" label, frequency (DSEG7 56px), "MHz" top right; status line: station key (DSEG14 22px), TUNED lamp (`--lit` when locked), AFC lamp (`--amber` while AFC pulls), 10-bar signal meter (bars 9–10 amber).
@@ -51,11 +51,11 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
   - **Plate** (row 3): "AHMED HAMDAN" (800, 15px, 0.26em) and "CYBERSECURITY · FULL-STACK" (600, 12px, 0.12em), no wrapping.
   - **Lower** (row 4): speaker 212px (SVG grille: rings r = 12…96 step 10, holes r 2.6, about one hole per 10px of circumference, alternate rings offset) and controls: tuning knob 122px with red grip dot, "TUNING" label, previous/next seek buttons 40px, volume knob 50px (−135° to +135°).
 - **Above the case:** antenna 7×180px at −13°, chrome gradient, ball tip, red tip lamp when locked; carry handle; five piano preset keys 44×20px (pressed key drops 7px and lights red).
-- **Program** (right): wall canvas fills the column. Overlay grid rows `300px | 1fr | 104px`, side padding 48px. On windows under 657px tall the stage gives way first (`clamp(144px, 100dvh − 357px, 300px)`), so the panel keeps the 253px it has at 1366×657 (a 1920×1080 screen at 200% zoom is 960×540); `../DECISIONS.md`, 2026-11-25.
-  - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING". Hidden (its row kept) when the stage is under 240px, as on phones.
+- **Program** (right): wall canvas fills the column. Overlay grid rows `clamp(144px, 100dvh − 540px, 300px) | 1fr | 104px`, side padding 48px: the panel comes first and keeps about 436px, and the stage takes the rest of the height, 300px from 840px tall (190px on a 1536×730 window, 144px at 1366×657 and below); `../DECISIONS.md`, 2026-11-27 (was `clamp(144px, 100dvh − 357px, 300px)`, 2026-11-25).
+  - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING". Hidden (its row kept) when the stage is under 240px (a desktop window under 780px tall), as on phones.
   - Panel: radius 10px, `rgba(18,17,16,.9)`, 1px `--rule` inset edge, `backdrop-filter: blur(2px)`, padding 28/32, internal scroll, static canvas overlay (`mix-blend-mode: screen`).
   - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station" (touch screens: the phone wording below); player on the right. The hint wraps first (a flexible column of at least 14rem); the player drops below it only when the column is too narrow for both.
-- **Panel layouts:** about (240px portrait 4:5 + text, facts list, two actions), gallery (4 columns, 4:5), case (image 16:8 + text, meta row, actions), list (rows with right-aligned category labels), poem, contact (large link rows with right-aligned labels; active row in `--lit`).
+- **Panel layouts:** about (portrait 4:5, 30% of the panel from 240px to 300px, beside kicker, heading, lede, the two actions, text and the facts list; the actions come right after the lede so they show without scrolling), gallery (4 columns, 4:5), case (image 16:8 + text, meta row, actions), list (rows with right-aligned category labels), poem, contact (large link rows with right-aligned labels; active row in `--lit`).
 - **Buttons:** 44px tall, radius 6px, `--rubber` with a 3px bottom shadow; primary = `--lit` with dark text. Pressed state moves 2px down.
 
 ## Layout (phone, approved 2026-11-21)
@@ -69,7 +69,7 @@ From `reference/phone-mock.html`, for screens up to 699px wide and for phones he
   - **Dial window:** full width at 408:204, the desktop drawing scaled as one. Its padding and the band-key column are the scale's proportions (12/408, 6/408 and 78/384 of the width), so the SVG scale and the HTML labels line up at any width. Rows are 32px at 390px wide.
   - **Plate:** name 14px, 0.24em; subtitle as on the desktop.
   - No speaker, tuning knob or volume knob: the dial is dragged, and phones have volume buttons.
-- **Program:** the LED wall is a 144px strip; the panel starts 16px above its bottom edge (128px). No stage head. Panel: radius 12px, `rgba(18,17,16,.96)`, no backdrop blur, padding 22/18/26, as tall as its content (the page scrolls, not the panel). In a panel under 600px wide, the About portrait is 96px, beside the kicker and the heading.
+- **Program:** the LED wall is a 144px strip; the panel starts 16px above its bottom edge (128px). No stage head. Panel: radius 12px, `rgba(18,17,16,.96)`, no backdrop blur, padding 22/18/26, as tall as its content (the page scrolls, not the panel). In a panel under 600px wide, the About portrait is full width under the kicker and the heading (Ahmed, 2026-11-27), and never taller than the screen minus 80px (a phone held sideways).
 - **Docked LCD:** once half the dial is under the top edge, a 56px bar slides down (0.3s, `--ease-out`): seek, a mini LCD (FM, frequency DSEG7 22px, key DSEG14 15px, TUNED lamp), seek. A press on the mini LCD scrolls back to the dial and focuses the current station's mark; a seek from it brings the new panel into view under it.
 - **Between stations** the panel keeps its last height, so the page never shrinks under a finger.
 - **Player:** a bar fixed to the bottom, 64px plus the home-indicator area, `#181615` with a `--rule` top edge; play button 44px, marquee 15px, time 12px. The page ends 8px above it.
@@ -124,9 +124,9 @@ On lock: click sound, station mark turns amber, panel shows the station, stage h
 ## LED wall
 
 - Dot pitch 8px, lit dot 5×5px inset 1.5px; off dots `#1d1310` pre-rendered once per resize.
-- Stage = top 292px (`STG` rows); the panel sits below it, and the lower wall still shows faint motion.
+- Stage = the wall above the panel less 8px (`STG` rows: 36 at a 300px stage, 22 at 190px); the panel sits below it, and the lower wall still shows faint motion.
 - Two intensity buffers (red, amber); writes keep the maximum; per-frame decay 0.74 (0.35 for the ME name scroll so letters stay crisp; 0 with reduced motion). Amber draws over red. About 30 fps.
-- **ME:** "AHMED HAMDAN  ·  " rendered to a bitmap at stage height (Barlow 800), scrolling 14 cells/s.
+- **ME:** each station's `wall` words (ABOUT "HELLO, I'M AHMED", PHOTOS "SNAPSHOTS", STORY "MY STORY"; default the site name) plus "  ·  ", in capitals, rendered to a bitmap at stage height less 8 rows (Barlow 800), scrolling 14 cells/s.
 - **WORK:** bar columns every 2 cells, heights `3 + (sin(k·1.7)·.5+.5)(sin(k·.27)·.5+.5)(STG−5)`, scrolling 6 cells/s, top cell full intensity, body 55%; an amber scan cursor sweeps right to left at 40 cells/s.
 - **SECURITY:** an amber firewall line at 26% of the width (every other row); packet lanes every 3 rows, 3 packets per lane, speeds `22 + (lane mod 5) × 7` cells/s, moving right to left. Normal packets (red) pass through; every sixth is malicious (amber) and bursts into a ring at the firewall.
 - **POETRY:** layered sine waves: main red `sin(x·.07 + t)·sin(x·.019 − .32t)` at ±38% of the stage, amber `sin(x·.041 − .6t)` at ±20% (40% intensity), two faint red waves lower on the wall (22% and 16%).

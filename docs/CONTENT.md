@@ -6,10 +6,10 @@ Rules: no invented claims, clients, metrics or testimonials; no nickname; "cyber
 
 | Freq | Station | File | Have | Need from Ahmed | Status |
 | --- | --- | --- | --- | --- | --- |
-| 88.7 | ME · ABOUT | `me/about.md` | Pitch line, facts (focus, languages, off the clock) | Portrait photo (4:5), approve the pitch wording | Placeholder |
+| 88.7 | ME · ABOUT | `me/about.md` | Portrait (`src/assets/stations/me/about.jpg`, crop of Ahmed's photo, no metadata), pitch line, a paragraph in his voice, facts, GET IN TOUCH (EMAIL) and SEE THE WORK (his GitHub); the wall scrolls "HELLO, I'M AHMED" (all approved 2026-11-27) | Nothing | Ready |
 | 90.1 | ME · PHOTOS | `me/photos.md` | Nothing | 4–8 photos of himself with a short caption each (place), permission to publish | Placeholder |
 | 91.4 | ME · STORY | `me/story.md` | Nothing | Story in his own words: studies, why security and web, where he is heading. Gaza may appear here, honestly | Placeholder |
-| 92.9 | WORK · ELANCER | `work/elancer.md` | One-line description, role, stack, status | Screenshots (16:8), source link (or "private"), live demo if any, case study later | Placeholder |
+| 92.9 | WORK · ELANCER | `work/elancer.md` | One-line description, role, stack, status (finished, Ahmed 2026-11-27) | Screenshots (16:8), source link (or "private"), live demo if any, case study later | Placeholder |
 | 94.3 | WORK · LARAVEL | `work/laravel.md` | Draft list of skills | Confirm or replace items; link projects if any | Placeholder |
 | 95.4 | WORK · REACT | `work/react.md` | Draft list of skills | Confirm or replace items | Placeholder |
 | 96.8 | SECURITY · LAB NOTES | `security/lab-notes.md` | Intro line | Choose 2–4 write-ups (own labs only), each with a title, a short summary, maybe a link | Placeholder |
@@ -23,7 +23,9 @@ Rules: no invented claims, clients, metrics or testimonials; no nickname; "cyber
 
 The number of stations per band can change (for example two poems or five). Frequencies must stay inside their band and at least 0.8 MHz apart; the build checks both.
 
-ABOUT's pitch and facts share the panel with its two buttons: at 1280×800 the placeholder copy leaves GET IN TOUCH 5px short of the panel's bottom edge. With the final copy, check that both buttons show without scrolling at 1280×800 (shorter pitch or facts on one line each).
+ABOUT's two buttons come right after the pitch line, so they show without scrolling on every desktop window checked (1280×800, 1366×657, 1440×790, 1536×730, 1920×950); the paragraph and the facts follow and may need a short scroll. On phones and tablets the full-width portrait comes first, so the buttons are below it.
+
+Work in progress that has no station yet: Jawla, Ahmed's startup (the ABOUT paragraph names it). Ask him whether it gets a WORK station when the WORK band is filled.
 
 A band's first station needs room on narrow phones: its label sits after the band's name on the dial. LAB NOTES at 96.8 MHz is the tightest (4px from "SECURITY" on 320–360px phones, and touching it when a visitor enlarges letter spacing, WCAG 1.4.12). When the SECURITY stations are chosen, start the band at 97.2 MHz or higher (about 20px more room); the other bands' first stations already have 20px or more.
 
@@ -31,12 +33,23 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 
 ## Music
 
-- Track: "you got a lot to finish. let's lock in." (jazz piano), a 66-minute mix downloaded from YouTube; its source and licence are unknown.
-- **Published excerpt** (Ahmed approved it on 2026-11-21): `public/audio/lock-in.mp3`, the mix's first song from 0:00 to 3:24, ending in the silence before the second song; 192 kbps MP3 cut on frame boundaries without re-encoding, 4.9 MB, loaded only when a visitor presses play. It is the one audio file allowed in git (by name in `.gitignore`) and is listed in `src/data/tracks.ts`. No credit line while the source is unknown.
-- Risk Ahmed accepted: if the rights holder files a takedown, GitHub can disable the repository and the site. Then remove the file from `tracks.ts` and the repository (the player hides when the list is empty) and redeploy.
-- Still open: the source and credit line (add `credit` in `tracks.ts`, and decide where a visible credit goes if a licence requires one).
-- The full mix stays out of git. Development may still use it from `public/audio/`, listed in the git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`), which replaces the published list in local builds.
-- Another track: same steps (excerpt in `public/audio/` and allowed by name in `.gitignore`, `{ title, src, credit }` in `published`), only after Ahmed confirms its rights.
+- **Decided 2026-11-27:** the player becomes a playlist ("What I listen to" with a list of songs), and the site takes a colour per song while it plays (`docs/DECISIONS.md`, 2026-11-27). Ahmed chose to publish the **full songs** and accepts the takedown risk below. Not built yet; each song is committed and pushed on its own (a slow upload line), allowed by name in `.gitignore`.
+
+| # | Song (credit line) | File in Ahmed's music folder | Size | Colour: LED / ground |
+| --- | --- | --- | --- | --- |
+| 1 | Skychaser – 104.6 Sky FM (slowed and reverb) | `Skychaser - 104.6 Sky Fm (Slowed and Reverb).mp3` | 4.1 MB | dark blue `#3d7bff` / `#060d18` |
+| 2 | Medasin – Magic (slowed and reverb) | `Medasin - Magic [slowed reverb].mp3` (the title uses stylised Unicode letters) | 10.3 MB | violet `#b48cff` / `#110d19` |
+| 3 | blut own – drifting | `blut own - drifting.mp3` | 4.8 MB | aqua `#3fe0c8` / `#081514` |
+| 4 | Sleep Party People – I'm Not Human At All | `Sleep Party People - I'm Not Human At All.mp3` | 10.6 MB | moon white `#e4e0ff` / `#0f0f14` |
+| 5 | cult member – u weren't here i really miss you (slowed x reverb) | `cult member - u weren't here i really miss you (slowed x reverb).mp3` | 8.5 MB | rose `#ff6f9f` / `#170b11` |
+| 6 | SILO – MEANINGFUL LOVE (TikTok version) | `SILO - MEANINGFUL LOVE [TIKTOK VERSION].mp3` | 4.5 MB | lime `#a8f060` / `#0d130a` |
+| 7 | Luvcat – He's My Man | `Luvcat - He's My Man {lyric video}.mp3` | 5.6 MB | wine red `#ff3b5c` / `#16090c` |
+
+  About 48 MB in all. Every LED colour passes 4.5:1 as text on its panel and as the background of the dark button text (dark blue is the darkest blue that does: 5.0:1). Published files get plain ASCII names under `public/audio/`.
+- **Still to ask Ahmed:** whether the colour fades back to red on pause (proposed) or stays; whether "you got a lot to finish. let's lock in." stays in the list; the list's design (proposed: previous, next and a list button; the list opens above the player with a colour dot per song; a tap plays a song; at the end of a song the next one starts).
+- **Current track** (live since 2026-11-21): "you got a lot to finish. let's lock in." (jazz piano), the first song of a 66-minute mix downloaded from YouTube (source and licence unknown), published as `public/audio/lock-in.mp3`: 0:00 to 3:24, 192 kbps MP3 cut on frame boundaries without re-encoding, 4.9 MB, loaded only when a visitor presses play. No credit line while the source is unknown.
+- **Risk Ahmed accepted:** these are other artists' songs. If a rights holder files a takedown, GitHub can disable the repository and the site. Then remove the song from `tracks.ts` and the repository and redeploy. Git keeps every committed file in its history, so removed songs still count towards the repository's size.
+- Development may still use local files from `public/audio/`, listed in the git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`), which replaces the published list in local builds.
 
 ## Images
 

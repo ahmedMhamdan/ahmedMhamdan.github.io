@@ -28,7 +28,7 @@ The site itself is the proof of skill: a working radio you tune by hand, an LED 
 
 - Visitors arrive from a CV link, LinkedIn, GitHub, or a shared message, on laptops during work hours and on phones.
 - Five bands (sections) with stations (pages): ME (About, Photos, Story), WORK (Elancer, Laravel, React), SECURITY (Lab notes, Research; light, Ahmed picks the items later), POETRY (each poem a designed piece), CONTACT (Email, GitHub, LinkedIn).
-- Music: a "What I listen to" player, bottom-right. One track for now (jazz piano). The music plays through the radio: clean when tuned, filtered with static while the dial moves.
+- Music: a "What I listen to" player, bottom-right, becoming a playlist of seven songs Ahmed chose, each turning the site its own colour while it plays (decided 2026-11-27; one track, jazz piano, until it is built). The music plays through the radio: clean when tuned, filtered with static while the dial moves.
 - Excluded for now: gaming channel content, a log/updates feed, a CTF hunt.
 
 ## Capabilities and Constraints
@@ -37,7 +37,7 @@ The site itself is the proof of skill: a working radio you tune by hand, an LED 
 - Static only: no backend, no database, no accounts, no tracking.
 - Audio plays only after a visitor action.
 - Coursework answers are never published before deadlines; lab write-ups only from labs on Ahmed's own machines.
-- Undecided: final project and security list, poem selection, photo set, public email, LinkedIn URL, the music's source and credit line, code licence.
+- Undecided: final project and security list, poem selection (the poems will be pictures), photo set, public email, LinkedIn URL, the current track's source and credit line, code licence.
 
 ## Brand Commitments
 
@@ -48,10 +48,11 @@ The site itself is the proof of skill: a working radio you tune by hand, an LED 
 
 ## Evidence on Hand
 
-- Elancer: a real bilingual (English/Arabic) Laravel + React freelance marketplace, in progress. Source link and screenshots to be supplied.
+- Elancer: a real bilingual (English/Arabic) Laravel + React freelance marketplace, finished. Source link and screenshots to be supplied.
+- Jawla: Ahmed's startup, his current work (named on ABOUT; details to come from him).
 - Security coursework and labs (advanced ethical hacking, wireless security, digital forensics); team research topic: AI-assisted SQLi/XSS detection. Selection pending.
 - Poems and photos: to be provided by Ahmed.
-- Music: one local track (about 66 minutes, source and licence unknown). Public release needs publishing rights and a short excerpt; until then no audio file ships.
+- Music: a 3:24 excerpt of one track is live (source unknown). Seven full songs by other artists are chosen for the playlist; Ahmed accepts the takedown risk (`docs/CONTENT.md`, "Music").
 - No testimonials, clients, metrics, or awards exist. Do not invent any.
 
 ## Product Principles
