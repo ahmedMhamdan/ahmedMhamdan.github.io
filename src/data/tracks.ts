@@ -21,6 +21,7 @@ const published: Track[] = [
   { title: 'Magic (slowed and reverb)', artist: 'Medasin', src: '/audio/medasin-magic.mp3', color: { lit: '#b48cff', ground: '#110d19' } },
   { title: 'drifting', artist: 'blut own', src: '/audio/blut-own-drifting.mp3', color: { lit: '#3fe0c8', ground: '#081514' } },
   { title: "I'm Not Human At All", artist: 'Sleep Party People', src: '/audio/sleep-party-people-not-human.mp3', color: { lit: '#e4e0ff', ground: '#0f0f14' } },
+  { title: "u weren't here i really miss you (slowed x reverb)", artist: 'cult member', src: '/audio/cult-member-u-werent-here.mp3', color: { lit: '#ff6f9f', ground: '#170b11' } },
   // The first song of a mix, 0:00 to 3:24 (approved by Ahmed on 2026-11-21; source unknown, so no credit).
   { title: "you got a lot to finish. let's lock in.", src: '/audio/lock-in.mp3' },
 ];
