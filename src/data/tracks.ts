@@ -19,6 +19,7 @@ export interface Track {
 const published: Track[] = [
   { title: '104.6 Sky FM (slowed and reverb)', artist: 'Skychaser', src: '/audio/skychaser-sky-fm.mp3', color: { lit: '#3d7bff', ground: '#060d18' } },
   { title: 'Magic (slowed and reverb)', artist: 'Medasin', src: '/audio/medasin-magic.mp3', color: { lit: '#b48cff', ground: '#110d19' } },
+  { title: 'drifting', artist: 'blut own', src: '/audio/blut-own-drifting.mp3', color: { lit: '#3fe0c8', ground: '#081514' } },
   // The first song of a mix, 0:00 to 3:24 (approved by Ahmed on 2026-11-21; source unknown, so no credit).
   { title: "you got a lot to finish. let's lock in.", src: '/audio/lock-in.mp3' },
 ];
