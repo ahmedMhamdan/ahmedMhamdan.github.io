@@ -17,13 +17,14 @@ const n2 = (v: number) => +v.toFixed(2);
 const rowTop = (row: number) => PAD_Y + row * ROW_H;
 const baseline = (row: number) => rowTop(row) + ROW_H - 11;
 
-/** Tick colours: the active row's ticks are lit at 55%, the others are ghost ticks. */
-export const TICK_ON = 'rgba(255,59,31,.55)';
+/** Tick colours: the active row's ticks are lit at 55%, the others are ghost ticks. CSS colours (global.css),
+ * set as the style's fill so they follow a song's colour. */
+export const TICK_ON = 'var(--tick-on)';
 export const TICK_OFF = 'var(--ghost)';
 /** Station mark colours: locked, on the active row, elsewhere. */
 export const MARK_LOCK = 'var(--amber)';
 export const MARK_ON = 'var(--lit)';
-export const MARK_OFF = '#3a201a';
+export const MARK_OFF = 'var(--mark-off)';
 
 /** 41 ticks across one row, a major tick every 10. */
 export function tickPath(row: number): string {

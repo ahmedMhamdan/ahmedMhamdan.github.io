@@ -19,7 +19,6 @@ interface Props {
 const { station, stations } = Astro.props;
 const { data } = station;
 const others = stations.filter((s) => s.id !== station.id);
-const track = tracks[0];
 ---
 
 <main class="program">
@@ -37,7 +36,7 @@ const track = tracks[0];
     </div>
     <footer class="foot">
       <p class="hint" data-hint><b>{ui.hintStatic.strong}</b>{ui.hintStatic.rest}</p>
-      {track && <Player track={track} />}
+      {tracks.length > 0 && <Player tracks={tracks} />}
     </footer>
   </div>
   {
@@ -63,18 +62,27 @@ const track = tracks[0];
     position: relative;
     overflow: hidden;
     min-width: 0;
-    /* Unlit LED dots: pitch 8px, 5×5px dot inset 1.5px (direction.md, LED wall). */
-    --dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='1.5' y='1.5' width='5' height='5' fill='%231d1310'/%3E%3C/svg%3E");
-    background: var(--dots) var(--ground);
+    background: var(--ground);
   }
-  /* The area the LED wall may light. Its canvas has one pixel per dot (src/scripts/wall.ts sets its
-     size in whole cells): scaled up without smoothing, then cut to 5×5 dots by the same grid as the
-     background, so lit dots sit exactly on the unlit ones. Physical top/left on purpose: the
-     background grid starts at the top left in either direction. */
+  /* The area the LED wall may light, with its unlit dots: pitch 8px, 5×5px dot inset 1.5px (direction.md,
+     LED wall), in --dot cut out by a mask, so the dots take a song's colour. Its canvas has one pixel per
+     dot (src/scripts/wall.ts sets its size in whole cells): scaled up without smoothing, then cut to 5×5
+     dots by the same grid, so lit dots sit exactly on the unlit ones. Physical top/left on purpose: the
+     grid starts at the top left in either direction. */
   .wall {
     position: absolute;
     inset: 0;
     overflow: hidden;
+  }
+  .wall::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--dot);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='1.5' y='1.5' width='5' height='5'/%3E%3C/svg%3E")
+      0 0 / 8px 8px;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='1.5' y='1.5' width='5' height='5'/%3E%3C/svg%3E")
+      0 0 / 8px 8px;
   }
   .wall canvas {
     position: absolute;
@@ -115,7 +123,7 @@ const track = tracks[0];
     position: relative;
     min-height: 0;
     border-radius: 10px;
-    background: rgba(18, 17, 16, 0.9);
+    background: color-mix(in srgb, var(--panel-bg) 90%, transparent);
     box-shadow:
       inset 0 0 0 1px var(--rule),
       0 20px 40px rgba(0, 0, 0, 0.35);
@@ -182,7 +190,7 @@ const track = tracks[0];
       letter-spacing: 0.2em;
     }
     .panel {
-      background: rgba(18, 17, 16, 0.94);
+      background: color-mix(in srgb, var(--panel-bg) 94%, transparent);
       backdrop-filter: none;
     }
     .view {
@@ -211,7 +219,6 @@ const track = tracks[0];
     .wall {
       inset: 0 0 auto;
       height: 144px;
-      background: var(--dots);
     }
     .over {
       height: auto;
@@ -224,7 +231,7 @@ const track = tracks[0];
     .panel {
       margin-inline: 10px;
       border-radius: 12px;
-      background: rgba(18, 17, 16, 0.96);
+      background: color-mix(in srgb, var(--panel-bg) 96%, transparent);
       box-shadow:
         inset 0 0 0 1px var(--rule),
         0 -6px 24px rgba(0, 0, 0, 0.35);

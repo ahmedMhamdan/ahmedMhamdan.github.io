@@ -45,6 +45,9 @@ export const ui = {
   track: 'Track',
   play: 'Play',
   pause: 'Pause',
+  previousSong: 'Previous song',
+  nextSong: 'Next song',
+  playlist: 'Playlist',
   dialFx: 'DIAL FX',
   volume: 'Volume',
 } as const;

@@ -43,23 +43,24 @@ src/
   lib/scale.ts             dial scale geometry shared by Radio.astro (build) and scripts/dial.ts and tuner.ts (run time: the needle, the frequency under a pointer); tests in scale.test.ts
   lib/sound.ts             pure sound and player math (per-frame sound targets, marquee, time, volume); tests in sound.test.ts
   lib/ui.ts                interface strings in one place (Arabic-ready)
-  data/tracks.ts           the player's tracks: one approved excerpt (public/audio/lock-in.mp3); a git-ignored tracks.local.ts may list a local file for development
-  scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden
+  data/tracks.ts           the playlist in playing order (title, artist, file, colours); songs Ahmed approved only (docs/CONTENT.md, Music); a git-ignored tracks.local.ts may list local files for development
+  scripts/main.ts          client entry: state, one rAF loop that sleeps when idle and while the tab is hidden, and the power-on (the radio opens switched off and tunes in to the page's station)
   scripts/state.ts         the one shared state object (tuner writes, everything else reads)
   scripts/tuner.ts         inputs (knob, dial drag, wheel, keys, links, back/forward), easing, AFC, lock
   scripts/dial.ts          moves the SVG scale: needle, lit row, marks, preset keys, seek links
   scripts/readouts.ts      LCD (and the docked LCD), lamps, meter, knob slider, antenna, stage head, speaker cone
   scripts/dock.ts          phones: the LCD docked at the top once the dial scrolls away, seek follow, the panel's height held between stations
   scripts/panel.ts         panel swap from <template>, decode, pixel resolve, static, idle, URL/title/announcement
-  scripts/wall.ts          LED wall: band animations, billboards, noise, ripples, music spectrum; one canvas pixel per dot, scaled and masked by CSS
+  scripts/wall.ts          LED wall: band animations, billboards, noise, ripples, music spectrum; one canvas pixel per dot, scaled and masked by CSS; its LED colour follows the song
+  scripts/ledfont.ts       the wall's 5×7 dot-matrix font (1×, or 2×/3× smoothed with Scale2x/Scale3x)
   scripts/audio.ts         Web Audio graph (music through the radio, static, whistle, lock click) and its per-frame tick; made on the first press only
-  scripts/player.ts        "What I listen to" player: play/pause, marquee, time, DIAL FX, and the volume knob on the radio
+  scripts/player.ts        "What I listen to" playlist: starts on the first click or tap, play/pause, previous/next, the song list, marquee, time, DIAL FX, each song's colours, and the volume knob on the radio
   scripts/rotary.ts        turning a knob by hand (pointer capture, angle deltas): tuning and volume knobs
   layouts/Base.astro       html shell, fonts, meta
   layouts/RadioLayout.astro      every station page: radio left, program right; complete without JS
   components/Radio.astro   the radio object at rest (LCD, dial scale SVG, links, speaker grille built at build time), its phone head unit and the docked LCD
   components/Program.astro LED wall (dot grid, canvas, mask), stage head, panel, footer hint and player
-  components/Player.astro  music player markup, rendered only when tracks.ts lists a track
+  components/Player.astro  music player markup and the song list (a popover), rendered only when tracks.ts lists a song
   components/Panel*.astro  panel layouts: about, gallery, case, list, poem, contact (+ PanelHead, Pic, Actions)
   pages/index.astro        home (ME · ABOUT)
   pages/[...slug].astro    every other station
@@ -96,7 +97,7 @@ Client modules load from one `<script>` in `RadioLayout.astro` (entry `src/scrip
 - Respect `prefers-reduced-motion`: instant tuning, no decode scramble, still wall, no image pixel-resolve.
 
 ### Behaviour and performance
-- Audio starts only after a user gesture. No autoplay, ever.
+- Audio starts only after a user gesture, never before. The music starts on the visitor's first click or tap anywhere on the page (Ahmed, 2026-11-27), never from a key press alone, and not again in a session once they pause it; the next song follows when one ends.
 - Every station is reachable by plain links and by keyboard (1–5 bands, arrow keys, knob as `role="slider"`).
 - Tuning to a station updates the URL with `history.pushState` to its real page; back/forward retunes the dial.
 - Canvas loops pause when the tab is hidden and when nothing changes; target 60 fps on a mid-range laptop and a stable frame rate on mid-range phones.

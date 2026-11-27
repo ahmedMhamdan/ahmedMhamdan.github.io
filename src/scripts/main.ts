@@ -2,7 +2,10 @@
 // changes and while the tab is hidden (QR-04). The music keeps playing in a hidden tab; only the
 // pictures stop. Without this script every page still works: the
 // dial marks are plain links and each station is a real page.
-import type { StationInfo } from '../lib/dial';
+// Power on: a page opens with the radio off (global.css); after POWER_MS it switches on just below the
+// page's station and tunes in to it, static and all. Not with reduced motion, nor where CSS cannot
+// tell that scripts run (then there is no "off" to start from).
+import { LO, type StationInfo } from '../lib/dial';
 import { createAudio } from './audio';
 import { createDial } from './dial';
 import { createDock } from './dock';
@@ -12,6 +15,9 @@ import { createReadouts } from './readouts';
 import { createState, need } from './state';
 import { createTuner } from './tuner';
 import { createWall } from './wall';
+
+const POWER_MS = 450;
+const BOOT_MHZ = 0.5; // how far below its station the dial wakes up
 
 interface RadioData {
   current: string;
@@ -24,6 +30,15 @@ function start() {
   const program = need(document, '.program');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const s = createState(data.stations, data.current, motion.matches);
+  const root = document.documentElement;
+  const boot = !s.reduceMotion && matchMedia('(scripting: enabled)').matches;
+  if (boot) {
+    // Below the station, but nearer to it than to the station under it, so it is the one that comes in.
+    const home = s.current.freq;
+    const under = s.stations.filter((st) => st.freq < home).at(-1);
+    s.f = s.target = home - Math.min(BOOT_MHZ, home - LO, under ? (home - under.freq) / 2 - 0.05 : BOOT_MHZ);
+    s.booting = true;
+  }
 
   let raf = 0;
   let last = 0;
@@ -71,6 +86,18 @@ function start() {
   // First frame right away, even in a background tab, so the slider has its value from the start.
   last = performance.now();
   frame(last);
+
+  if (!boot) root.dataset.power = 'on';
+  else
+    setTimeout(() => {
+      root.dataset.power = 'on';
+      // Tune in, unless the visitor already took the dial.
+      if (s.booting) {
+        s.target = s.current.freq;
+        s.lastMove = performance.now();
+      }
+      wake();
+    }, POWER_MS);
 }
 
 start();

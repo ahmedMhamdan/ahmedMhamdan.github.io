@@ -12,11 +12,33 @@
   font-display: block;
 }
 
+/* The two colours a song can change (src/scripts/player.ts sets them on <html> while it plays): registered,
+   so they glide from one song to the next instead of jumping. Everything tinted by the LED colour derives
+   from these two below. Without music they are the radio's own red on warm black. */
+@property --lit {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff3b1f;
+}
+@property --ground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #121110;
+}
+
 :root {
   --ground: #121110;
   --case: #211d1a;
   --lit: #ff3b1f; /* lit LED segment, primary accent */
-  --ghost: #2b1915; /* unlit segment: decorative only, always aria-hidden */
+  --ghost: color-mix(in srgb, var(--lit) 10%, var(--ground)); /* unlit segment (#2a1511 in red): decorative only, always aria-hidden */
+  --dot: color-mix(in srgb, var(--lit) 5%, var(--ground)); /* unlit LED wall dot (#1e1311) */
+  --glass: color-mix(in srgb, var(--ground) 60%, #000); /* LCD glass (#0b0a0a) */
+  --panel-bg: color-mix(in srgb, var(--ground) 65%, #121110); /* content panel, before its transparency */
+  --lamp-off: color-mix(in srgb, var(--lit) 15%, #2b2b2b); /* unlit lamp (#4b2d29) */
+  --mark-off: color-mix(in srgb, var(--lit) 20%, #12100f); /* station mark off the active row (#3e1912) */
+  --tick-on: color-mix(in srgb, var(--lit) 55%, transparent); /* the active row's ticks */
+  --needle-out: color-mix(in srgb, var(--lit) 35%, transparent); /* the needle outside the active row */
+  --lit-edge: color-mix(in srgb, var(--lit) 45%, #000); /* the lit button's bottom edge (#731a0e) */
   --amber: #ffb000; /* lock, AFC, focus ring */
   --text: #e6dad3;
   --label: #c2b3ab;
@@ -32,6 +54,9 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   color-scheme: dark;
+  transition:
+    --lit 1.2s ease,
+    --ground 1.2s ease;
 }
 
 *,
@@ -118,6 +143,11 @@ button {
   inset: 0;
   color: var(--lit);
 }
+/* Fourteen-segment cells have twice the segments, diagonals included: at full ghost strength the empty
+   cells read as broken letters, so their ghosts are dimmer. */
+.seg.s14 .g {
+  color: color-mix(in srgb, var(--ghost) 45%, transparent);
+}
 
 /* Words for the input at hand: keyboard shortcuts, or dragging and tapping on a touch screen. */
 .for-touch {
@@ -147,6 +177,39 @@ button {
   text-transform: uppercase;
   color: var(--amber);
   vertical-align: middle;
+}
+
+/* Power on (src/scripts/main.ts). With the script and motion allowed, a page opens with the radio switched
+   off: the LCD shows only its ghost cells, the dial is dark and the wall unlit. The script switches it on
+   (data-power="on") and tunes in to the page's station; the panel's words are there all along. If the
+   script never runs, everything comes on by itself after 3 s. No script or reduced motion: always on. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  html:not([data-power='on']) :is(.lcd, .mlcd) :is(.l, .fm, .meters, .mlamp),
+  html:not([data-power='on']) .wall canvas {
+    opacity: 0;
+    animation: power-failsafe 0s 3s forwards;
+  }
+  html:not([data-power='on']) .dialwin {
+    filter: brightness(0.3);
+    animation: power-failsafe 0s 3s forwards;
+  }
+  html:not([data-power='on']) .panel .static {
+    visibility: hidden;
+    animation: power-failsafe 0s 3s forwards;
+  }
+  .dialwin {
+    transition: filter 0.35s ease-out;
+  }
+  .wall canvas {
+    transition: opacity 0.3s ease-out;
+  }
+}
+@keyframes power-failsafe {
+  to {
+    opacity: 1;
+    filter: none;
+    visibility: visible;
+  }
 }
 
 /* Windows High Contrast (forced colours): the radio, its docked LCD and the player are drawn objects

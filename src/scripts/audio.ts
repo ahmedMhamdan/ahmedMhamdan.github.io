@@ -3,7 +3,7 @@
 //   <audio> → MediaElementSource → highpass → lowpass → music gain → analyser (fft 256) → volume → output
 //   white noise (2 s loop) → bandpass 2200 Hz, Q 0.5 → noise gain → volume
 //   sine oscillator (whistle) → whistle gain → volume
-// Nothing exists before the first press of play or DIAL FX (no autoplay, QR-07). Every change glides
+// Nothing exists before the visitor's first click or tap (QR-07: it starts the music) or press of DIAL FX. Every change glides
 // (setTargetAtTime) so the filters never click, and a parameter is sent only when its target moves,
 // so a radio at rest costs nothing. The context sleeps while there is neither music nor DIAL FX.
 import { SOUND, movingFrom, soundTargets, type SoundTargets } from '../lib/sound';

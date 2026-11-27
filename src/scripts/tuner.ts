@@ -32,6 +32,7 @@ export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void)
 
   const moved = () => {
     s.lastMove = performance.now();
+    s.booting = false; // the visitor took over the dial
     wake();
   };
   const tuneTo = (freq: number) => {
@@ -210,8 +211,11 @@ export function createTuner(radio: HTMLElement, s: RadioState, wake: () => void)
     if (s.dragging && s.locked && s.locked !== wasLocked && 'vibrate' in navigator) navigator.vibrate(LOCK_BUZZ_MS);
     s.row = rowOf(s.f);
     s.df = s.f - prevF;
-    // Settled on a station: it becomes the page (URL, title, announcement).
-    if (s.locked && !s.dragging && s.f === s.target) s.current = s.locked;
+    // Settled on a station: it becomes the page (URL, title, announcement), and any power-on is over.
+    if (s.locked && !s.dragging && s.f === s.target) {
+      s.current = s.locked;
+      s.booting = false;
+    }
 
     return s.dragging || s.f !== s.target || afcPending(afc);
   };

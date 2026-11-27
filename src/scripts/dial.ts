@@ -34,7 +34,7 @@ export function createDial(radio: HTMLElement, s: RadioState) {
       row = s.row;
       rows.forEach((el, i) => el.classList.toggle('on', i === row));
       keys.forEach((el, i) => el.classList.toggle('on', i === row));
-      ticks.forEach((el, i) => el.setAttribute('fill', i === row ? TICK_ON : TICK_OFF));
+      ticks.forEach((el, i) => (el.style.fill = i === row ? TICK_ON : TICK_OFF));
       needleOut.setAttribute('d', needles[row].outRow);
       needleIn.setAttribute('d', needles[row].inRow);
     }
@@ -49,7 +49,8 @@ export function createDial(radio: HTMLElement, s: RadioState) {
       locked = s.locked;
       for (const st of s.stations) {
         const on = st === locked;
-        marks.get(st.id)?.setAttribute('fill', on ? MARK_LOCK : st.row === row ? MARK_ON : MARK_OFF);
+        const mark = marks.get(st.id);
+        if (mark) mark.style.fill = on ? MARK_LOCK : st.row === row ? MARK_ON : MARK_OFF;
         links.get(st.id)?.classList.toggle('lock', on);
       }
     }

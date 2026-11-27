@@ -16,10 +16,10 @@ Screenshots: `screenshots/g-me-about.png` (ME · ABOUT, tuned), `screenshots/g-w
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--ground` | `#121110` | page ground, wall off-dots base |
+| `--ground` | `#121110` | page ground, wall off-dots base; a song sets its own (see "Song colours") |
 | `--case` | `#211d1a` | radio case mid-tone (gradient `#2a2522 → #1c1917 58% → #171412`) |
-| `--lit` | `#ff3b1f` | lit LED segments, primary accent, primary button |
-| `--ghost` | `#2b1915` | unlit segments, inactive ticks; decorative only, `aria-hidden` |
+| `--lit` | `#ff3b1f` | lit LED segments, primary accent, primary button; a song sets its own |
+| `--ghost` | `--lit` 10% in `--ground` (`#2a1511`) | unlit segments, inactive ticks; decorative only, `aria-hidden`; fourteen-segment cells at 45% of it |
 | `--amber` | `#ffb000` | lock state, AFC lamp, malicious packets, wall secondary, focus ring |
 | `--text` | `#e6dad3` | headings and body on the panel |
 | `--label` | `#c2b3ab` | default UI labels |
@@ -27,9 +27,13 @@ Screenshots: `screenshots/g-me-about.png` (ME · ABOUT, tuned), `screenshots/g-w
 | `--dimlabel` | `#9a7a70` | only on the darkest grounds (LCD, dial window); check contrast where used |
 | `--rubber` | `#24211f` | buttons and keys |
 | `--rule` | `#2a2725` | hairlines, panel edge |
-| LCD glass | `#0b0a09` | LCD background, inset shadow |
+| `--glass` | `--ground` 60% in black (`#0b0a0a`) | LCD background, inset shadow |
 | Dial glass | `#0d0c0b` | dial window background |
-| Wall off-dot | `#1d1310` | unlit LED dots |
+| `--dot` | `--lit` 5% in `--ground` (`#1e1311`) | unlit LED dots |
+
+### Song colours (2026-11-27)
+
+`--lit` and `--ground` are registered with `@property` and glide over 1.2 s when a song is chosen (at once with reduced motion); a pause keeps them. Derived in `global.css`: `--ghost`, `--dot`, `--glass`, `--panel-bg` (`--ground` 65% in `#121110`), `--lamp-off` (`--lit` 15% in `#2b2b2b`), `--mark-off` (`--lit` 20% in `#12100f`), `--tick-on` (`--lit` at 55%), `--needle-out` (`--lit` at 35%), `--lit-edge` (`--lit` 45% in black). The wall's lit dots and the static's specks (`0.7 × colour + 0.3`) follow the same colour. Amber, the case, the panel's text and the player bar stay as they are. Colours per song: `docs/CONTENT.md`, "Music".
 
 Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text.
 
@@ -47,13 +51,13 @@ Body text on the panel uses `#d8ccc5`. Selection: `--lit` background, black text
 - **Radio** 452×722 (plus about 196px of antenna, handle and keys above), bottom-centred in its column, scaled down to fit the viewport height (`scale = min(1, (innerHeight − 30) / 918)`); it takes up only its scaled height, so on a short screen its bottom stays in sight.
 - **Case:** radius 28px, padding 22/22/24, rows `144px 204px 30px 1fr`, gap 12px, four screws in the corners.
   - **LCD** (row 1): "FM" label, frequency (DSEG7 56px), "MHz" top right; status line: station key (DSEG14 22px), TUNED lamp (`--lit` when locked), AFC lamp (`--amber` while AFC pulls), 10-bar signal meter (bars 9–10 amber).
-  - **Dial window** (row 2): five rows `78px | 1fr`; band key = band number (DSEG7) + band name; station marks positioned at `(freq − 88 − band×4) / 4 × 100%`. Canvas overlay: 41 ticks per row (major every 10), active row ticks `rgba(255,59,31,.55)`, others `--ghost`; station marks 5×6px (amber when locked, red on the active row, `#3a201a` otherwise); needle dashed 4px-on/3px-off across all rows, 4px wide and solid red inside the active row, 2px at 35% elsewhere.
+  - **Dial window** (row 2): five rows `78px | 1fr`; band key = band number (DSEG7) + band name; station marks positioned at `(freq − 88 − band×4) / 4 × 100%`. Canvas overlay: 41 ticks per row (major every 10), active row ticks `--tick-on` (`--lit` at 55%), others `--ghost`; station marks 5×6px (amber when locked, `--lit` on the active row, `--mark-off` otherwise); needle dashed 4px-on/3px-off across all rows, 4px wide and solid `--lit` inside the active row, 2px at 35% elsewhere.
   - **Plate** (row 3): "AHMED HAMDAN" (800, 15px, 0.26em) and "CYBERSECURITY · FULL-STACK" (600, 12px, 0.12em), no wrapping.
   - **Lower** (row 4): speaker 212px (SVG grille: rings r = 12…96 step 10, holes r 2.6, about one hole per 10px of circumference, alternate rings offset) and controls: tuning knob 122px with red grip dot, "TUNING" label, previous/next seek buttons 40px, volume knob 50px (−135° to +135°).
 - **Above the case:** antenna 7×180px at −13°, chrome gradient, ball tip, red tip lamp when locked; carry handle; five piano preset keys 44×20px (pressed key drops 7px and lights red).
 - **Program** (right): wall canvas fills the column. Overlay grid rows `clamp(144px, 100dvh − 540px, 300px) | 1fr | 104px`, side padding 48px: the panel comes first and keeps about 436px, and the stage takes the rest of the height, 300px from 840px tall (190px on a 1536×730 window, 144px at 1366×657 and below); `../DECISIONS.md`, 2026-11-27 (was `clamp(144px, 100dvh − 357px, 300px)`, 2026-11-25).
   - Stage head: "SIGNAL" left; right "BAND · KEY · 88.7 MHz" (band and key in `--lit`) or "SEARCHING". Hidden (its row kept) when the stage is under 240px (a desktop window under 780px tall), as on phones.
-  - Panel: radius 10px, `rgba(18,17,16,.9)`, 1px `--rule` inset edge, `backdrop-filter: blur(2px)`, padding 28/32, internal scroll, static canvas overlay (`mix-blend-mode: screen`).
+  - Panel: radius 10px, `--panel-bg` at 90%, 1px `--rule` inset edge, `backdrop-filter: blur(2px)`, padding 28/32, internal scroll, static canvas overlay (`mix-blend-mode: screen`).
   - Footer: hint "**Turn the dial** · 1–5 jump to a band · ← → next station" (touch screens: the phone wording below); player on the right. The hint wraps first (a flexible column of at least 14rem); the player drops below it only when the column is too narrow for both.
 - **Panel layouts:** about (portrait 4:5, 30% of the panel from 240px to 300px, beside kicker, heading, lede, the two actions, text and the facts list; the actions come right after the lede so they show without scrolling), gallery (4 columns, 4:5), case (image 16:8 + text, meta row, actions), list (rows with right-aligned category labels), poem, contact (large link rows with right-aligned labels; active row in `--lit`).
 - **Buttons:** 44px tall, radius 6px, `--rubber` with a 3px bottom shadow; primary = `--lit` with dark text. Pressed state moves 2px down.
@@ -69,7 +73,7 @@ From `reference/phone-mock.html`, for screens up to 699px wide and for phones he
   - **Dial window:** full width at 408:204, the desktop drawing scaled as one. Its padding and the band-key column are the scale's proportions (12/408, 6/408 and 78/384 of the width), so the SVG scale and the HTML labels line up at any width. Rows are 32px at 390px wide.
   - **Plate:** name 14px, 0.24em; subtitle as on the desktop.
   - No speaker, tuning knob or volume knob: the dial is dragged, and phones have volume buttons.
-- **Program:** the LED wall is a 144px strip; the panel starts 16px above its bottom edge (128px). No stage head. Panel: radius 12px, `rgba(18,17,16,.96)`, no backdrop blur, padding 22/18/26, as tall as its content (the page scrolls, not the panel). In a panel under 600px wide, the About portrait is full width under the kicker and the heading (Ahmed, 2026-11-27), and never taller than the screen minus 80px (a phone held sideways).
+- **Program:** the LED wall is a 144px strip; the panel starts 16px above its bottom edge (128px). No stage head. Panel: radius 12px, `--panel-bg` at 96%, no backdrop blur, padding 22/18/26, as tall as its content (the page scrolls, not the panel). In a panel under 600px wide, the About portrait is full width under the kicker and the heading (Ahmed, 2026-11-27), and never taller than the screen minus 80px (a phone held sideways).
 - **Docked LCD:** once half the dial is under the top edge, a 56px bar slides down (0.3s, `--ease-out`): seek, a mini LCD (FM, frequency DSEG7 22px, key DSEG14 15px, TUNED lamp), seek. A press on the mini LCD scrolls back to the dial and focuses the current station's mark; a seek from it brings the new panel into view under it.
 - **Between stations** the panel keeps its last height, so the page never shrinks under a finger.
 - **Player:** a bar fixed to the bottom, 64px plus the home-indicator area, `#181615` with a `--rule` top edge; play button 44px, marquee 15px, time 12px. The page ends 8px above it.
@@ -87,7 +91,7 @@ For screens 700–959px wide (plan Phase 5: "radio scaled, program narrower"); `
 
 - **Page:** the desktop's two columns, full viewport, no page scroll; the panel scrolls internally.
 - **Radio:** the whole desktop radio, scaled with `scale = min(1, (innerHeight − 30) / 918, (innerWidth / 2 − 48) / 452)`, in a column as wide as the scaled radio plus 24px each side, centred in the height from the antenna tip to the bottom of the case (padding `176px × scale + 15px` above, 15px below). It takes up only its scaled height (also on the desktop), so a short screen never cuts its bottom off.
-- **Program:** the rest of the width, side padding 16px; rows `clamp(144px, 100dvh − 456px, 300px) | 1fr | auto`: from 756px tall the desktop's 300px stage, on shorter screens the stage gives way first so the panel keeps about 336px. Stage head 12px, 0.2em; under 696px tall (a stage under 240px) it is hidden, as on phones. Panel `rgba(18,17,16,.94)` without backdrop blur, padding 24/22.
+- **Program:** the rest of the width, side padding 16px; rows `clamp(144px, 100dvh − 456px, 300px) | 1fr | auto`: from 756px tall the desktop's 300px stage, on shorter screens the stage gives way first so the panel keeps about 336px. Stage head 12px, 0.2em; under 696px tall (a stage under 240px) it is hidden, as on phones. Panel `--panel-bg` at 94% without backdrop blur, padding 24/22.
 - **Footer:** the hint, then the player across the full width at the phone's compact size (64px; play button 44px, marquee 15px, time 12px).
 - **Targets on touch tablets** (`any-pointer: coarse`): the seek buttons, the volume knob and the preset keys keep their drawn size but get invisible tap areas of `44px / scale` (seek buttons reach outwards; seek and volume meet halfway across their 12px gap; preset keys reach up into the handle). Dial rows stay as drawn (29px at 768px wide); a tap on the track picks the nearest station in its row.
 - No docked LCD and no panel hold. Touch tablets get the touch wording.
@@ -118,15 +122,16 @@ On lock: click sound, station mark turns amber, panel shows the station, stage h
 - Slide-in of panel children: 550 ms `cubic-bezier(.16,1,.3,1)`, from `translateY(14px)` with `blur(3px)` and opacity 0; 60 ms stagger.
 - Decode: `[data-decode]` text resolves left to right over 600 ms; unresolved characters are random `a–z0–9` (spaces kept).
 - Image pixel-resolve: block sizes 40 → 26 → 16 → 10 → 6 → 3px, 95 ms per step, then the real image.
-- Static overlay: 200×120 canvas, reddish noise (`r = v`, `g = 0.45v`, `b = 0.35v`, half the pixels transparent), opacity `min(0.9, (1 − strength) × 0.95)`, zero when locked.
+- Static overlay: 200×120 canvas, noise in the LED colour paled (`channel = v × (0.7 × colour + 0.3)`; the radio's red gives `r = v`, `g ≈ 0.46v`, `b ≈ 0.38v`), half the pixels transparent, opacity `min(0.9, (1 − strength) × 0.95)`, zero when locked.
 - Reduced motion: none of the above; content appears at once.
 
 ## LED wall
 
-- Dot pitch 8px, lit dot 5×5px inset 1.5px; off dots `#1d1310` pre-rendered once per resize.
+- Dot pitch 8px, lit dot 5×5px inset 1.5px; off dots in `--dot`, a CSS mask over the wall (so they take a song's colour).
 - Stage = the wall above the panel less 8px (`STG` rows: 36 at a 300px stage, 22 at 190px); the panel sits below it, and the lower wall still shows faint motion.
-- Two intensity buffers (red, amber); writes keep the maximum; per-frame decay 0.74 (0.35 for the ME name scroll so letters stay crisp; 0 with reduced motion). Amber draws over red. About 30 fps.
-- **ME:** each station's `wall` words (ABOUT "HELLO, I'M AHMED", PHOTOS "SNAPSHOTS", STORY "MY STORY"; default the site name) plus "  ·  ", in capitals, rendered to a bitmap at stage height less 8 rows (Barlow 800), scrolling 14 cells/s.
+- Two intensity buffers (LED colour, amber); writes keep the maximum; per-frame decay 0.74 (0 with reduced motion; the ME words are redrawn whole every frame, so they leave no trail). Amber draws over the LED colour. About 30 fps.
+- Rows: the stage head (when shown) covers the top rows; the music's bars take the last 2 (stage under 18 rows), 3, or 4 (30 rows and more).
+- **ME:** each station's `wall` words (ABOUT "HELLO, I'M AHMED", PHOTOS "SNAPSHOTS", STORY "MY STORY"; default the site name) plus "  ·  ", in capitals, in the 5×7 dot-matrix font (`src/scripts/ledfont.ts`, proportional, 1 column between letters, 3 for a space) at 1×, 2× or 3× (as many sevens as fit between the stage head and the bars, at most 3; 2× and 3× smoothed with Scale2x/Scale3x), centred there, scrolling 15 cells/s (one cell every second frame).
 - **WORK:** bar columns every 2 cells, heights `3 + (sin(k·1.7)·.5+.5)(sin(k·.27)·.5+.5)(STG−5)`, scrolling 6 cells/s, top cell full intensity, body 55%; an amber scan cursor sweeps right to left at 40 cells/s.
 - **SECURITY:** an amber firewall line at 26% of the width (every other row); packet lanes every 3 rows, 3 packets per lane, speeds `22 + (lane mod 5) × 7` cells/s, moving right to left. Normal packets (red) pass through; every sixth is malicious (amber) and bursts into a ring at the firewall.
 - **POETRY:** layered sine waves: main red `sin(x·.07 + t)·sin(x·.019 − .32t)` at ±38% of the stage, amber `sin(x·.041 − .6t)` at ±20% (40% intensity), two faint red waves lower on the wall (22% and 16%).
@@ -134,12 +139,12 @@ On lock: click sound, station mark turns amber, panel shows the station, stage h
 - **Billboard:** stations with an image (PHOTOS, ELANCER) show the image as an LED halftone (luminance^1.4, threshold 0.12), revealed top-down at 34 rows/s with an amber scanline, instead of the band animation.
 - **Noise between stations:** `180 × (1 − weight)` random red dots, plus flickering vertical columns where neighbouring stations sit (mapped ±2 MHz across the width).
 - **Ripples:** pointer move (at most every 140 ms) strength 0.45, radius 9 cells; pointer down on empty space strength 1, radius 40; growth 0.045 cells/ms.
-- **Spectrum:** while music plays, 48 analyser bins → amber bars up to 6 cells tall at the stage bottom (35%).
+- **Spectrum:** while music plays, 48 analyser bins → thin amber bars (one LED wide, one apart) in the stage's last 2 to 4 rows (40%); a bar is `floor(bin / 255 × (rows + 0.5))` tall, so quiet bins light nothing.
 - Animation weight: 1 when locked, otherwise `strength × 0.6`.
 
 ## Sound
 
-Created only after the first click on play or DIAL FX.
+Created only after the visitor's first click or tap (anywhere: it starts the music; on DIAL FX: the effects only). Never from a key press alone.
 
 ```
 <audio> → MediaElementSource → highpass → lowpass → music gain → analyser (fft 256) → volume → output
@@ -153,9 +158,15 @@ Per frame (`fx` = DIAL FX on, `moving = min(1, speed × 40)`):
 - Whistle: frequency `220 + distance × 5200` Hz; gain `fx × (1 − distance / 0.4) × 0.018` when 0.02 < distance < 0.4, else 0.
 - Clarity `c = fx ? (locked ? 1 : strength × 0.8) : 1`: highpass `20 + (1 − c) × 650` Hz, lowpass `1500 + c² × 17000` Hz, music gain `0.3 + 0.7c`. All parameter changes use `setTargetAtTime` (0.03–0.08 s) to avoid clicks.
 - Lock click: 1300 Hz square, gain 0.04 → exponential ramp to silence in 35 ms (only when DIAL FX is on).
-- First play sets the source and turns DIAL FX on. Default volume 0.8.
+- The first song to play turns DIAL FX on (unless the visitor set it). Default volume 0.8.
 
-Player: play/pause button 56px; marquee of the track title in 12 DSEG14 cells, advancing every 240 ms while playing; elapsed time `mm:ss` in DSEG7; "WHAT I LISTEN TO" caption; DIAL FX toggle with a lamp (`aria-pressed`). The track title is also available as visually hidden text.
+Player: play/pause button 56px; marquee of "ARTIST - TITLE" in 12 DSEG14 cells (B drawn with the 8), advancing every 240 ms while playing; elapsed time `mm:ss` in DSEG7; "WHAT I LISTEN TO" caption; with more than one song, previous, next and a list button (44px targets, 18px icons; on phones only the list button); DIAL FX toggle with a lamp (`aria-pressed`). The song is also available as visually hidden text.
+
+Song list: a popover above the player, aligned to its end edge (a sheet 8px from both sides above the phone's bar), at most 360px wide and 60% of the height; "PLAYLIST" caption; one 54px row per song: a 10px colour dot (a 3px ring at 35% around the playing one), the title (17px, 600; the playing one in `--lit`), the artist (12px caps). A tap plays the song and closes the list; Escape or a press outside closes it.
+
+## Power on (2026-11-27)
+
+With the script and motion allowed, a page opens with the radio off: the LCD's lit cells, FM label, lamps and meter hidden (ghost cells only), the dial window at 30% brightness, the wall's canvas and the panel's static hidden (CSS under `@media (scripting: enabled)`, with a 3 s failsafe). After 0.45 s it switches on (the dial window fades up in 0.35 s, the wall in 0.3 s) half a megahertz below the page's station (less if a station sits closer below) and tunes in with the normal easing, static and lock. The panel keeps its words throughout; the URL does not change. A visitor who takes the dial meanwhile ends it. Reduced motion: no power-on.
 
 ## Accessibility rules for this world
 

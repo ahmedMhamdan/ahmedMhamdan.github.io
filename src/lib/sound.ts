@@ -1,6 +1,7 @@
 // Pure sound and player math shared by the client audio (src/scripts/audio.ts, player.ts), the player
 // markup and the tests (sound.test.ts). Numbers: docs/design/direction.md, "Sound". No DOM, no Astro imports.
 import { TUNING } from './dial.ts';
+import { seg14 } from './tuning.ts';
 
 export const SOUND = {
   volume: 0.8, // default volume
@@ -12,6 +13,15 @@ export const SOUND = {
   marqueeCells: 12,
   marqueeMs: 240, // the marquee advances one cell this often while playing
 } as const;
+
+/** The radio's own colours (global.css --lit and --ground), shown while no song has played. */
+export const RADIO_COLOR = { lit: '#ff3b1f', ground: '#121110' } as const;
+
+/** Hex colour (#rrggbb) to 0..255 channels. */
+export function rgbOf(hex: string): [number, number, number] {
+  const n = parseInt(hex.replace('#', ''), 16) || 0;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
 
 export interface SoundInput {
   /** Signal strength 0..1 and MHz to the nearest station (the tuner's). */
@@ -68,9 +78,10 @@ export const VOLUME_SWEEP = 1.5 * Math.PI;
 /**
  * The marquee: 12 fourteen-segment cells of the track title, `step` cells along. Letters, digits, space,
  * "." and "-" only; a "." lights the decimal point of the cell before it, so it takes no cell of its own.
+ * B is drawn with the 8 (seg14).
  */
 export function marqueeCells(title: string, step: number): string {
-  const text = `   ${title.toUpperCase().replace(/[^A-Z0-9 .-]/g, '')}   `;
+  const text = seg14(`   ${title.toUpperCase().replace(/[^A-Z0-9 .-]/g, '')}   `);
   const cells = (text.match(/[^.]\.?|\./g) ?? []).map((c) => (c === '.' ? '!.' : c.replace(' ', '!')));
   const n = cells.length;
   if (!n) return '!'.repeat(SOUND.marqueeCells);

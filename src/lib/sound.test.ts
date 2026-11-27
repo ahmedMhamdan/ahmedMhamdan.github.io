@@ -73,8 +73,8 @@ describe('marqueeCells', () => {
     assert.equal(marqueeCells(title, 20).replace(/\./g, '').length, 12);
   });
   it('wraps around, also for short titles', () => {
-    assert.equal(marqueeCells('ab', 0), '!!!AB!!!!!!A');
-    assert.equal(marqueeCells('ab', 3), 'AB!!!!!!AB!!');
+    assert.equal(marqueeCells('ab', 0), '!!!A8!!!!!!A');
+    assert.equal(marqueeCells('ab', 3), 'A8!!!!!!A8!!');
     assert.equal(marqueeCells('ab', 8), marqueeCells('ab', 0));
     assert.equal(marqueeCells('', 3), '!!!!!!!!!!!!');
   });

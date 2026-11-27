@@ -33,23 +33,22 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 
 ## Music
 
-- **Decided 2026-11-27:** the player becomes a playlist ("What I listen to" with a list of songs), and the site takes a colour per song while it plays (`docs/DECISIONS.md`, 2026-11-27). Ahmed chose to publish the **full songs** and accepts the takedown risk below. Not built yet; each song is committed and pushed on its own (a slow upload line), allowed by name in `.gitignore`.
+- **Built 2026-11-27:** the "What I listen to" playlist, in this order, then "you got a lot to finish. let's lock in." last, in the radio's red (`docs/DECISIONS.md`, 2026-11-27). The site takes each song's colour when it is chosen; a pause keeps it. The music starts on the visitor's first click or tap. Ahmed chose to publish the **full songs** and accepts the takedown risk below. Each song is committed and pushed on its own (a slow upload line), allowed by name in `.gitignore`.
 
-| # | Song (credit line) | File in Ahmed's music folder | Size | Colour: LED / ground |
-| --- | --- | --- | --- | --- |
-| 1 | Skychaser – 104.6 Sky FM (slowed and reverb) | `Skychaser - 104.6 Sky Fm (Slowed and Reverb).mp3` | 4.1 MB | dark blue `#3d7bff` / `#060d18` |
-| 2 | Medasin – Magic (slowed and reverb) | `Medasin - Magic [slowed reverb].mp3` (the title uses stylised Unicode letters) | 10.3 MB | violet `#b48cff` / `#110d19` |
-| 3 | blut own – drifting | `blut own - drifting.mp3` | 4.8 MB | aqua `#3fe0c8` / `#081514` |
-| 4 | Sleep Party People – I'm Not Human At All | `Sleep Party People - I'm Not Human At All.mp3` | 10.6 MB | moon white `#e4e0ff` / `#0f0f14` |
-| 5 | cult member – u weren't here i really miss you (slowed x reverb) | `cult member - u weren't here i really miss you (slowed x reverb).mp3` | 8.5 MB | rose `#ff6f9f` / `#170b11` |
-| 6 | SILO – MEANINGFUL LOVE (TikTok version) | `SILO - MEANINGFUL LOVE [TIKTOK VERSION].mp3` | 4.5 MB | lime `#a8f060` / `#0d130a` |
-| 7 | Luvcat – He's My Man | `Luvcat - He's My Man {lyric video}.mp3` | 5.6 MB | wine red `#ff3b5c` / `#16090c` |
+| # | Song (title, artist) | File in Ahmed's music folder | Published as (`public/audio/`) | Size | Colour: LED / ground |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 104.6 Sky FM (slowed and reverb), Skychaser | `Skychaser - 104.6 Sky Fm (Slowed and Reverb).mp3` | `skychaser-sky-fm.mp3` | 4.1 MB | dark blue `#3d7bff` / `#060d18` |
+| 2 | Magic (slowed and reverb), Medasin | `Medasin - Magic [slowed reverb].mp3` (the title uses stylised Unicode letters) | `medasin-magic.mp3` | 10.3 MB | violet `#b48cff` / `#110d19` |
+| 3 | drifting, blut own | `blut own - drifting.mp3` | `blut-own-drifting.mp3` | 4.8 MB | aqua `#3fe0c8` / `#081514` |
+| 4 | I'm Not Human At All, Sleep Party People | `Sleep Party People - I'm Not Human At All.mp3` | `sleep-party-people-not-human.mp3` | 10.6 MB | moon white `#e4e0ff` / `#0f0f14` |
+| 5 | u weren't here i really miss you (slowed x reverb), cult member | `cult member - u weren't here i really miss you (slowed x reverb).mp3` | `cult-member-u-werent-here.mp3` | 8.5 MB | rose `#ff6f9f` / `#170b11` |
+| 6 | MEANINGFUL LOVE (TikTok version), SILO | `SILO - MEANINGFUL LOVE [TIKTOK VERSION].mp3` | `silo-meaningful-love.mp3` | 4.5 MB | lime `#a8f060` / `#0d130a` |
+| 7 | He's My Man, Luvcat | `Luvcat - He's My Man {lyric video}.mp3` | `luvcat-hes-my-man.mp3` | 5.6 MB | wine red `#ff3b5c` / `#16090c` |
 
-  About 48 MB in all. Every LED colour passes 4.5:1 as text on its panel and as the background of the dark button text (dark blue is the darkest blue that does: 5.0:1). Published files get plain ASCII names under `public/audio/`.
-- **Still to ask Ahmed:** whether the colour fades back to red on pause (proposed) or stays; whether "you got a lot to finish. let's lock in." stays in the list; the list's design (proposed: previous, next and a list button; the list opens above the player with a colour dot per song; a tap plays a song; at the end of a song the next one starts).
-- **Current track** (live since 2026-11-21): "you got a lot to finish. let's lock in." (jazz piano), the first song of a 66-minute mix downloaded from YouTube (source and licence unknown), published as `public/audio/lock-in.mp3`: 0:00 to 3:24, 192 kbps MP3 cut on frame boundaries without re-encoding, 4.9 MB, loaded only when a visitor presses play. No credit line while the source is unknown.
+  About 48 MB in all. The published copies are the same MP3 frames with the tags removed (no re-encoding; only the encoder's name in the first frame remains). Every LED colour passes 4.5:1 as text on its panel and on the song list, and as the background of the dark button text (dark blue is the darkest blue that does: 5.0:1 on the panel, 4.7:1 on the list).
+- **The original track** (live since 2026-11-21, now last in the list): "you got a lot to finish. let's lock in." (jazz piano), the first song of a 66-minute mix downloaded from YouTube (source and licence unknown), published as `public/audio/lock-in.mp3`: 0:00 to 3:24, 192 kbps MP3 cut on frame boundaries without re-encoding, 4.9 MB, loaded only when it plays. No credit line while the source is unknown.
 - **Risk Ahmed accepted:** these are other artists' songs. If a rights holder files a takedown, GitHub can disable the repository and the site. Then remove the song from `tracks.ts` and the repository and redeploy. Git keeps every committed file in its history, so removed songs still count towards the repository's size.
-- Development may still use local files from `public/audio/`, listed in the git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, src: '/audio/<file>.mp3' }]`), which replaces the published list in local builds.
+- Development may still use local files from `public/audio/`, listed in the git-ignored `src/data/tracks.local.ts` (`export const tracks = [{ title, artist, src: '/audio/<file>.mp3', color }]`), which replaces the published list in local builds.
 
 ## Images
 

@@ -88,7 +88,10 @@ export function keyReadout(key: string, strength: number, locked: boolean, rnd: 
 
 /** Segment readouts: "!" is a blank cell as wide as a lit one. */
 export const freqCells = (f: number) => f.toFixed(1).padStart(5, '!');
-export const keyCells = (text: string) => text.padEnd(9, ' ').replace(/ /g, '!');
+export const keyCells = (text: string) => seg14(text.padEnd(9, ' ').replace(/ /g, '!'));
+
+/** DSEG14 draws B like a 3 with a bar through it (ABOUT reads "A3OUT"); its 8 reads as a B in a word. */
+export const seg14 = (cells: string) => cells.replace(/B/g, '8');
 
 /** Knob rotation in degrees: one full turn per 2 MHz. */
 export const knobAngle = (f: number) => ((f - LO) / TUNING.mhzPerTurn) * 360;

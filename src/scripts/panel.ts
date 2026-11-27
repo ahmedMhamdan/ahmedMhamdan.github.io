@@ -4,6 +4,7 @@
 // static over the panel, then the idle panel. When the dial settles: URL, title and announcement.
 // Reduced motion: the panel swaps at once, with no slide, decode, pixel resolve or moving static.
 import type { StationInfo } from '../lib/dial';
+import { rgbOf } from '../lib/sound';
 import { normalizePath } from '../lib/tuning';
 import { ui } from '../lib/ui';
 import { need, type RadioState } from './state';
@@ -90,9 +91,17 @@ export function createPanel(program: HTMLElement, s: RadioState) {
   const out = noise && new Uint32Array(noise.data.buffer);
   let pool: Uint32Array | undefined;
   let renew = 0;
+  let tint = '';
+  let speck = speckOf(s.lit);
 
   function drawStatic() {
     if (!ctx || !noise || !out) return;
+    if (tint !== s.lit) {
+      // A new song's colour: the specks take it from the next pool on.
+      tint = s.lit;
+      speck = speckOf(tint);
+      pool = undefined;
+    }
     if (!pool) {
       pool = new Uint32Array(pixels * 2);
       for (let i = 0; i < pool.length; i++) pool[i] = speck();
@@ -110,7 +119,7 @@ export function createPanel(program: HTMLElement, s: RadioState) {
     const animate = !s.reduceMotion;
     if (s.locked) {
       if (shown !== s.locked.id) show(s.locked.id, now, animate);
-    } else if (s.strength < 0.15 && shown !== IDLE) show(IDLE, now, false);
+    } else if (s.strength < 0.15 && shown !== IDLE && !s.booting) show(IDLE, now, false);
     if (decodes.length) decode(now);
 
     // Static: reddish noise, stronger the weaker the signal; still with reduced motion.
@@ -131,11 +140,15 @@ export function createPanel(program: HTMLElement, s: RadioState) {
   };
 }
 
-/** One static pixel as packed RGBA (little-endian, as in every browser): reddish, opaque half the time. */
-function speck(): number {
-  if (Math.random() < 0.5) return 0;
-  const v = Math.random() * 255;
-  return (255 << 24) | ((v * 0.35) << 16) | ((v * 0.45) << 8) | v;
+/** Static pixels in the LED colour, paled a little (the radio's red gives the original reddish specks), as
+ * packed RGBA (little-endian, as in every browser); opaque half the time. */
+function speckOf(hex: string): () => number {
+  const [r, g, b] = rgbOf(hex).map((c) => 0.7 * (c / 255) + 0.3);
+  return () => {
+    if (Math.random() < 0.5) return 0;
+    const v = Math.random() * 255;
+    return ((255 << 24) | ((v * b) << 16) | ((v * g) << 8) | (v * r)) >>> 0;
+  };
 }
 
 /** Pixel resolve: the new image appears in big blocks that sharpen to the real picture. */

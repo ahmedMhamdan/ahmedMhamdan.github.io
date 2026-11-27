@@ -8,7 +8,9 @@
 // putImageData of a few thousand pixels whatever is lit, and none at all when nothing changed.
 // About 30 fps; stops while the wall is off screen or the tab is hidden (QR-04).
 // Reduced motion: one still frame per station, no ripples (QR-03).
+import { rgbOf } from '../lib/sound';
 import { ui } from '../lib/ui';
+import { dotText, type DotText } from './ledfont';
 import { need, type RadioState } from './state';
 
 const P = 8; // dot pitch, CSS px (the dot shape itself is the CSS mask in Program.astro)
@@ -16,19 +18,18 @@ const STAGE_GAP = 8; // the stage stops this far above the panel (300 px row →
 const FRAME_MS = 1000 / 30;
 const MIN_GAP_MS = FRAME_MS - 4; // a little slack for rAF jitter: every 2nd frame at 60 Hz, every 4th at 120 Hz
 const DECAY = 0.74; // per 30 fps frame
-const DECAY_NAME = 0.35; // the ME name scroll keeps its letters crisp
 const OFF = 0.05; // dimmer than this, a dot is unlit
-const FAMILY = '"Barlow Semi Condensed", system-ui, sans-serif';
+const NAME_SPEED = 15; // cells per second: one cell every second frame
 const STILL_T = [0, 3, 3, 3, 3]; // reduced motion: animation time of the still frame per band (ME starts at the name)
 const MAX_RIPPLES = 12;
 const RIPPLE_GROWTH = 0.045; // cells per ms
 const SPECTRUM_BINS = 48; // the lowest analyser bins (up to about 8 kHz), spread across the width
-const SPECTRUM_ROWS = 6;
-const SPECTRUM_V = 0.35;
+const SPECTRUM_V = 0.4;
 
-// Packed RGB as ImageData stores it (little-endian ABGR, as in every browser): --lit and --amber.
-const RED = 0x1f3bff;
+// Packed RGB as ImageData stores it (little-endian ABGR, as in every browser): --amber. The LED colour
+// (--lit) comes from the state: the playing song's, gliding over GLIDE_MS like the CSS colours.
 const AMBER = 0x00b0ff;
+const GLIDE_MS = 1200;
 
 /** "HELLO" in Morse at 3 cells per dit, with the gaps between marks, letters and repeats. */
 const MORSE = (() => {
@@ -40,12 +41,6 @@ const MORSE = (() => {
   }
   return q.concat(Array<number>(18).fill(0));
 })();
-
-interface Mask {
-  w: number;
-  h: number;
-  m: Uint8Array;
-}
 
 interface Ripple {
   x: number;
@@ -70,17 +65,20 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   const ctx = canvas.getContext('2d');
   if (!ctx) return () => false;
 
-  // Grid, in cells: W × H, of which the top STG rows are the stage above the panel.
+  // Grid, in cells: W × H, of which the top STG rows are the stage above the panel. The stage head (when
+  // shown) covers the rows above TOP; the music's bars stand in the last SPEC rows of the stage.
   let W = 0;
   let H = 0;
   let STG = 0;
+  let TOP = 1;
+  let SPEC = 2;
   let N = 0;
   let red = new Float32Array(0);
   let amber = new Float32Array(0);
   let image: ImageData | null = null;
   let pixels = new Uint32Array(0); // the canvas's pixels: one per cell
 
-  let pending: { w: number; h: number; stage: number } | null = null;
+  let pending: { w: number; h: number; stage: number; head: number } | null = null;
   let visible = true;
   let t = 0; // animation clock, seconds
   let drawnAt = -Infinity;
@@ -92,13 +90,25 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   let rnd: () => number = Math.random;
   const ripples: Ripple[] = [];
   let lastRipple = 0;
+  let litHex = s.lit;
+  let lit = rgbOf(litHex);
+  let litFrom = lit;
+  let litTo = lit;
+  let glideAt = -1;
+  let LIT = packed(lit);
 
   // ---- size: measured when it changes, applied at the next frame (never read layout mid-frame) ----
   // Pixel ratio does not matter: the canvas has one pixel per cell and CSS scales it.
   // The stage is the wall above the panel: below the stage head on a desktop, the strip above the
   // panel's top edge on a phone (where there is no stage head).
   const measure = () => {
-    pending = { w: box.clientWidth, h: box.clientHeight, stage: panel.offsetTop };
+    // The stage head's words, when shown: the wall's own words start below them.
+    const words = stagehead.firstElementChild;
+    const head =
+      words && getComputedStyle(stagehead).visibility === 'visible' && stagehead.offsetHeight
+        ? words.getBoundingClientRect().bottom - box.getBoundingClientRect().top
+        : 0;
+    pending = { w: box.clientWidth, h: box.clientHeight, stage: panel.offsetTop, head };
     wake();
   };
   const resize = new ResizeObserver(measure);
@@ -109,10 +119,12 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (visible) wake();
   }).observe(box);
 
-  function applySize({ w, h, stage }: NonNullable<typeof pending>) {
+  function applySize({ w, h, stage, head }: NonNullable<typeof pending>) {
     const nw = Math.floor(w / P);
     const nh = Math.floor(h / P);
     STG = Math.max(4, Math.min(nh, Math.floor((stage - STAGE_GAP) / P)));
+    TOP = head > 0 ? Math.ceil(head / P) + 1 : 1;
+    SPEC = STG >= 30 ? 4 : STG >= 18 ? 3 : 2;
     dirty = true;
     if (nw === W && nh === H) return;
     W = nw;
@@ -136,22 +148,17 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (v > B[i]) B[i] = v;
   }
 
-  // ---- ME: the station's words (or the name), as a bitmap one LED per pixel, at stage height ----
-  let fontReady = !document.fonts;
-  let name: (Mask & { stage: number; text: string }) | null = null;
-  document.fonts
-    ?.load(`800 32px ${FAMILY}`)
-    .catch(() => undefined)
-    .then(() => {
-      fontReady = true;
-      dirty = true;
-      wake();
-    });
-
+  // ---- ME: the station's words (or the name) in the 5×7 LED font, as big as the stage allows ----
+  // Each font dot is k × k LEDs (k = 1 to 3), centred between the stage head and the music's bars.
+  let name: (DotText & { key: string; y0: number }) | null = null;
   function nameMask() {
-    if (!fontReady) return null;
-    const text = `${(s.near.wall ?? ui.siteName).toUpperCase()}  ·  `;
-    if (!name || name.stage !== STG || name.text !== text) name = { ...textMask(text, Math.max(10, STG - 8)), stage: STG, text };
+    const text = `${s.near.wall ?? ui.siteName}  ·  `;
+    const key = `${text}|${STG}|${TOP}|${SPEC}`;
+    if (name?.key !== key) {
+      const room = STG - SPEC - 1 - TOP;
+      const k = Math.max(1, Math.min(3, Math.floor(room / 7)));
+      name = { ...dotText(text, k), key, y0: Math.max(0, TOP + Math.floor((room - 7 * k) / 2)) };
+    }
     return name;
   }
 
@@ -161,15 +168,13 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   let rtl = false;
   const side = (x: number) => (rtl ? W - 1 - x : x);
   const bands: ((t: number, w: number) => void)[] = [
-    // ME: the station's words scroll 14 cells/s.
+    // ME: the station's words scroll 15 cells/s.
     (t, w) => {
       const b = nameMask();
-      if (!b) return;
-      const off = Math.floor(t * 14);
-      const y0 = Math.max(0, Math.floor((STG - b.h) / 2) + 1);
+      const off = Math.floor(t * NAME_SPEED);
       for (let x = 0; x < W; x++) {
         const cx = (x + off) % b.w;
-        for (let y = 0; y < b.h; y++) if (b.m[y * b.w + cx]) put(red, x, y0 + y, w);
+        for (let y = 0; y < b.h; y++) if (b.m[y * b.w + cx]) put(red, x, b.y0 + y, w);
       }
     },
     // WORK: bar columns every 2 cells scroll 6 cells/s; an amber cursor sweeps right to left at 40 cells/s.
@@ -328,12 +333,13 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (!(e.target as Element | null)?.closest?.('a, button, input, [tabindex], .panel')) fromPointer(e, 1, 40);
   });
 
-  // ---- the music: amber bars up to 6 cells tall standing on the stage's last row ----
+  // ---- the music: thin amber bars (one LED wide, one apart) in the stage's last SPEC rows ----
+  // Quiet bins light nothing, so there is no solid floor line; the bars stay lighter than the words.
   function spectrum() {
     const bins = s.audio.bins;
     if (bins.length < SPECTRUM_BINS) return;
-    for (let x = 0; x < W; x++) {
-      const h = Math.round((bins[Math.floor((x / W) * SPECTRUM_BINS)] / 255) * SPECTRUM_ROWS);
+    for (let x = 0; x < W; x += 2) {
+      const h = Math.min(SPEC, Math.floor((bins[Math.floor((x / W) * SPECTRUM_BINS)] / 255) * (SPEC + 0.5)));
       for (let y = 0; y < h; y++) put(amber, x, STG - 1 - y, SPECTRUM_V);
     }
   }
@@ -360,7 +366,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     for (let i = 0; i < N; i++) {
       const a = amber[i];
       const r = red[i];
-      const px = a > OFF ? (alpha(a) | AMBER) >>> 0 : r > OFF ? (alpha(r) | RED) >>> 0 : 0;
+      const px = a > OFF ? (alpha(a) | AMBER) >>> 0 : r > OFF ? (alpha(r) | LIT) >>> 0 : 0;
       if (px !== pixels[i]) {
         pixels[i] = px;
         changed = true;
@@ -381,6 +387,24 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
       ripples.length = 0;
       dirty = true;
     }
+    // A new song's colour: glide to it (at once with reduced motion).
+    if (s.lit !== litHex) {
+      litHex = s.lit;
+      litFrom = lit;
+      litTo = rgbOf(litHex);
+      glideAt = now;
+    }
+    let gliding = false;
+    if (glideAt >= 0) {
+      const k = s.reduceMotion ? 1 : Math.min(1, (now - glideAt) / GLIDE_MS);
+      const e = 1 - (1 - k) * (1 - k);
+      lit = litFrom.map((c, i) => Math.round(c + (litTo[i] - c) * e)) as typeof lit;
+      LIT = packed(lit);
+      dirty = true;
+      gliding = k < 1;
+      if (!gliding) glideAt = -1;
+    }
+
     if (s.locked !== locked) {
       locked = s.locked;
       revealAt = -1;
@@ -401,7 +425,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
       compose(STILL_T[s.near.row], now, true);
       rnd = Math.random;
       paint();
-      return false;
+      return gliding;
     }
     stillKey = '';
 
@@ -411,9 +435,12 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     drawnAt = now;
     t += step / 1000;
 
-    const d = Math.pow(s.near.row === 0 && !s.near.billboard ? DECAY_NAME : DECAY, step / FRAME_MS);
+    // Everything fades out over a few frames, except the ME words: they are redrawn whole every frame, so
+    // a letter that moves on leaves no trail of dim dots (the stage's rows above the music's bars).
+    const d = Math.pow(DECAY, step / FRAME_MS);
+    const crisp = s.near.row === 0 && !s.near.billboard ? (STG - SPEC) * W : 0;
     for (let i = 0; i < N; i++) {
-      const r = red[i] * d;
+      const r = i < crisp ? 0 : red[i] * d;
       const a = amber[i] * d;
       red[i] = r < 0.01 ? 0 : r;
       amber[i] = a < 0.01 ? 0 : a;
@@ -424,32 +451,11 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   };
 }
 
+/** RGB as a packed pixel without its alpha (little-endian ABGR). */
+const packed = ([r, g, b]: number[]) => (b << 16) | (g << 8) | r;
+
 /** Brightness as the alpha byte of a packed pixel. */
 const alpha = (v: number) => (v >= 1 ? 255 : (v * 255 + 0.5) | 0) << 24;
-
-/** Text as a 1-bit mask, one LED per pixel. */
-function textMask(text: string, px: number): Mask {
-  const c = document.createElement('canvas');
-  const x = c.getContext('2d', { willReadFrequently: true });
-  if (!x) return { w: 1, h: 1, m: new Uint8Array(1) };
-  const style = () => {
-    x.font = `800 ${px}px ${FAMILY}`;
-    x.letterSpacing = `${Math.round(px * 0.08)}px`;
-    x.textBaseline = 'top';
-  };
-  style();
-  const w = Math.ceil(x.measureText(text).width) + 4;
-  const h = Math.ceil(px * 1.05);
-  c.width = w;
-  c.height = h;
-  style(); // resizing a canvas resets its state
-  x.fillStyle = '#fff';
-  x.fillText(text, 0, Math.round(px * 0.02));
-  const d = x.getImageData(0, 0, w, h).data;
-  const m = new Uint8Array(w * h);
-  for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 130 ? 1 : 0;
-  return { w, h, m };
-}
 
 /** An image as LED brightness (luminance^1.4) at W × S cells, cropped to cover, a little above centre. */
 function halftone(img: HTMLImageElement, W: number, S: number): Float32Array {

@@ -85,7 +85,7 @@
   background: var(--lit);
   color: #140806;
   box-shadow:
-    0 3px 0 #7a1a0c,
+    0 3px 0 var(--lit-edge),
     0 5px 10px rgba(0, 0, 0, 0.5);
 }
 .view .act:active:not([disabled]) {

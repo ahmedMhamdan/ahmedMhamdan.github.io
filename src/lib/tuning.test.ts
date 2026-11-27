@@ -144,6 +144,7 @@ describe('readouts', () => {
     assert.equal(freqCells(88.7), '!88.7');
     assert.equal(freqCells(100.66), '100.7');
     assert.equal(keyCells('POEM I'), 'POEM!I!!!');
+    assert.equal(keyCells('GITHUB'), 'GITHU8!!!'); // DSEG14's 8 reads as a B
   });
   it('turns the knob once per 2 MHz', () => {
     assert.equal(knobAngle(88), 0);

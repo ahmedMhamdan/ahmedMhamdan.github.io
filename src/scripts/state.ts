@@ -1,7 +1,7 @@
 // The one state object. The tuner writes the signal once per frame; the player and the audio write
 // `audio`; every other module only reads it.
 import type { StationInfo } from '../lib/dial';
-import { SOUND } from '../lib/sound';
+import { RADIO_COLOR, SOUND } from '../lib/sound';
 
 export interface AudioState {
   /** The Web Audio graph exists (made on the first press of play or DIAL FX, never before). */
@@ -47,6 +47,10 @@ export interface RadioState {
   current: StationInfo;
 
   reduceMotion: boolean;
+  /** The page just opened and the radio is tuning in to its station (main.ts): the panel keeps its words. */
+  booting: boolean;
+  /** The LED colour (hex): the playing song's, or the radio's red. The wall and the static draw with it. */
+  lit: string;
 
   audio: AudioState;
 }
@@ -68,6 +72,8 @@ export function createState(stations: StationInfo[], currentId: string, reduceMo
     df: 0,
     current,
     reduceMotion,
+    booting: false,
+    lit: RADIO_COLOR.lit,
     audio: { ready: false, playing: false, fx: false, volume: SOUND.volume, level: 0, bins: new Uint8Array(0) },
   };
 }

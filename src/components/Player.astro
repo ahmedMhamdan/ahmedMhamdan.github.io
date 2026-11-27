@@ -1,35 +1,84 @@
 ---
-// The "What I listen to" player from the reference mock (FR-08): play/pause, the track title as a
-// 12-cell fourteen-segment marquee, elapsed time, and the DIAL FX toggle. Rendered only when
-// src/data/tracks.ts lists a track, and hidden until src/scripts/player.ts wires it (it needs the script).
-// The audio file loads on the first press of play, never before.
+// The "What I listen to" player from the reference mock (FR-08): play/pause, the song as a 12-cell
+// fourteen-segment marquee, elapsed time, and the DIAL FX toggle. With more than one song it is a playlist:
+// previous, next, and a list of the songs that opens above the player (a popover), each with its colour.
+// Rendered only when src/data/tracks.ts lists a song, and hidden until src/scripts/player.ts wires it (it
+// needs the script). No audio loads before the visitor's first click or tap.
 import type { Track } from '../data/tracks';
-import { marqueeCells, timeCells } from '../lib/sound';
+import { RADIO_COLOR, marqueeCells, timeCells } from '../lib/sound';
 import { ui } from '../lib/ui';
 
 interface Props {
-  track: Track;
+  tracks: Track[];
 }
 
-const { track } = Astro.props;
+const { tracks } = Astro.props;
+const songs = tracks.map((t) => ({
+  ...t,
+  marquee: t.artist ? `${t.artist} - ${t.title}` : t.title,
+  name: [t.title, t.artist, t.credit].filter(Boolean).join(', '),
+  color: t.color ?? RADIO_COLOR,
+}));
+const first = songs[0];
+const many = songs.length > 1;
 ---
 
-<section class="player" aria-label={ui.listen} data-player data-title={track.title} hidden>
+<section class:list={['player', { many }]} aria-label={ui.listen} data-player hidden>
   <button class="pbtn" type="button" data-play aria-label={ui.play}>
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4v16l13-8z"></path></svg>
   </button>
   <div class="ptxt">
-    <span class="seg marq" aria-hidden="true"
-      ><span class="g">~~~~~~~~~~~~</span><span class="l" data-marquee>{marqueeCells(track.title, 0)}</span></span
+    <span class="seg s14 marq" aria-hidden="true"
+      ><span class="g">~~~~~~~~~~~~</span><span class="l" data-marquee>{marqueeCells(first.marquee, 0)}</span></span
     >
     <span class="pcap">
-      <span class="sr-only">{ui.track}: {track.title}{track.credit && `. ${track.credit}`}</span>
+      <span class="sr-only" data-now>{ui.track}: {first.name}</span>
       <span aria-hidden="true">{ui.listen}</span>
       <span class="seg ptime" aria-hidden="true"><span class="g">88:88</span><span class="l" data-time>{timeCells(0)}</span></span>
     </span>
   </div>
+  {
+    many && (
+      <div class="pnav">
+        <button class="ibtn pstep" type="button" data-prev aria-label={ui.previousSong}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 5h2.5v14H6zM19 5v14L9 12z" /></svg>
+        </button>
+        <button class="ibtn pstep" type="button" data-next aria-label={ui.nextSong}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 5H18v14h-2.5zM5 5v14l10-7z" /></svg>
+        </button>
+        <button class="ibtn" type="button" data-list-button aria-label={ui.playlist} popovertarget="playlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16v2.2H4zM4 11h16v2.2H4zM4 16h10v2.2H4z" /></svg>
+        </button>
+      </div>
+    )
+  }
   <button class="mini" type="button" data-fx aria-pressed="false"><i aria-hidden="true"></i>{ui.dialFx}</button>
-  <audio preload="none" data-src={track.src}></audio>
+  <div class="plist" id="playlist" popover data-list>
+    <p class="phead" aria-hidden="true">{ui.playlist}</p>
+    <ol aria-label={ui.playlist}>
+      {
+        songs.map((t, i) => (
+          <li>
+            <button
+              type="button"
+              data-track={i}
+              data-src={t.src}
+              data-marquee={t.marquee}
+              data-name={t.name}
+              data-lit={t.color.lit}
+              data-ground={t.color.ground}
+              aria-current={i === 0 ? 'true' : undefined}
+            >
+              <i aria-hidden="true" style={`--c:${t.color.lit}`} />
+              <span class="pt">{t.title}</span>
+              {t.artist && <span class="pa">{t.artist}</span>}
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+  <audio preload="none"></audio>
 </section>
 
 <style>
@@ -39,6 +88,7 @@ const { track } = Astro.props;
     height: 76px;
     display: grid;
     grid-template-columns: auto auto auto;
+    grid-auto-flow: column;
     align-items: center;
     gap: 16px;
     padding-inline: 10px 16px;
@@ -112,10 +162,111 @@ const { track } = Astro.props;
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #4a302a;
+    background: var(--lamp-off);
   }
   .mini[aria-pressed='true'] i {
     background: var(--lit);
+  }
+
+  /* Previous, next and the list: 44px targets with an 18px icon. */
+  .pnav {
+    display: flex;
+    margin-inline: -10px;
+  }
+  .ibtn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+  }
+  .ibtn svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--label);
+  }
+  .ibtn:hover svg {
+    fill: var(--text);
+  }
+  .ibtn:active svg {
+    transform: translateY(1px);
+  }
+
+  /* The list: a popover above the player (src/scripts/player.ts places it), a sheet above the phone's bar. */
+  .plist {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    width: min(360px, calc(100vw - 16px));
+    max-height: min(60dvh, 440px);
+    overflow: auto;
+    padding: 6px;
+    border: 0;
+    border-radius: 10px;
+    background: #181615;
+    color: var(--text);
+    box-shadow:
+      inset 0 0 0 1px var(--rule),
+      0 18px 40px rgba(0, 0, 0, 0.55);
+    scrollbar-width: thin;
+    scrollbar-color: #3a3330 transparent;
+  }
+  .plist::backdrop {
+    background: transparent;
+  }
+  .phead {
+    padding: 10px 12px 6px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+  .plist ol {
+    list-style: none;
+  }
+  .plist button {
+    display: grid;
+    grid-template-columns: 10px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 14px;
+    row-gap: 2px;
+    width: 100%;
+    min-height: 54px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-align: start;
+  }
+  .plist button:not([aria-current]):hover {
+    background: #221f1d;
+  }
+  .plist i {
+    grid-row: span 2;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  .pt {
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  .pa {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--quiet);
+  }
+  /* The song playing (or about to): its title in the LED colour (every song colour is at least 4.7:1 on the
+     list's background, so the row stays untinted) and a ring around its dot. */
+  .plist [aria-current='true'] .pt {
+    color: var(--lit);
+  }
+  .plist [aria-current='true'] i {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 35%, transparent);
   }
 
   /* Tablet and phone: the compact player of the phone mock (docs/design/reference/phone-mock.html). On a
@@ -124,7 +275,7 @@ const { track } = Astro.props;
     .player {
       width: 100%;
       height: 64px;
-      grid-template-columns: 44px minmax(0, 1fr) auto;
+      grid-template-columns: 44px minmax(0, 1fr);
       gap: 12px;
       padding-inline: 10px 8px;
     }
@@ -156,8 +307,15 @@ const { track } = Astro.props;
       letter-spacing: 0.18em;
     }
   }
-  /* Phone: a slim bar fixed to the bottom of the screen, under the thumb, clear of the home indicator. */
+  /* Phone: a slim bar fixed to the bottom of the screen, under the thumb, clear of the home indicator. The
+     list button stays; previous and next are in the list (a tap on a song plays it). */
   @media (max-width: 699px), (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+    .pstep {
+      display: none;
+    }
+    .pnav {
+      margin-inline: -4px;
+    }
     .player {
       position: fixed;
       z-index: 20;
