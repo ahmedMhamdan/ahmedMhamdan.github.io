@@ -23,13 +23,15 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# audio and private assets: never commit until rights and the final excerpt are confirmed
+# audio and private assets: never commit; only the files Ahmed approved are allowed by name below
 public/audio/*
 *.mp3
 *.wav
 *.flac
 # the one published excerpt (Ahmed approved it on 2026-11-21; docs/CONTENT.md, Music)
 !public/audio/lock-in.mp3
+# the playlist's full songs (Ahmed chose them on 2026-11-27, accepting the takedown risk; docs/CONTENT.md, Music)
+!public/audio/skychaser-sky-fm.mp3
 private/
 # local development track list (points at public/audio/)
 src/data/tracks.local.ts
