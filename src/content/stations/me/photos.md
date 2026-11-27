@@ -5,6 +5,7 @@ freq: 90.1
 title: Photos
 layout: gallery
 kicker: ME · PHOTOS
+wall: SNAPSHOTS
 gallery:
   - { caption: '[ where it was taken ]' }
   - { caption: '[ where it was taken ]' }

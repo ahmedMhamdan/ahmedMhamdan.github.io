@@ -81,5 +81,6 @@ export async function stationInfo(s: Station): Promise<StationInfo> {
     title: pageTitle(s),
     name: spokenName(s),
     billboard: image && (await getImage({ src: image, width: BILLBOARD_WIDTH, format: 'webp' })).src,
+    wall: s.data.wall,
   };
 }

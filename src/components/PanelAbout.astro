@@ -1,5 +1,6 @@
 ---
-// about: portrait (4:5) beside heading, lede, facts and actions.
+// about: portrait (4:5) beside heading, lede, actions, text and facts. The actions come right after the
+// lede, so they show without scrolling on a laptop however long the text grows.
 import { render } from 'astro:content';
 import type { Station } from '../lib/stations';
 import Actions from './Actions.astro';
@@ -16,10 +17,11 @@ const { Content } = await render(station);
 ---
 
 <div class="about">
-  <Pic image={data.image} alt={data.imageAlt} shape="tall" width={240} />
+  <Pic image={data.image} alt={data.imageAlt} shape="tall" width={300} />
   <div>
     <PanelHead station={station} />
     {data.lede && <p class="lede" data-decode>{data.lede}</p>}
+    <Actions actions={data.actions} />
     {station.body?.trim() && <div class="txt"><Content /></div>}
     {
       data.facts.length > 0 && (
@@ -33,6 +35,5 @@ const { Content } = await render(station);
         </dl>
       )
     }
-    <Actions actions={data.actions} />
   </div>
 </div>

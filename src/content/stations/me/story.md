@@ -5,6 +5,7 @@ freq: 91.4
 title: Where I come from, where I'm going
 layout: list
 kicker: ME · STORY
+wall: MY STORY
 placeholder: true # Ahmed writes this in his own words
 ---
 

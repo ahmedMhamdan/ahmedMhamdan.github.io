@@ -98,11 +98,15 @@
 }
 
 /* image frames */
+/* The portrait is 30% of the panel, from 240px to 300px (as tall as a 436px panel's content box). */
 .view .about {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: clamp(240px, 30cqi, 300px) 1fr;
   gap: 34px;
   align-items: start;
+}
+.view .about .acts + .txt {
+  margin-top: 22px;
 }
 .view .pic {
   position: relative;
@@ -315,37 +319,22 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
-  /* A small portrait beside the kicker and heading, so the heading stays on a phone's first screen
-     (plan Phase 5; docs/design/reference/phone-mock.html); the rest of the text runs full width. */
+  /* One column: the kicker and the heading, then the portrait full width (Ahmed, 2026-11-27), then the
+     rest. The heading comes first so it stays on a phone's first screen. */
   .view .about {
-    grid-template-columns: 96px minmax(0, 1fr);
-    grid-template-rows: 1fr auto;
-    gap: 0 16px;
+    gap: 0;
   }
-  .view .about > div {
+  .view .about > div:not(.pic) {
     display: contents;
   }
   .view .about .pic {
-    grid-row: 1 / span 2;
-  }
-  .view .about .pic.empty {
-    letter-spacing: 0.1em;
-  }
-  .view .about .k {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-  }
-  .view .about h1 {
-    grid-column: 2;
-    grid-row: 2;
-    margin-bottom: 0;
+    order: 1;
+    margin-block: 4px 20px;
+    /* Full width, but never taller than the screen minus the player bar (a phone held sideways). */
+    max-width: min(100%, calc((100dvh - 80px) * 0.8));
   }
   .view .about > div > :not(.k, h1) {
-    grid-column: 1 / -1;
-  }
-  .view .about .lede {
-    margin-top: 16px;
+    order: 2;
   }
   .view .grid4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));

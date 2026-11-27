@@ -195,6 +195,9 @@ for (let r = 12; r <= 96; r += 10) {
      tan(atan2(a, b)) turns the ratio of two lengths into a plain number, so no fit() script is needed. */
   .stand {
     --fit: min(1, tan(atan2(100dvh - 30px, 918px)));
+    /* As wide as the scaled radio plus 34px each side (520px at full size), so on a short window the
+       radio stays near the left edge and the program gets the width it frees. */
+    width: calc(452px * var(--fit) + 68px);
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);

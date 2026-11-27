@@ -26,6 +26,8 @@ const stations = defineCollection({
         title: z.string(),
         layout: z.enum(LAYOUTS),
         kicker: z.string().optional(),
+        /** ME band only: the words the LED wall scrolls while the station is tuned (default: the site name). */
+        wall: z.string().max(40).optional(),
         lede: z.string().optional(),
         // Small amber tag after the heading, for example "DRAFT LIST".
         tag: z.string().optional(),
@@ -60,6 +62,9 @@ const stations = defineCollection({
         const { lo, hi } = bandRange(s.band);
         if (s.freq <= lo || s.freq >= hi) {
           ctx.addIssue({ code: 'custom', message: `${s.freq} MHz is outside the ${s.band} band (${lo}–${hi}).` });
+        }
+        if (s.wall && s.band !== 'me') {
+          ctx.addIssue({ code: 'custom', message: 'wall is for ME stations only (the other bands have their own animations).' });
         }
         if (s.image && !s.imageAlt) {
           ctx.addIssue({ code: 'custom', message: 'imageAlt is required when image is set.' });

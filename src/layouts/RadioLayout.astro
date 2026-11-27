@@ -40,14 +40,10 @@ const data = JSON.stringify({ current: station.id, stations: infos }).replace(/<
     position: fixed;
     inset: 0;
     display: grid;
-    grid-template-columns: 520px minmax(0, 1fr);
-  }
-  /* Tablet (700–959px): the desktop layout with the radio scaled to at most half the width; its column is
-     as wide as the scaled radio (Radio.astro sets the width), and the program takes the rest. */
-  @media (max-width: 959px) {
-    .page {
-      grid-template-columns: auto minmax(0, 1fr);
-    }
+    /* The radio's column is as wide as the scaled radio plus a margin (Radio.astro sets the width:
+       520px at full size), and the program takes the rest. Tablets (700–959px) scale the radio to at
+       most half the width. */
+    grid-template-columns: auto minmax(0, 1fr);
   }
   /* Phone upright: the head unit, then the program; the page scrolls. */
   @media (max-width: 699px) {

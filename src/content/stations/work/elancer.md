@@ -10,7 +10,7 @@ imagePending: true
 facts:
   - { label: Role, value: Full-stack developer }
   - { label: Stack, value: 'Laravel, React' }
-  - { label: Status, value: In progress }
+  - { label: Status, value: Finished }
 actions:
   - { label: Case study · soon }
   - { label: Source } # link or "private" to confirm

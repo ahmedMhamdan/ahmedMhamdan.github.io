@@ -136,9 +136,9 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
     if (v > B[i]) B[i] = v;
   }
 
-  // ---- ME: the name, as a bitmap one LED per pixel, at stage height ----
+  // ---- ME: the station's words (or the name), as a bitmap one LED per pixel, at stage height ----
   let fontReady = !document.fonts;
-  let name: (Mask & { stage: number }) | null = null;
+  let name: (Mask & { stage: number; text: string }) | null = null;
   document.fonts
     ?.load(`800 32px ${FAMILY}`)
     .catch(() => undefined)
@@ -150,7 +150,8 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
 
   function nameMask() {
     if (!fontReady) return null;
-    if (!name || name.stage !== STG) name = { ...textMask(`${ui.siteName.toUpperCase()}  ·  `, Math.max(10, STG - 8)), stage: STG };
+    const text = `${(s.near.wall ?? ui.siteName).toUpperCase()}  ·  `;
+    if (!name || name.stage !== STG || name.text !== text) name = { ...textMask(text, Math.max(10, STG - 8)), stage: STG, text };
     return name;
   }
 
@@ -160,7 +161,7 @@ export function createWall(program: HTMLElement, s: RadioState, wake: () => void
   let rtl = false;
   const side = (x: number) => (rtl ? W - 1 - x : x);
   const bands: ((t: number, w: number) => void)[] = [
-    // ME: the name scrolls 14 cells/s.
+    // ME: the station's words scroll 14 cells/s.
     (t, w) => {
       const b = nameMask();
       if (!b) return;

@@ -30,6 +30,8 @@ export interface StationInfo {
   name: string;
   /** Small copy of the station's image, shown on the LED wall as a billboard while tuned (absent: band animation). */
   billboard?: string;
+  /** ME band: the words the LED wall scrolls (absent: the site name). */
+  wall?: string;
 }
 
 /** Tuner behaviour constants (reference mock; docs/design/direction.md, "Tuning model"). */
