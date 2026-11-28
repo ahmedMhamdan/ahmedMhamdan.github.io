@@ -23,6 +23,7 @@ const published: Track[] = [
   { title: "I'm Not Human At All", artist: 'Sleep Party People', src: '/audio/sleep-party-people-not-human.mp3', color: { lit: '#e4e0ff', ground: '#0f0f14' } },
   { title: "u weren't here i really miss you (slowed x reverb)", artist: 'cult member', src: '/audio/cult-member-u-werent-here.mp3', color: { lit: '#ff6f9f', ground: '#170b11' } },
   { title: 'MEANINGFUL LOVE (TikTok version)', artist: 'SILO', src: '/audio/silo-meaningful-love.mp3', color: { lit: '#a8f060', ground: '#0d130a' } },
+  { title: "He's My Man", artist: 'Luvcat', src: '/audio/luvcat-hes-my-man.mp3', color: { lit: '#ff3b5c', ground: '#16090c' } },
   // The first song of a mix, 0:00 to 3:24 (approved by Ahmed on 2026-11-21; source unknown, so no credit).
   { title: "you got a lot to finish. let's lock in.", src: '/audio/lock-in.mp3' },
 ];
