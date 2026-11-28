@@ -33,7 +33,7 @@ Station frontmatter (validated in `src/content.config.ts`): `layout` picks the p
 
 ## Music
 
-- **Built 2026-11-27:** the "What I listen to" playlist, in this order, then "you got a lot to finish. let's lock in." last, in the radio's red (`docs/DECISIONS.md`, 2026-11-27). The site takes each song's colour when it is chosen; a pause keeps it. The music starts on the visitor's first click or tap. Ahmed chose to publish the **full songs** and accepts the takedown risk below. Each song is committed and pushed on its own (a slow upload line), allowed by name in `.gitignore`: all seven pushed by 2026-11-28 (`1c9176a` to `0732cf4`), not deployed yet.
+- **Built 2026-11-27:** the "What I listen to" playlist, in this order, then "you got a lot to finish. let's lock in." last, in the radio's red (`docs/DECISIONS.md`, 2026-11-27). The site takes each song's colour when it is chosen; a pause keeps it. The music starts on the visitor's first click or tap. Ahmed chose to publish the **full songs** and accepts the takedown risk below. Each song is committed and pushed on its own (a slow upload line), allowed by name in `.gitignore`: all seven pushed by 2026-11-28 (`1c9176a` to `0732cf4`) and live since that day.
 
 | # | Song (title, artist) | File in Ahmed's music folder | Published as (`public/audio/`) | Size | Colour: LED / ground |
 | --- | --- | --- | --- | --- | --- |
