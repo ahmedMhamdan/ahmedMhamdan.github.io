@@ -36,6 +36,7 @@ public/audio/*
 !public/audio/blut-own-drifting.mp3
 !public/audio/sleep-party-people-not-human.mp3
 !public/audio/cult-member-u-werent-here.mp3
+!public/audio/silo-meaningful-love.mp3
 private/
 # local development track list (points at public/audio/)
 src/data/tracks.local.ts

@@ -22,6 +22,7 @@ const published: Track[] = [
   { title: 'drifting', artist: 'blut own', src: '/audio/blut-own-drifting.mp3', color: { lit: '#3fe0c8', ground: '#081514' } },
   { title: "I'm Not Human At All", artist: 'Sleep Party People', src: '/audio/sleep-party-people-not-human.mp3', color: { lit: '#e4e0ff', ground: '#0f0f14' } },
   { title: "u weren't here i really miss you (slowed x reverb)", artist: 'cult member', src: '/audio/cult-member-u-werent-here.mp3', color: { lit: '#ff6f9f', ground: '#170b11' } },
+  { title: 'MEANINGFUL LOVE (TikTok version)', artist: 'SILO', src: '/audio/silo-meaningful-love.mp3', color: { lit: '#a8f060', ground: '#0d130a' } },
   // The first song of a mix, 0:00 to 3:24 (approved by Ahmed on 2026-11-21; source unknown, so no credit).
   { title: "you got a lot to finish. let's lock in.", src: '/audio/lock-in.mp3' },
 ];
